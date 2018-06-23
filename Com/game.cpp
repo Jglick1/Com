@@ -41,7 +41,7 @@ void Game::gameLoop() {
     
     this->_player = Player(graphics, Vector2(3,3));
     
-    this->_level = Level("/Users/jonahglick/Documents/Com/com_test", graphics);
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test1", graphics);
     //this->_hud = HUD(graphics, this->_player);
     //this->_inventory = Inventory(graphics, this->_player);
     

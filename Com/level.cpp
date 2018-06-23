@@ -83,7 +83,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 			ss1 << tsxSource;
 			doc1.LoadFile(ss1.str().c_str());
             
-            std::cout << ss1.str() << std::endl;
+            //std::cout << ss1.str() << std::endl;
 			
 			
 			//std::cout << "	tileset stuff:" + ss1.str() << std::endl;
@@ -276,7 +276,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 						width = pObject->FloatAttribute("width");
 						height = pObject->FloatAttribute("height");
 						
-						this->_collisionRects.push_back(Rectangle(int(x) * globals::SPRITE_SCALE, int(y) * globals::SPRITE_SCALE, int(width) * globals::SPRITE_SCALE, int(height) * globals::SPRITE_SCALE));
+						this->_collisionRects.push_back(Rectangle(int(x) * globals::LEVEL_SCALE, int(y) * globals::LEVEL_SCALE, int(width) * globals::LEVEL_SCALE, int(height) * globals::LEVEL_SCALE));
 						
 						pObject = pObject->NextSiblingElement("object");
 					}
@@ -293,7 +293,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 						std::stringstream ss;
 						ss << name;
 						if (ss.str() == "player") {
-							this->_spawnPoint = Vector2(int(x) * globals::SPRITE_SCALE, int(y) * globals::SPRITE_SCALE);
+							this->_spawnPoint = Vector2(int(x) * globals::LEVEL_SCALE, int(y) * globals::LEVEL_SCALE);
 						}
 						
 						pObject = pObject->NextSiblingElement("object");
@@ -372,6 +372,8 @@ void Level::update(int elapsedTime) {
 
 
 void Level::draw(Graphics &graphics) {
+    //std::cout << this->_tileList.size() << std::endl;
+    
 	for (int i = 0; i < this->_tileList.size(); i++) {
 		this->_tileList.at(i).draw(graphics);
 	}

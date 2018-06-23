@@ -11,9 +11,11 @@
 
 namespace globals {
     
-    const int SCREEN_WIDTH = 640;
-    const int SCREEN_HEIGHT = 480;
+    const int SCREEN_WIDTH = 1280; //640;
+    const int SCREEN_HEIGHT = 800; //480;
     //const float SPRITE_SCALE = 2.0f;
+    
+    const int LEVEL_SCALE = 4;
     
     const int SPRITE_SCALE = 1;
     

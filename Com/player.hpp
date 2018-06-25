@@ -55,7 +55,7 @@ public:
 private:
     float _dx, _dy;
     int _mx, _my; //mouse x and mouse y
-    Sprite _fov;
+    //Sprite _fov;
     
     
     //Direction _facing;

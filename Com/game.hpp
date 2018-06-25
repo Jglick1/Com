@@ -12,6 +12,7 @@
 #include "player.hpp"
 #include "level.hpp"
 #include "graphics.hpp"
+#include "unit.hpp"
 //#include "hud.hpp"
 //#include "inventory.hpp"
 
@@ -38,6 +39,8 @@ private:
     
     float _deltaX;
     float _deltaY;
+    
+    Unit _unit;
     
     
 };

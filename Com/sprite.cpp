@@ -28,7 +28,8 @@ _x(posX), _y(posY)
     }
     
     this->_boundingBox = Rectangle(this->_x, this->_y, width * globals::SPRITE_SCALE, height * globals::SPRITE_SCALE);
-    
+
+
 }
 
 Sprite::~Sprite() {}
@@ -36,6 +37,7 @@ Sprite::~Sprite() {}
 void Sprite::draw(Graphics &graphics, int x, int y) {
     
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE };
+
     
     //std::cout << "x: " << x << " y: " << y << std::endl;
     
@@ -48,26 +50,8 @@ void Sprite::drawAngle(Graphics &graphics, int x, int y, float angle) {
     
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE };
     
-    
-    //std::cout << this->_sourceRect.w << " " <<this->_sourceRect.h << std::endl;
-    
-    //std::cout << "x: " << x << " y: " << y << std::endl;
-    
-    //graphics.blitSurface(this->_spriteSheet, &this->_sourceRect, &destinationRectangle);
-    
-    //texture, sourceRectangle, destinationRectangle
-    
-    /*
-    int SDL_RenderCopyEx(SDL_Renderer*          renderer,
-                         SDL_Texture*           texture,
-                         const SDL_Rect*        srcrect,
-                         const SDL_Rect*        dstrect,
-                         const double           angle,
-                         const SDL_Point*       center,
-                         const SDL_RendererFlip flip)
-    */
-    //SDL_Point point = {x, y};
-    SDL_Point point = {48, 80}; // 96/2 and 32+32+16
+
+    SDL_Point point = {15, 30}; // 96/2 and 32+32+16
     
     //std::cout << "x: " << x << " y: " << y << std::endl;
     

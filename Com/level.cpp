@@ -12,12 +12,18 @@
 #include "globals.hpp"
 #include "tinyxml2.h"
 #include "rectangle.hpp"
+#include "map.hpp"
+#include "sprite.hpp"
 #include <sstream>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 
 using namespace tinyxml2;
+
+namespace player_constants {
+    const float WALK_SPEED = 0.2f;
+}
 
 Level::Level() {}
 
@@ -26,11 +32,19 @@ Level::Level(std::string mapName, Graphics &graphics) :
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
 	_dx(0.0),
-	_dy(0.0)
+	_dy(0.0),
+    _angle(0.0),
+    _position(Vector2(0,0)),
+    _transx(0),
+    _transy(0),
+    _ang(0)
 {
 	//std::cout << "loading map for " + mapName << std::endl;
 	this->loadMap(mapName, graphics);
 	//std::cout << "end of loading map for" + mapName << std::endl;
+    
+    this->_map = Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0);
+
 }
 
 Level::~Level() {}
@@ -353,11 +367,21 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 
 void Level::update(int elapsedTime) {
 	//std::cout << "dx: " << this->_dx << " dy: " << this->_dy << std::endl;
-
+    /*
     for(int i = 0; i < this->_tileList.size(); i++) {
         this->_tileList.at(i).update(elapsedTime, this->_dx, this->_dy);
     }
-	
+	*/
+    
+    std::cout << this->_dx << " " << this->_dy << std::endl;
+    
+
+    this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
+    this->_position.y += std::round(this->_dy * elapsedTime);
+    
+    //std::cout << this->_dx << " " << this->_dy << std::endl;
+    
+    
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).update(elapsedTime, this->_dx, this->_dy);
     }
@@ -366,6 +390,8 @@ void Level::update(int elapsedTime) {
         this->_doorList.at(i).update(elapsedTime, this->_dx, this->_dy);
     }
     */
+    
+    //std::cout << this->_angle << std::endl;
 	
 
 }
@@ -373,10 +399,69 @@ void Level::update(int elapsedTime) {
 
 void Level::draw(Graphics &graphics) {
     //std::cout << this->_tileList.size() << std::endl;
-    
+    /*
 	for (int i = 0; i < this->_tileList.size(); i++) {
 		this->_tileList.at(i).draw(graphics);
 	}
+     */
+    
+    
+    //angle
+    //int d = 290; //calculate position of player w.r.t. center of map. (in pixels)
+    
+    //int d = std::sqrt(std::pow(this->_position.x,2) + std::pow(this->_position.y - 290,2));
+    
+    //std::cout << d << std::endl;
+    
+
+    //this->_transx = std::floor(d * std::sin(this->_angle * 3.14159 / 180));
+    //this->_transy = std::floor(d - d * std::cos(this->_angle * 3.14159 / 180));
+    
+    
+    
+    //float d = std::sqrt(std::pow(this->_position.x,2) + std::pow(this->_position.y,2));
+    //this->_transx = d * std::cos(std::acos(this->_position.x / d) + this->_angle*3.14159/180);
+    //this->_transy = d * std::sin(std::asin(this->_position.y / d) + this->_angle*3.14159/180);
+    
+    
+    
+    this->_transx = this->_position.x;
+    this->_transy = this->_position.y;
+    
+    
+    
+
+    
+    
+    //along x axis
+    //this->_transx -= this->_position.x * (1 - std::cos(this->_angle * 3.14159 / 180));
+    //this->_transy += this->_position.x * std::sin(this->_angle * 3.14159 / 180);
+    
+    //along y axis
+    //this->_transx -= this->_position.y * std::sin(this->_angle * 3.14159 / 180);
+    //this->_transy -= this->_position.y * (1 - std::cos(this->_angle * 3.14159 / 180));
+    
+    
+    
+    
+
+
+    
+    //std::cout << this->_position.x << std::endl;
+    
+    
+    
+    //translation
+    //this->_transx += this->_position.x * std::floor(std::sin(this->_angle * 3.14159 / 180));
+    //this->_transy += this->_position.y * std::floor(std::cos(this->_angle * 3.14159 / 180));
+    
+    //this->_map.drawAngle(graphics, this->_position.x, this->_position.y, this->_angle);
+    this->_map.drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    
+    //std::cout << this->_position.x << " " << this->_position.y << std::endl;
+
+    
+    //this->_angle++;
 	
 }
 
@@ -407,25 +492,66 @@ const Vector2 Level::getPlayerSpawnPoint() const {
 	return this->_spawnPoint;
 }
 
-void Level::moveUp() {
-	this->_dy = -0.2f;
-	this->_dx = 0.0f;
+
+/*
+void Level::moveForward() {
+    this->_dx = 0.0;
+    this->_dy = -player_constants::WALK_SPEED;
 }
 
-void Level::moveDown() {
-	this->_dy = 0.2f;
-	this->_dx = 0.0f;
+void Level::moveBackward() {
+    this->_dx = 0.0;
+    this->_dy = player_constants::WALK_SPEED;
+}
+
+
+void Level::moveRight() {
+    this->_dx = player_constants::WALK_SPEED;
+    this->_dy = 0.0;
 }
 
 void Level::moveLeft() {
-	this->_dx = -0.2f;
-	this->_dy = 0.0f;
+    this->_dx = -player_constants::WALK_SPEED;
+    this->_dy = 0.0;
+}
+*/
+
+
+
+
+void Level::moveForward() {
+    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
 }
 
-void Level::moveRight() {
-	this->_dx = 0.2f;
-	this->_dy = 0.0f;
+void Level::moveBackward() {
+    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
 }
+
+
+void Level::moveRight() {
+    this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+}
+
+void Level::moveLeft() {
+    this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+}
+
+
+void Level::cameraMove() {
+    this->_cameraMove = 1;
+}
+
+void Level::cameraStill() {
+    this->_cameraMove = 0;
+}
+
+ 
+
+
 
 void Level::stopMoving() {
 	this->_dx = 0.0f;
@@ -435,5 +561,9 @@ void Level::stopMoving() {
 void Level::handleTileCollisions() {
 	this->_dx = 0;
 	this->_dy = 0;
+}
+
+void Level::changeAngle(float angle) {
+    this->_angle += angle;
 }
 

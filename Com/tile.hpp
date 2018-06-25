@@ -11,6 +11,7 @@
 
 #include "globals.hpp"
 #include <cmath>
+#include "graphics.hpp"
 //#include "player.hpp"
 
 
@@ -24,6 +25,7 @@ public:
 	Tile(SDL_Texture * _tileset, Vector2 size, Vector2 tilesetPosition, Vector2 position);
 	void update(int elapsedTime, float dx, float dy);
 	void draw(Graphics &graphics);
+    
 private:
 	SDL_Texture * _tileset;
 	Vector2 _size;

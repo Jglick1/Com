@@ -22,10 +22,10 @@ public:
     Unit();
     Unit(Graphics &graphics, Vector2 spawnPoint);
     void draw(Graphics &graphics);
-    void update(float elapsedTime, int mx, int my);
+    void update(float elapsedTime);
     
-    void moveUp();
-    void moveDown();
+    void moveForward();
+    void moveBackward();
     void moveRight();
     void moveLeft();
     
@@ -53,8 +53,9 @@ public:
     
 private:
     float _dx, _dy;
-    int _mx, _my; //mouse x and mouse y
-    Sprite _fov;
+    float _angle;
+    //int _mx, _my; //mouse x and mouse y
+    //Sprite _fov;
     
     
 };

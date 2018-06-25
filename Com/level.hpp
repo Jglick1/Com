@@ -14,6 +14,8 @@
 #include "tile.hpp"
 #include <vector>
 #include "rectangle.hpp"
+#include "sprite.hpp"
+#include "map.hpp"
 //#include "door.hpp"
 
 class Graphics;
@@ -34,16 +36,21 @@ public:
 	
 	const Vector2 getPlayerSpawnPoint() const;
 	
-	void moveUp();
-	void moveDown();
+	void moveForward();
+	void moveBackward();
 	void moveRight();
 	void moveLeft();
 	void stopMoving();
 	
 	void handleTileCollisions();
+    
+    void changeAngle(float angle);
 	
-	
+    void cameraMove();
+    void cameraStill();
+    
 private:
+    Map _map;
 	std::string _mapName;
 	Vector2 _spawnPoint;
 	Vector2 _size;
@@ -59,6 +66,16 @@ private:
 	void loadMap(std::string mapName, Graphics &graphics);
 	
 	float _dx, _dy;
+    float _angle; // really player angle
+    Vector2 _position;
+    
+    int _transx;
+    int _transy;
+    int _ang;
+    
+    bool _cameraMove;
+    
+
 };
 
 struct Tileset {

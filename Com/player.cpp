@@ -22,7 +22,8 @@ Player::Player() {}
 
 Player::Player(Graphics &graphics, Vector2 spawnPoint) :
 //AnimatedSprite(graphics, "/Users/jonahglick/Documents/Io/Link1.png", 171, 129, 16, 22, spawnPoint.x, spawnPoint.y, 75),
-Sprite(graphics, "/Users/jonahglick/Documents/Com/rifelman_final_96x96.png", 0, 0, 96, 96, 300, 300),
+//Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 660),
+Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 375),
 _dx(0),
 _dy(0),
 _mx(0),
@@ -31,7 +32,7 @@ _my(0)
     //graphics.loadImage("/Users/jonahglick/Documents/Com/rifelman_final_96x96.png");
     
     
-    this->_fov = Sprite(graphics, "/Users/jonahglick/Documents/Com/view_direction.png", 0, 0, 96, 128, 300, 300);
+    //this->_fov = Sprite(graphics, "/Users/jonahglick/Documents/Com/view_direction.png", 0, 0, 96, 128, 300, 300);
     
     
     
@@ -108,6 +109,7 @@ void Player::moveLeft() {
     //this->playAnimation("RunLeft");
     //this->_facing = LEFT;
 }
+
 
 void Player::moveUpAndRight() {
     this->_dx = player_constants::WALK_SPEED/1.41421;
@@ -211,8 +213,7 @@ void Player::update(float elapsedTime, int mx, int my) {
 }
 
 void Player::draw(Graphics &graphics) {
-    //std::cout << float(this->_x) << " " << float(this->_y) << std::endl;
-    //this->_fov.draw(graphics, this->_x, this->_y-32);
+    /*
     float angle = 0.0;
     
     if(this->_my < (this->_y + 48)) {
@@ -221,9 +222,10 @@ void Player::draw(Graphics &graphics) {
     else {
         angle = 180-std::atan((this->_mx - (this->_x + 48))/(this->_my - (this->_y + 48))) * 180 / 3.14159;
     }
-    //float angle = -std::atan((this->_mx - (this->_x + 48))/(this->_my - (this->_y + 48))) * 180 / 3.14159;
     
     this->_fov.drawAngle(graphics, this->_x, this->_y-32, angle);
+    */
+    
     Sprite::draw(graphics, this->_x, this->_y);
     //Sprite::drawAngle(graphics, this->_x, this->_y);
 }

@@ -19,6 +19,7 @@
 		41D4197920DDF5B600A97956 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4197620DDF5B600A97956 /* tinyxml2.cpp */; };
 		41D4197C20DDF60F00A97956 /* level.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4197A20DDF60F00A97956 /* level.cpp */; };
 		41D4197F20DEF8F200A97956 /* unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4197D20DEF8F200A97956 /* unit.cpp */; };
+		41D4198220DF46F800A97956 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4198020DF46F800A97956 /* map.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,6 +59,8 @@
 		41D4197B20DDF60F00A97956 /* level.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = level.hpp; sourceTree = "<group>"; };
 		41D4197D20DEF8F200A97956 /* unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unit.cpp; sourceTree = "<group>"; };
 		41D4197E20DEF8F200A97956 /* unit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = unit.hpp; sourceTree = "<group>"; };
+		41D4198020DF46F800A97956 /* map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = map.cpp; sourceTree = "<group>"; };
+		41D4198120DF46F800A97956 /* map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = map.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,9 +112,10 @@
 				41D4196D20DB578000A97956 /* sprite.cpp */,
 				41D4197120DB592900A97956 /* player.cpp */,
 				41D4197620DDF5B600A97956 /* tinyxml2.cpp */,
-				41D4197420DDF5B600A97956 /* tile.cpp */,
 				41D4197A20DDF60F00A97956 /* level.cpp */,
+				41D4197420DDF5B600A97956 /* tile.cpp */,
 				41D4197D20DEF8F200A97956 /* unit.cpp */,
+				41D4198020DF46F800A97956 /* map.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -130,6 +134,7 @@
 				41D4197520DDF5B600A97956 /* tile.hpp */,
 				41D4197B20DDF60F00A97956 /* level.hpp */,
 				41D4197E20DEF8F200A97956 /* unit.hpp */,
+				41D4198120DF46F800A97956 /* map.hpp */,
 			);
 			name = headers;
 			sourceTree = "<group>";
@@ -206,6 +211,7 @@
 				41D4197F20DEF8F200A97956 /* unit.cpp in Sources */,
 				41D4197820DDF5B600A97956 /* tile.cpp in Sources */,
 				41D4197320DB592900A97956 /* player.cpp in Sources */,
+				41D4198220DF46F800A97956 /* map.cpp in Sources */,
 				41D4197920DDF5B600A97956 /* tinyxml2.cpp in Sources */,
 				41D4196C20DB548900A97956 /* input.cpp in Sources */,
 				41D4196220DB538200A97956 /* graphics.cpp in Sources */,

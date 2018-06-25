@@ -40,6 +40,7 @@ void Game::gameLoop() {
     //this->_player = Player(graphics, this->_level.getPlayerSpawnPoint());
     
     this->_player = Player(graphics, Vector2(3,3));
+    this->_unit = Unit(graphics, Vector2(0,0));
     
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test1", graphics);
     //this->_hud = HUD(graphics, this->_player);
@@ -54,8 +55,10 @@ void Game::gameLoop() {
     this->_deltaX = 0.0;
     this->_deltaY = 0.0;
 
-    int xm = 0.0;
-    int ym = 0.0;
+    int old_xm = 0;
+    
+    int xm = 0;
+    int ym = 0;
     
     while(true) {
         
@@ -73,11 +76,18 @@ void Game::gameLoop() {
             else if (event.type == SDL_QUIT) {
                 return;
             }
-            //else if (event.type == SDL_MOUSEMOTION) {
-            //    this->_deltaX += event.motion.x;
+            else if (event.type == SDL_MOUSEMOTION) {
+                this->_deltaX = event.motion.xrel;
             //    this->_deltaY += event.motion.y;
-            //}
-            
+            }
+            /*
+            else if (input.isKeyHeld(SDL_SCANCODE_0)) {
+                this->_level.changeAngle(10.0);
+            }
+            else if (input.isKeyHeld(SDL_SCANCODE_9)) {
+                this->_level.changeAngle(-10.0);
+            }
+            */
             
             else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 if(event.button.button == SDL_BUTTON_LEFT) {
@@ -92,52 +102,36 @@ void Game::gameLoop() {
         }
         
         
-        //SDL_GetMouseState(&this->_player->_mx, &this->player->_my);
+        /*
+        if (!(this->_deltaX > 100) && (this->_deltaX > 2 || this->_deltaX < -2)) {
+            this->_level.changeAngle(0.2*(this->_deltaX));
+        }
+         */
+        
+        //std::cout << this->_deltaX << std::endl;
+        
+        old_xm = xm;
+        SDL_GetMouseState(&xm, &ym);
+        if (std::abs((xm - old_xm)) < 100 && std::abs(xm - old_xm) > 1) {
+            this->_level.changeAngle(-0.2*(xm - old_xm));
+        }
+
+        
         
         //std::cout << "x: " << xpos << " y: " << ypos << std::endl;
         
         if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE)) {
             return;
         }
-        
 
-        /*
-        if (input.isKeyHeld(SDL_SCANCODE_W) == true && input.isKeyHeld(SDL_SCANCODE_D) == true) {
-            this->_player.moveUpAndRight();
-        }
-        else if(input.isKeyHeld(SDL_SCANCODE_W) == true && input.isKeyHeld(SDL_SCANCODE_A) == true) {
-            this->_player.moveUpAndLeft();
-        }
-        else if(input.isKeyHeld(SDL_SCANCODE_S) == true && input.isKeyHeld(SDL_SCANCODE_D) == true) {
-            this->_player.moveDownAndRight();
-        }
-        else if(input.isKeyHeld(SDL_SCANCODE_S) == true && input.isKeyHeld(SDL_SCANCODE_A) == true) {
-            this->_player.moveDownAndLeft();
-        }
-        else if (input.isKeyHeld(SDL_SCANCODE_W) == true) {
-            this->_player.moveUp();
-        }
-        else if (input.isKeyHeld(SDL_SCANCODE_S) == true) {
-            this->_player.moveDown();
-        }
-        else if (input.isKeyHeld(SDL_SCANCODE_D) == true) {
-            this->_player.moveRight();
-        }
-        else if (input.isKeyHeld(SDL_SCANCODE_A) == true) {
-            this->_player.moveLeft();
-        }
-        else {
-            this->_player.stopMoving();
-        }
-        */
-        
-        
         if(keyInPower) {
             switch (inPower) {
                 case UP:
                     if (!input.isKeyHeld(SDL_SCANCODE_UP)) {
                         keyInPower = 0;
                     }
+                    this->_level.moveBackward();
+                    /*
                     else if(input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
                         inPower = UPRIGHT;
                         keyInPower = 1;
@@ -148,11 +142,15 @@ void Game::gameLoop() {
                         keyInPower = 1;
                         this->_player.moveUpAndLeft();
                     }
+                     */
                     break;
+                     
                 case DOWN:
                     if (!input.isKeyHeld(SDL_SCANCODE_DOWN)) {
                         keyInPower = 0;
                     }
+                    this->_level.moveForward();
+                    /*
                     else if(input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
                         inPower = DOWNRIGHT;
                         keyInPower = 1;
@@ -163,11 +161,15 @@ void Game::gameLoop() {
                         keyInPower = 1;
                         this->_player.moveDownAndLeft();
                     }
+                     */
                     break;
+                     
                 case RIGHT:
                     if (!input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
                         keyInPower = 0;
                     }
+                    this->_level.moveLeft();
+                    /*
                     else if(input.isKeyHeld(SDL_SCANCODE_UP)) {
                         inPower = UPRIGHT;
                         keyInPower = 1;
@@ -178,11 +180,14 @@ void Game::gameLoop() {
                         keyInPower = 1;
                         this->_player.moveDownAndRight();
                     }
+                    */
                     break;
                 case LEFT:
                     if (!input.isKeyHeld(SDL_SCANCODE_LEFT)) {
                         keyInPower = 0;
                     }
+                    this->_level.moveRight();
+                    /*
                     else if(input.isKeyHeld(SDL_SCANCODE_UP)) {
                         inPower = UPLEFT;
                         keyInPower = 1;
@@ -193,7 +198,9 @@ void Game::gameLoop() {
                         keyInPower = 1;
                         this->_player.moveDownAndLeft();
                     }
+                     */
                     break;
+                    /*
                 case UPRIGHT:
                     if(!input.isKeyHeld(SDL_SCANCODE_UP) && !input.isKeyHeld(SDL_SCANCODE_RIGHT)){
                         keyInPower = 0;
@@ -201,12 +208,14 @@ void Game::gameLoop() {
                     else if(!input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
                         keyInPower = 1;
                         inPower = UP;
-                        this->_player.moveUp();
+                        //this->_player.moveUp();
+                        this->_level.moveBackward();
                     }
                     else if(!input.isKeyHeld(SDL_SCANCODE_UP)) {
                         keyInPower = 1;
                         inPower = RIGHT;
-                        this->_player.moveRight();
+                        //this->_player.moveRight();
+                        this->_level.moveLeft();
                     }
                     break;
                 case UPLEFT:
@@ -216,12 +225,14 @@ void Game::gameLoop() {
                     else if(!input.isKeyHeld(SDL_SCANCODE_LEFT)) {
                         keyInPower = 1;
                         inPower = UP;
-                        this->_player.moveUp();
+                        //this->_player.moveUp();
+                        this->_level.moveBackward();
                     }
                     else if(!input.isKeyHeld(SDL_SCANCODE_UP)) {
                         keyInPower = 1;
                         inPower = LEFT;
-                        this->_player.moveLeft();
+                        //this->_player.moveLeft();
+                        this->_level.moveRight();
                     }
                     break;
                 case DOWNRIGHT:
@@ -254,11 +265,12 @@ void Game::gameLoop() {
                         this->_player.moveLeft();
                     }
                     break;
+                     */
             }
         }
         
         else {
-            
+            /*
             if (input.isKeyHeld(SDL_SCANCODE_UP) == true && input.isKeyHeld(SDL_SCANCODE_RIGHT) == true) {
                 inPower = UPRIGHT;
                 keyInPower = 1;
@@ -279,29 +291,30 @@ void Game::gameLoop() {
                 keyInPower = 1;
                 this->_player.moveDownAndLeft();
             }
-            else if (input.isKeyHeld(SDL_SCANCODE_UP) == true) {
+             */
+            if (input.isKeyHeld(SDL_SCANCODE_UP) == true) {
                 inPower = UP;
                 keyInPower = 1;
-                this->_player.moveUp();
-                //this->_level.moveDown();
+                //this->_player.moveUp();
+                this->_level.moveBackward();
             }
             else if (input.isKeyHeld(SDL_SCANCODE_DOWN) == true) {
                 inPower = DOWN;
                 keyInPower = 1;
-                this->_player.moveDown();
-                //this->_level.moveUp();
+                //this->_player.moveDown();
+                this->_level.moveForward();
             }
             else if (input.isKeyHeld(SDL_SCANCODE_RIGHT) == true) {
                 inPower = RIGHT;
                 keyInPower = 1;
-                this->_player.moveRight();
-                //this->_level.moveLeft();
+                //this->_player.moveRight();
+                this->_level.moveLeft();
             }
             else if (input.isKeyHeld(SDL_SCANCODE_LEFT) == true) {
                 inPower = LEFT;
                 keyInPower = 1;
-                this->_player.moveLeft();
-                //this->_level.moveRight();
+                //this->_player.moveLeft();
+                this->_level.moveRight();
             }
             
             
@@ -309,10 +322,12 @@ void Game::gameLoop() {
             
             
             else {
-                this->_player.stopMoving();
-                //this->_level.stopMoving();
+                //this->_player.stopMoving();
+                this->_level.stopMoving();
             }
         }
+        
+        //this->_unit.moveLeft();
         
         
         const int CURRENT_TIME_MS = SDL_GetTicks();
@@ -346,8 +361,11 @@ void Game::gameLoop() {
 void Game::draw(Graphics &graphics) {
     graphics.clear();
     
+    
     this->_level.draw(graphics);
     this->_player.draw(graphics);
+    
+    this->_unit.draw(graphics);
     
     //this->_hud.draw(graphics);
     
@@ -385,6 +403,7 @@ void Game::update(float elapsedTime) {
     
     this->_player.update(elapsedTime, mx, my);
     this->_level.update(elapsedTime);
+    this->_unit.update(elapsedTime);
     //this->_hud.update(elapsedTime, this->_player);
     
     

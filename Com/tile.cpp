@@ -18,8 +18,8 @@ void Tile::update(int elapsedTime, float dx, float dy) {
 	
     
     
-	//this->_position.x += std::floor(dx * elapsedTime);
-	//this->_position.y += std::floor(dy * elapsedTime);
+	this->_position.x += std::floor(dx * elapsedTime);
+    this->_position.y += std::floor(dy * elapsedTime);
 	
     
 }
@@ -27,6 +27,8 @@ void Tile::update(int elapsedTime, float dx, float dy) {
 void Tile::draw(Graphics &graphics) {
 	SDL_Rect destRect = { this->_position.x, this->_position.y, this->_size.x * globals::LEVEL_SCALE, this->_size.y * globals::LEVEL_SCALE };
 	SDL_Rect sourceRect = { this->_tilesetPosition.x, this->_tilesetPosition.y, this->_size.x, this->_size.y };
-
+    
 	graphics.blitSurface(this->_tileset, &sourceRect, &destRect);
 }
+
+

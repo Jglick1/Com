@@ -49,6 +49,8 @@ public:
     void cameraMove();
     void cameraStill();
     
+    float getAngle();
+    
 private:
     Map _map;
 	std::string _mapName;

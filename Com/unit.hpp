@@ -22,7 +22,7 @@ public:
     Unit();
     Unit(Graphics &graphics, Vector2 spawnPoint);
     void draw(Graphics &graphics);
-    void update(float elapsedTime);
+    void update(float elapsedTime, float playerAngle);
     
     void moveForward();
     void moveBackward();
@@ -56,6 +56,7 @@ private:
     float _angle;
     //int _mx, _my; //mouse x and mouse y
     //Sprite _fov;
+    float _playerAngle;
     
     
 };

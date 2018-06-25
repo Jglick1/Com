@@ -373,7 +373,7 @@ void Level::update(int elapsedTime) {
     }
 	*/
     
-    std::cout << this->_dx << " " << this->_dy << std::endl;
+    //std::cout << this->_dx << " " << this->_dy << std::endl;
     
 
     this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
@@ -549,8 +549,6 @@ void Level::cameraStill() {
     this->_cameraMove = 0;
 }
 
- 
-
 
 
 void Level::stopMoving() {
@@ -565,5 +563,9 @@ void Level::handleTileCollisions() {
 
 void Level::changeAngle(float angle) {
     this->_angle += angle;
+}
+
+float Level::getAngle() {
+    return this->_angle;
 }
 

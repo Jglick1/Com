@@ -13,7 +13,10 @@
 
 Graphics::Graphics() {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
-    SDL_SetWindowTitle(this->_window, "Io");
+    SDL_SetWindowTitle(this->_window, "Com");
+    
+    //SDL_WarpMouseInWindow(this->_window, 10, 10);
+    
 }
 
 Graphics::~Graphics() {

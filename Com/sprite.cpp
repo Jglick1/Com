@@ -28,6 +28,8 @@ _x(posX), _y(posY)
     }
     
     this->_boundingBox = Rectangle(this->_x, this->_y, width * globals::SPRITE_SCALE, height * globals::SPRITE_SCALE);
+    
+    this->_playerBoundingBox = Rectangle(this->_x, this->_y+10, width, height-10);
 
 
 }
@@ -65,6 +67,10 @@ void Sprite::update() {
 
 const Rectangle Sprite::getBoundingBox() const {
     return this->_boundingBox;
+}
+
+const Rectangle Sprite::getPlayerBoundingBox() const {
+    return this->_playerBoundingBox;
 }
 
 const sides::Side Sprite::getCollisionSide(Rectangle &other) const {

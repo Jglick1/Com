@@ -23,7 +23,7 @@ struct SDL_Texture;
 struct SDL_Rect;
 struct Tileset;
 
-class Level {
+class Level : public Map{
 public:
 	Level();
 	Level(std::string mapName, Graphics &graphics);
@@ -42,7 +42,7 @@ public:
 	void moveLeft();
 	void stopMoving();
 	
-	void handleTileCollisions();
+	void handleTileCollisions(std::vector<Rectangle> &others);
     
     void changeAngle(float angle);
 	
@@ -51,8 +51,11 @@ public:
     
     float getAngle();
     
+    void changeY(int newY, int newCollisionY);
+    void changeX(int newX, int newCollisionX);
+    
 private:
-    Map _map;
+    //Map _map;
 	std::string _mapName;
 	Vector2 _spawnPoint;
 	Vector2 _size;

@@ -73,3 +73,37 @@ void Map::drawTrans(Graphics &graphics, int transx, int transy, float ang, int x
     SDL_RenderCopyEx(graphics.getRenderer(), this->_spriteSheet, &this->_sourceRect, &destinationRectangle, ang, &point, SDL_FLIP_NONE);
     
 }
+
+/*
+const sides::Side Map::getCollisionSide(Rectangle &other) const {
+    int amtRight, amtLeft, amtTop, amtBottom;
+    amtRight = this->getBoundingBox().getRight() - other.getLeft();
+    amtLeft = other.getRight() - this->getBoundingBox().getLeft();
+    amtTop = other.getBottom() - this->getBoundingBox().getTop();
+    amtBottom = this->getBoundingBox().getBottom() - other.getTop();
+    
+    int vals[4] = { abs(amtRight), abs(amtLeft), abs(amtTop), abs(amtBottom) };
+    int lowest = vals[0];
+    for (int i = 0; i < 4; i++) {
+        if (vals[i] < lowest) {
+            lowest = vals[i];
+        }
+    }
+    
+    return
+    lowest == abs(amtRight) ? sides::RIGHT :
+    lowest == abs(amtLeft) ? sides::LEFT :
+    lowest == abs(amtTop) ? sides::TOP :
+    lowest == abs(amtBottom) ? sides::BOTTOM :
+    sides::NONE;
+    
+}
+
+const Rectangle Map::getBoundingBox() const {
+    return this->_boundingBox;
+}
+*/
+
+
+
+

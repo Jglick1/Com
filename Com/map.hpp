@@ -30,6 +30,10 @@ public:
     const inline float getX() const { return this->_x; }
     const inline float getY() const { return this->_y; }
     
+    /*
+    const sides::Side getCollisionSide(Rectangle &other) const;
+    const Rectangle getBoundingBox() const;
+    */
     
 protected:
     SDL_Rect _sourceRect;

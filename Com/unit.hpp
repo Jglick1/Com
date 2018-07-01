@@ -29,12 +29,21 @@ public:
     void moveRight();
     void moveLeft();
     
+    void moveForwardParallax();
+    void moveBackwardParallax();
+    void moveRightParallax();
+    void moveLeftParallax();
+    
     void moveUpAndRight();
     void moveUpAndLeft();
     void moveDownAndRight();
     void moveDownAndLeft();
     
     void stopMoving();
+    
+    void setPlayerAngle(float playerAngle);
+    
+    void handleTileCollisions();
     
     
     //virtual void animationDone(std::string currentAnimation);

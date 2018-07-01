@@ -28,6 +28,7 @@ namespace player_constants {
 Level::Level() {}
 
 Level::Level(std::string mapName, Graphics &graphics) :
+    Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0),
 	_mapName(mapName),
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
@@ -39,11 +40,11 @@ Level::Level(std::string mapName, Graphics &graphics) :
     _transy(0),
     _ang(0)
 {
-	//std::cout << "loading map for " + mapName << std::endl;
+
 	this->loadMap(mapName, graphics);
-	//std::cout << "end of loading map for" + mapName << std::endl;
+
     
-    this->_map = Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0);
+    //this->_map = Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0);
 
 }
 
@@ -392,89 +393,51 @@ void Level::update(int elapsedTime) {
     */
     
     //std::cout << this->_angle << std::endl;
-	
+    //std::cout << this->_dy << std::endl;
 
+    
+    //std::cout << this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
+    
+    
 }
 
 
 void Level::draw(Graphics &graphics) {
-    //std::cout << this->_tileList.size() << std::endl;
-    /*
-	for (int i = 0; i < this->_tileList.size(); i++) {
-		this->_tileList.at(i).draw(graphics);
-	}
-     */
-    
-    
-    //angle
-    //int d = 290; //calculate position of player w.r.t. center of map. (in pixels)
-    
-    //int d = std::sqrt(std::pow(this->_position.x,2) + std::pow(this->_position.y - 290,2));
-    
-    //std::cout << d << std::endl;
-    
-
-    //this->_transx = std::floor(d * std::sin(this->_angle * 3.14159 / 180));
-    //this->_transy = std::floor(d - d * std::cos(this->_angle * 3.14159 / 180));
-    
-    
-    
-    //float d = std::sqrt(std::pow(this->_position.x,2) + std::pow(this->_position.y,2));
-    //this->_transx = d * std::cos(std::acos(this->_position.x / d) + this->_angle*3.14159/180);
-    //this->_transy = d * std::sin(std::asin(this->_position.y / d) + this->_angle*3.14159/180);
-    
     
     
     this->_transx = this->_position.x;
     this->_transy = this->_position.y;
     
     
-    
 
-    
-    
-    //along x axis
-    //this->_transx -= this->_position.x * (1 - std::cos(this->_angle * 3.14159 / 180));
-    //this->_transy += this->_position.x * std::sin(this->_angle * 3.14159 / 180);
-    
-    //along y axis
-    //this->_transx -= this->_position.y * std::sin(this->_angle * 3.14159 / 180);
-    //this->_transy -= this->_position.y * (1 - std::cos(this->_angle * 3.14159 / 180));
-    
-    
-    
-    
-
-
-    
-    //std::cout << this->_position.x << std::endl;
-    
-    
-    
-    //translation
-    //this->_transx += this->_position.x * std::floor(std::sin(this->_angle * 3.14159 / 180));
-    //this->_transy += this->_position.y * std::floor(std::cos(this->_angle * 3.14159 / 180));
-    
     //this->_map.drawAngle(graphics, this->_position.x, this->_position.y, this->_angle);
-    this->_map.drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    //this->_map.drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    
+    Map::drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    
+    for(int i = 0; i<this->_collisionRects.size(); i++) {
+        graphics.drawRect(this->_collisionRects.at(i).getX(), this->_collisionRects.at(i).getY(), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
+    }
+    
+    //std::cout <<this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
     
     //std::cout << this->_position.x << " " << this->_position.y << std::endl;
-
     
-    //this->_angle++;
-	
+
 }
 
-std::vector<Rectangle> Level::checkTileCollisions(const Rectangle &other) {
+
+std::vector<Rectangle> Level::checkTileCollisions(const Rectangle &other) { //other is player
 	std::vector<Rectangle> others;
 	for (int i = 0; i < this->_collisionRects.size(); i++) {
 		if (this->_collisionRects.at(i).collidesWith(other)) {
 			others.push_back(this->_collisionRects.at(i));
 		}
 	}
-	return others;
+	return others;                                                          //returning level collision rects
 }
 
+ 
 /*
 std::vector<Door> Level::checkDoorCollisions(const Rectangle &other) {
 	std::vector<Door> others;
@@ -556,10 +519,127 @@ void Level::stopMoving() {
 	this->_dy = 0.0f;
 }
 
-void Level::handleTileCollisions() {
-	this->_dx = 0;
-	this->_dy = 0;
+
+/*
+void Level::handleTileCollisions(std::vector<Rectangle> &others, Direction &inPower) {
+	//this->_dx = 0.0;
+	//this->_dy = 0.0;
+    
+    
+    //std::cout << this->_position.x << " " << this->_position.y << std::endl;
+    //collide up y = -328
+    //collid down y = -257
+    
+    //collide right x = 47
+    //collide left x = -46
 }
+*/
+
+
+void Level::handleTileCollisions(std::vector<Rectangle> &others) { //other are the level's collision rects
+    //rectangle for the player
+    //Rectangle playerRec = Rectangle(625, 375, 30, 40);          //collsion rectangle for player
+    
+    Rectangle playerRec = Rectangle(625, 385, 30, 30);
+    
+    for (int i = 0; i < others.size(); i++) {
+        sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
+        
+        //sides::Side collisionSide = others.at(i).getCollisionSide(playerRec);
+        
+        /*
+        switch(collisionSide) {
+            case sides::TOP:
+                std::cout << "top" << std::endl;            //top of player rec
+                //std::cout << others.at(i).getBottom() << std::endl;
+                //std::cout << this->_position.y << std::endl;
+                break;
+            case sides::BOTTOM:
+                std::cout << "bottom" << std::endl;
+                break;
+            case sides::RIGHT:
+                std::cout << "right" << std::endl;
+                break;
+            case sides::LEFT:
+                std::cout << "left" << std::endl;
+                break;
+            default:
+                std::cout << "none" << std::endl;
+                break;
+        }
+        std::cout << std::endl;
+        */
+
+        /*
+        if (collisionSide != sides::NONE) {
+            switch (collisionSide) {
+                case sides::TOP:
+                    this->changeY(others.at(i).getBottom() - 704 - 1, others.at(i).getBottom() - 32 - 1);
+                    
+                    //std::cout << others.at(i).getBottom() << std::endl;
+                    
+                    this->_dy = 0.0f;
+
+                    break;
+                case sides::BOTTOM:
+                    this->_position.y  = 385 + 30 + 1;
+                    this->_dy = 0;
+                    break;
+                case sides::LEFT:
+                    this->_position.x  = others.at(i).getRight() + 1;
+                    this->_dx = 0;
+                    break;
+                case sides::RIGHT:
+                    this->_position.x  = others.at(i).getLeft() - 30 - 1; //player width //this->_boundingBox.getWidth() - 1;
+                    this->_dx = 0;
+            }
+        }
+        */
+        
+        if (collisionSide != sides::NONE) {
+            switch (collisionSide) {
+                case sides::TOP:                    //top refers to player's box
+                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 385, 385 - others.at(i).getHeight());
+                    //std::cout << others.at(i).getStartY() << " " << others.at(i).getHeight() <<std::endl;
+                    this->_dy = 0.0f;
+                    break;
+                case sides::BOTTOM:
+                    this->changeY(-(others.at(i).getStartY()) + 385 + 30, 385 + 30);
+                    this->_dy = 0.0f;
+                    break;
+                case sides::LEFT:
+                    this->changeX((-others.at(i).getStartX()) + 625 - others.at(i).getWidth(), 625 - others.at(i).getWidth());
+                    this->_dx = 0.0f;
+                    break;
+                case sides::RIGHT:
+                    this->changeX((-others.at(i).getStartX()) + 625 + 30, 625 + 30);
+                    this->_dx = 0.0f;
+            }
+        }
+        //this->changeY(387 - 704 - 1, 387 - 32 - 1);
+        //this->_dy = 0.0f;
+        
+    }
+}
+
+
+
+
+
+void Level::changeY(int newY, int newCollisionY) {
+    this->_position.y = newY;
+    for(int i  = 0; i < this->_collisionRects.size(); i++) {
+        this->_collisionRects.at(i).changeY(newCollisionY);
+    }
+}
+
+void Level::changeX(int newX, int newCollisionX) {
+    this->_position.x = newX;
+    for(int i  = 0; i < this->_collisionRects.size(); i++) {
+        this->_collisionRects.at(i).changeX(newCollisionX);
+    }
+}
+
 
 void Level::changeAngle(float angle) {
     this->_angle += angle;

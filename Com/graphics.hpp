@@ -32,6 +32,10 @@ public:
     
     SDL_Renderer* getRenderer() const;
     
+    void moveMouse();
+    
+    void drawRect(int x, int y, int width, int height);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

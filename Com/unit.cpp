@@ -19,7 +19,7 @@ namespace player_constants {
 Unit::Unit() {}
 
 Unit::Unit(Graphics &graphics, Vector2 spawnPoint) :
-Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 400 - 15, 600 - 30),
+Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 0, 800),
 _dx(0),
 _dy(0),
 _angle(0.0),
@@ -33,47 +33,51 @@ _playerAngle(0.0)
 }
 
 
-/*
+
+void Unit::moveForwardParallax() {
+    this->_dx += -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
+    this->_dy += -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
+}
+
+void Unit::moveBackwardParallax() {
+    this->_dx += player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
+    this->_dy += player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
+}
+
+
+void Unit::moveRightParallax() {
+    this->_dx += player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
+    this->_dy += -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
+}
+
+void Unit::moveLeftParallax() {
+    this->_dx += -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
+    this->_dy += player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
+}
+
+
+
+
 void Unit::moveForward() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_dx += 0.0;
+    this->_dy += -player_constants::WALK_SPEED;
 }
 
 void Unit::moveBackward() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_dx += 0.0;
+    this->_dy += player_constants::WALK_SPEED;
 }
 
 void Unit::moveRight() {
-    this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+    this->_dx += player_constants::WALK_SPEED;
+    this->_dy += 0.0;
 }
 
 void Unit::moveLeft() {
-    this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-}
- */
-
-void Unit::moveForward() {
-    this->_dx = 0.0;
-    this->_dy = -player_constants::WALK_SPEED;
+    this->_dx += -player_constants::WALK_SPEED;
+    this->_dy += 0.0;
 }
 
-void Unit::moveBackward() {
-    this->_dx = 0.0;
-    this->_dy = player_constants::WALK_SPEED;
-}
-
-void Unit::moveRight() {
-    this->_dx = player_constants::WALK_SPEED;
-    this->_dy =0.0;
-}
-
-void Unit::moveLeft() {
-    this->_dx = -player_constants::WALK_SPEED;
-    this->_dy = 0.0;
-}
 
 void Unit::stopMoving() {
     this->_dx = 0.0;
@@ -93,7 +97,12 @@ void Unit::draw(Graphics &graphics) {
     //Sprite::drawAngle(graphics, this->_x + std::round(d - d * std::cos(this->_playerAngle*3.14159/180)), this->_y - std::round(d * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
     
 
-    Sprite::drawAngle(graphics,640 + ( this->_x-640+15)* std::cos(this->_playerAngle*3.14159/180) - (this->_y-400+30) * std::sin(this->_playerAngle*3.14159/180), 400 + ( (this->_y-400+30) * std::cos(this->_playerAngle*3.14159/180) + (this->_x-640+15) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    //Sprite::drawAngle(graphics, 640-15 + ( this->_x-640-15)* std::cos(this->_playerAngle*3.14159/180) - (this->_y-400+30) * std::sin(this->_playerAngle*3.14159/180), 400-30 + ( (this->_y-400+30) * std::cos(this->_playerAngle*3.14159/180) + (this->_x-640-15) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    Sprite::drawAngle(graphics,640-15 + ( this->_x-640+15)* std::cos(this->_playerAngle*3.14159/180) - (this->_y-400+30) * std::sin(this->_playerAngle*3.14159/180), 400-30 + ( (this->_y-400+30) * std::cos(this->_playerAngle*3.14159/180) + (this->_x-640+15) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    
+    //this->stopMoving();
 
 }
 
@@ -102,7 +111,7 @@ void Unit::update(float elapsedTime, float playerAngle) {
     this->_y += std::round(this->_dy * elapsedTime);
     this->_x += std::round(this->_dx * elapsedTime);
     
-    this->_playerAngle = playerAngle;
+    //this->_playerAngle = playerAngle;
 
 
     
@@ -110,4 +119,13 @@ void Unit::update(float elapsedTime, float playerAngle) {
     
     Sprite::update();
     
+}
+
+void Unit::setPlayerAngle(float playerAngle) {
+    this->_playerAngle = playerAngle;
+}
+
+void Unit::handleTileCollisions() {
+    this->_dx = 0.0;
+    this->_dy = 0.0;
 }

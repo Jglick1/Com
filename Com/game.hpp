@@ -13,6 +13,7 @@
 #include "level.hpp"
 #include "graphics.hpp"
 #include "unit.hpp"
+#include "input.hpp"
 //#include "hud.hpp"
 //#include "inventory.hpp"
 
@@ -25,7 +26,8 @@ public:
 private:
     void gameLoop();
     void draw(Graphics &graphics);
-    void update(float elapsedTime);
+    void update(float elapsedTime, Direction &inPower);
+    void handleMovement(Direction &inPower, Input &input);
     
     Player _player;
     

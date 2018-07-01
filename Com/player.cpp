@@ -39,23 +39,7 @@ _my(0)
     //this->setupAnimations();
     //this->playAnimation("IdleUp");
 }
-/*
-void Player::setupAnimations() {
- 
-    this->addAnimation(5, 32, 0, "RunDown", 16, 23, Vector2(0, 0));
-    this->addAnimation(5, 32, 23, "RunUp", 16, 23, Vector2(0, 0));
-    this->addAnimation(1, 32, 0, "IdleDown", 16, 23, Vector2(0, 0));
-    this->addAnimation(1, 32, 23, "IdleUp", 16, 23, Vector2(0, 0));
-    
-    this->addAnimation(3, 16, 46, "RunRight", 16, 24, Vector2(0, 0));
-    this->addAnimation(3, 16, 70, "RunLeft", 16, 24, Vector2(0, 0));
-    this->addAnimation(1, 16, 46, "IdleRight", 16, 24, Vector2(0, 0));
-    this->addAnimation(1, 16, 70, "IdleLeft", 16, 24, Vector2(0, 0));
-}
-*/
-/*
-void Player::animationDone(std::string currentAnimation) {}
-*/
+
 const float Player::getX() const {
     return this->_x;
 }
@@ -85,29 +69,25 @@ const float Player::getDY() const {
 void Player::moveUp() {
     this->_dy = -player_constants::WALK_SPEED;
     this->_dx = 0.0f;
-    //this->playAnimation("RunUp");
-    //this->_facing = UP;
+
 }
 
 void Player::moveDown() {
     this->_dy = player_constants::WALK_SPEED;
     this->_dx = 0.0f;
-    //this->playAnimation("RunDown");
-    //this->_facing = DOWN;
+
 }
 
 void Player::moveRight() {
     this->_dx = player_constants::WALK_SPEED;
     this->_dy = 0.0f;
-    //this->playAnimation("RunRight");
-    //this->_facing = RIGHT;
+
 }
 
 void Player::moveLeft() {
     this->_dx = -player_constants::WALK_SPEED;
     this->_dy = 0.0f;
-    //this->playAnimation("RunLeft");
-    //this->_facing = LEFT;
+
 }
 
 
@@ -135,24 +115,8 @@ void Player::moveDownAndLeft() {
 void Player::stopMoving() {
     this->_dy = 0.0f;
     this->_dx = 0.0f;
-    /*
-    switch (this->_facing) {
-        case DOWN:
-            this->playAnimation("IdleDown");
-            break;
-        case UP:
-            this->playAnimation("IdleUp");
-            break;
-        case RIGHT:
-            this->playAnimation("IdleRight");
-            break;
-        case LEFT:
-            this->playAnimation("IdleLeft");
-            break;
-    }
-    */
-    
 }
+    
 
 /*
 void Player::handleTileCollisions(std::vector<Rectangle> &others) {
@@ -179,8 +143,9 @@ void Player::handleTileCollisions(std::vector<Rectangle> &others) {
         }
     }
 }
+*/
 
-
+/*
 void Player::handleDoorCollision(std::vector<Door> &others, Level &level, Graphics &graphics) {
     
     for(int i = 0; i<others.size(); i++) {
@@ -227,5 +192,6 @@ void Player::draw(Graphics &graphics) {
     */
     
     Sprite::draw(graphics, this->_x, this->_y);
+    graphics.drawRect(this->_x, this->_y+10, 30, 30);
     //Sprite::drawAngle(graphics, this->_x, this->_y);
 }

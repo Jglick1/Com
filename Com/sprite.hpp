@@ -27,6 +27,7 @@ public:
     
     const Rectangle getBoundingBox() const;
     const sides::Side getCollisionSide(Rectangle &other) const;
+    const Rectangle getPlayerBoundingBox() const;
     
     const inline float getX() const { return this->_x; }
     const inline float getY() const { return this->_y; }
@@ -37,6 +38,7 @@ protected:
     SDL_Texture* _spriteSheet;
     
     Rectangle _boundingBox;
+    Rectangle _playerBoundingBox;
     
     float _x, _y;
     

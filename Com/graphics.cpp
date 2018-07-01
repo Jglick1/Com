@@ -16,6 +16,7 @@ Graphics::Graphics() {
     SDL_SetWindowTitle(this->_window, "Com");
     
     //SDL_WarpMouseInWindow(this->_window, 10, 10);
+    //SDL_SetWindowFullscreen(this->_window, SDL_WINDOW_FULLSCREEN);
     
 }
 
@@ -49,4 +50,13 @@ void Graphics::clear() {
 
 SDL_Renderer* Graphics::getRenderer() const {
     return this->_renderer;
+}
+
+void Graphics::moveMouse() {
+    SDL_WarpMouseInWindow(this->_window, 640, 100);
+}
+
+void Graphics::drawRect(int x, int y, int width, int height) {
+    SDL_Rect destRect = {x, y, width, height};
+    SDL_RenderDrawRect(this->_renderer, &destRect);
 }

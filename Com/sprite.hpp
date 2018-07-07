@@ -42,6 +42,8 @@ protected:
     
     float _x, _y;
     
+    float _startX, _startY;
+    
 };
 
 

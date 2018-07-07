@@ -122,7 +122,7 @@ void Game::gameLoop() {
             this->handleMovement(inPower, input);
         //}
         
- 
+        //this->_unit.moveForward();
         
         
         const int CURRENT_TIME_MS = SDL_GetTicks();
@@ -142,11 +142,17 @@ void Game::gameLoop() {
         this->draw(graphics);
         this->_unit.stopMoving();
         
+        //handle movement
+        //update
+        //draw
+        
     }
     
 }
 
 void Game::handleMovement(Direction &inPower, Input &input) {
+    
+    
     switch (inPower) {
         case UP:
             if (input.wasKeyReleased(SDL_SCANCODE_W)) {
@@ -222,7 +228,7 @@ void Game::handleMovement(Direction &inPower, Input &input) {
 
 void Game::draw(Graphics &graphics) {
     graphics.clear();
-    
+
     
     this->_level.draw(graphics);
     this->_player.draw(graphics);
@@ -258,25 +264,50 @@ void Game::update(float elapsedTime, Direction &inPower) {
     */
 
 
+    //this->_unit.moveForward();
+    
     
     int mx;
     int my;
     
     SDL_GetMouseState(&mx, &my);
+    this->_level.update(elapsedTime);
     
     this->_player.update(elapsedTime, mx, my);
-    this->_level.update(elapsedTime);
-    this->_unit.update(elapsedTime, this->_level.getAngle());
+    //this->_unit.setDXDY(0.0, 0.0);
+    //this->_unit.update(elapsedTime, this->_level.getAngle());
     //this->_hud.update(elapsedTime, this->_player);
-        
     
+    //std::cout << this->_level.getDX() << " " << this->_level.getDY() << " ";
+    
+    //std::cout << this->_unit.getX() << " " << this->_unit.getY() << " ";
+    
+    
+    this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
+    this->_unit.update(elapsedTime, this->_level.getAngle());
+    
+    
+    
+    
+                                                                //handle collisions shoudl come after update for some reason
     std::vector<Rectangle> others;
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);
-        this->_level.handleTileCollisions(others);
-        this->_unit.handleTileCollisions();
+        this->_level.handleTileCollisions(others, this->_unit, elapsedTime);
+        this->_unit.handleTileCollisions(others, elapsedTime);
     }
+
+    //std::cout << this->_unit.getX() << " " << this->_unit.getY() << std::endl;
+    
+    //std::cout << this->_level.getX() << " " << this->_level.getY() << std::endl;
     
     
+    //std::cout << this->_player.getX() << " " << this->_player.getY() << std::endl;
+    
+    //std::cout << this->_level.getDX() << " " << this->_level.getDY() << std::endl;
+
+    //this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
+    //this->_unit.update(elapsedTime, this->_level.getAngle());
+
    
 }

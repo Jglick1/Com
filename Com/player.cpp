@@ -145,6 +145,15 @@ void Player::handleTileCollisions(std::vector<Rectangle> &others) {
 }
 */
 
+void Player::handleTileCollisions(float elapsedTime) {
+    //this->_x -= std::round(elapsedTime * this->_dx);
+    //this->_y -= std::round(elapsedTime * this->_dy);
+    
+}
+
+
+
+
 /*
 void Player::handleDoorCollision(std::vector<Door> &others, Level &level, Graphics &graphics) {
     

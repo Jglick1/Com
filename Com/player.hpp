@@ -40,7 +40,7 @@ public:
     //virtual void animationDone(std::string currentAnimation);
     //virtual void setupAnimations();
     
-    //void handleTileCollisions(std::vector<Rectangle> &others);
+    void handleTileCollisions(float elapsedTime);
     //void handleDoorCollision(std::vector<Door> &others, Level &level, Graphics &graphics);
     
     const float getX() const;

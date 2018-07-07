@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+//#include "unit.hpp"
 
 using namespace tinyxml2;
 
@@ -380,7 +381,7 @@ void Level::update(int elapsedTime) {
     this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
     this->_position.y += std::round(this->_dy * elapsedTime);
     
-    //std::cout << this->_dx << " " << this->_dy << std::endl;
+    //std::cout << this->_dx << " " << this->_dy << " ";
     
     
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
@@ -399,6 +400,7 @@ void Level::update(int elapsedTime) {
     //std::cout << this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
     
     
+    
 }
 
 
@@ -407,6 +409,8 @@ void Level::draw(Graphics &graphics) {
     
     this->_transx = this->_position.x;
     this->_transy = this->_position.y;
+    
+    
     
     
 
@@ -536,65 +540,22 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, Direction &inPo
 */
 
 
-void Level::handleTileCollisions(std::vector<Rectangle> &others) { //other are the level's collision rects
+void Level::handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, float elapsedTime) { //other are the level's collision rects
     //rectangle for the player
     //Rectangle playerRec = Rectangle(625, 375, 30, 40);          //collsion rectangle for player
     
     Rectangle playerRec = Rectangle(625, 385, 30, 30);
     
+    //this->_position.x -= std::round(elapsedTime * this->_dx);
+    //this->_position.y -= std::round(elapsedTime * this->_dy);
+    
+    //this->_dx = 0.0;
+    //this->_dy = 0.0;
+    
+    //std::cout << this->_dx << " " << this->_dy << std::endl;
+    
     for (int i = 0; i < others.size(); i++) {
         sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
-        
-        //sides::Side collisionSide = others.at(i).getCollisionSide(playerRec);
-        
-        /*
-        switch(collisionSide) {
-            case sides::TOP:
-                std::cout << "top" << std::endl;            //top of player rec
-                //std::cout << others.at(i).getBottom() << std::endl;
-                //std::cout << this->_position.y << std::endl;
-                break;
-            case sides::BOTTOM:
-                std::cout << "bottom" << std::endl;
-                break;
-            case sides::RIGHT:
-                std::cout << "right" << std::endl;
-                break;
-            case sides::LEFT:
-                std::cout << "left" << std::endl;
-                break;
-            default:
-                std::cout << "none" << std::endl;
-                break;
-        }
-        std::cout << std::endl;
-        */
-
-        /*
-        if (collisionSide != sides::NONE) {
-            switch (collisionSide) {
-                case sides::TOP:
-                    this->changeY(others.at(i).getBottom() - 704 - 1, others.at(i).getBottom() - 32 - 1);
-                    
-                    //std::cout << others.at(i).getBottom() << std::endl;
-                    
-                    this->_dy = 0.0f;
-
-                    break;
-                case sides::BOTTOM:
-                    this->_position.y  = 385 + 30 + 1;
-                    this->_dy = 0;
-                    break;
-                case sides::LEFT:
-                    this->_position.x  = others.at(i).getRight() + 1;
-                    this->_dx = 0;
-                    break;
-                case sides::RIGHT:
-                    this->_position.x  = others.at(i).getLeft() - 30 - 1; //player width //this->_boundingBox.getWidth() - 1;
-                    this->_dx = 0;
-            }
-        }
-        */
         
         if (collisionSide != sides::NONE) {
             switch (collisionSide) {
@@ -602,22 +563,45 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others) { //other are t
                     this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 385, 385 - others.at(i).getHeight());
                     //std::cout << others.at(i).getStartY() << " " << others.at(i).getHeight() <<std::endl;
                     this->_dy = 0.0f;
+                    
+                    //unit.setY(unit.getStartY() - 385 + 66); //maybe 65
+                    //unit.setDY(0.0f);
+                    //unit.moveForward();
+
+                    
                     break;
                 case sides::BOTTOM:
                     this->changeY(-(others.at(i).getStartY()) + 385 + 30, 385 + 30);
                     this->_dy = 0.0f;
+                    
+
+                    
+                    //unit.setY(unit.getStartY() - 385 + 128); //also not exactly right
+                    //unit.setDY(0.0f);
+                    
                     break;
                 case sides::LEFT:
                     this->changeX((-others.at(i).getStartX()) + 625 - others.at(i).getWidth(), 625 - others.at(i).getWidth());
                     this->_dx = 0.0f;
+                    
+
+                    
+                    //unit.setX(unit.getStartX() - 48);
+                    //unit.setDX(0.0f);
+                    
                     break;
                 case sides::RIGHT:
                     this->changeX((-others.at(i).getStartX()) + 625 + 30, 625 + 30);
                     this->_dx = 0.0f;
+                    
+                    
+                    //unit.setX(unit.getStartX() + 48);
+                    //unit.setDX(0.0f);
+                    
+                    break;
             }
         }
-        //this->changeY(387 - 704 - 1, 387 - 32 - 1);
-        //this->_dy = 0.0f;
+
         
     }
 }
@@ -628,14 +612,14 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others) { //other are t
 
 void Level::changeY(int newY, int newCollisionY) {
     this->_position.y = newY;
-    for(int i  = 0; i < this->_collisionRects.size(); i++) {
+    for(int i = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).changeY(newCollisionY);
     }
 }
 
 void Level::changeX(int newX, int newCollisionX) {
     this->_position.x = newX;
-    for(int i  = 0; i < this->_collisionRects.size(); i++) {
+    for(int i = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).changeX(newCollisionX);
     }
 }
@@ -647,5 +631,13 @@ void Level::changeAngle(float angle) {
 
 float Level::getAngle() {
     return this->_angle;
+}
+
+float Level::getDX() {
+    return this->_dx;
+}
+
+float Level::getDY() {
+    return this->_dy;
 }
 

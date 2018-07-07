@@ -16,6 +16,7 @@
 #include "rectangle.hpp"
 #include "sprite.hpp"
 #include "map.hpp"
+#include "unit.hpp"
 //#include "door.hpp"
 
 class Graphics;
@@ -42,7 +43,7 @@ public:
 	void moveLeft();
 	void stopMoving();
 	
-	void handleTileCollisions(std::vector<Rectangle> &others);
+    void handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, float elapsedTime);
     
     void changeAngle(float angle);
 	
@@ -53,6 +54,9 @@ public:
     
     void changeY(int newY, int newCollisionY);
     void changeX(int newX, int newCollisionX);
+    
+    float getDX();
+    float getDY();
     
 private:
     //Map _map;

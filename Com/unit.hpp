@@ -45,11 +45,29 @@ public:
     
     void handleTileCollisions();
     
+    float getDX();
+    float getDY();
+    
+    void setDXDY(float dx, float dy);
+    
+    void setDX(float dx);
+    void setDY(float dy);
+    
+    void setX(float x);
+    void setY(float y);
+    
+    int getStartX();
+    int getStartY();
+    
+    int getX();
+    int getY();
+    
+    void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime);
     
     //virtual void animationDone(std::string currentAnimation);
     //virtual void setupAnimations();
     
-    //void handleTileCollisions(std::vector<Rectangle> &others);
+    void handleTileCollisions(std::vector<Rectangle> &others);
     //void handleDoorCollision(std::vector<Door> &others, Level &level, Graphics &graphics);
     
     const float getX() const;
@@ -58,14 +76,22 @@ public:
     const float getMX() const;
     const float getMY() const;
     
+    void changeX(int newX);
+    void changeY(int newY);
+    
+    void moveToPosition(int posX, int posY);
 
     
 private:
     float _dx, _dy;
     float _angle;
+    float _staticdx, _staticdy;
+    float _staticx, _staticy;
     //int _mx, _my; //mouse x and mouse y
     //Sprite _fov;
     float _playerAngle;
+    
+    State _state;
     
     
 };

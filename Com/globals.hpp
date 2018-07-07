@@ -45,6 +45,9 @@ enum Direction {
     LEFT, RIGHT, UP, DOWN, UPRIGHT, UPLEFT, DOWNRIGHT, DOWNLEFT, NONE
 };
 
+enum State {
+    CHANGE_ANGLE, MOVE_FORWARD, STILL
+};
 
 struct Vector2 {
     int x, y;

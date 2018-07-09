@@ -36,6 +36,10 @@ public:
     
     void drawRect(int x, int y, int width, int height);
     
+    void drawLine(int x1, int y1, int x2, int y2);
+    
+    void drawPoint(int x, int y);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

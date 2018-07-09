@@ -27,8 +27,8 @@ public:
     
     void drawTrans(Graphics &graphics, int transx, int transy, float ang, int x, int y, bool camera_move);
     
-    const inline float getX() const { return this->_x; }
-    const inline float getY() const { return this->_y; }
+    //const inline float getX() const { return this->_x; }
+    //const inline float getY() const { return this->_y; }
     
     /*
     const sides::Side getCollisionSide(Rectangle &other) const;
@@ -40,7 +40,7 @@ protected:
     SDL_Texture* _spriteSheet;
     
 
-    float _x, _y;
+    //float _x, _y;
 
     
 };

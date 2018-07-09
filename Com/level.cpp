@@ -36,7 +36,9 @@ Level::Level(std::string mapName, Graphics &graphics) :
 	_dx(0.0),
 	_dy(0.0),
     _angle(0.0),
-    _position(Vector2(0,0)),
+    //_position(Vector2(0,0)),
+    _positionx(0),
+    _positiony(0),
     _transx(0),
     _transy(0),
     _ang(0)
@@ -378,8 +380,11 @@ void Level::update(int elapsedTime) {
     //std::cout << this->_dx << " " << this->_dy << std::endl;
     
 
-    this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
-    this->_position.y += std::round(this->_dy * elapsedTime);
+    //this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
+    //this->_position.y += std::round(this->_dy * elapsedTime);
+    
+    this->_positionx += this->_dx * elapsedTime;
+    this->_positiony += this->_dy * elapsedTime;
     
     //std::cout << this->_dx << " " << this->_dy << " ";
     
@@ -407,27 +412,113 @@ void Level::update(int elapsedTime) {
 void Level::draw(Graphics &graphics) {
     
     
-    this->_transx = this->_position.x;
-    this->_transy = this->_position.y;
+    //this->_transx = this->_position.x;
+    //this->_transy = this->_position.y;
     
     
-    
+    int posx = std::round(this->_positionx);
+    int posy = std::round(this->_positiony);
     
 
     //this->_map.drawAngle(graphics, this->_position.x, this->_position.y, this->_angle);
     //this->_map.drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
     
-    Map::drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    //Map::drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
+    
+    Map::drawTrans(graphics, posx, posy, this->_angle, posx, posy, this->_cameraMove);
+    
     
     for(int i = 0; i<this->_collisionRects.size(); i++) {
-        graphics.drawRect(this->_collisionRects.at(i).getX(), this->_collisionRects.at(i).getY(), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
+        graphics.drawRect(std::round(this->_collisionRects.at(i).getX()), std::round(this->_collisionRects.at(i).getY()), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
     }
     
     //std::cout <<this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
     
-    //std::cout << this->_position.x << " " << this->_position.y << std::endl;
+    //std::cout << this->_positionx << " " << this->_positiony << std::endl;
     
-
+    //graphics.drawLine(-this->_positionx + 640, -this->_positiony + 400, -this->_positionx + 640 + 100*std::sin(this->_angle*3.14159/180), -this->_positiony + 400 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    graphics.drawLine(640, 400, 640 - 100*std::sin(this->_angle*3.14159/180), 400 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    float m = (400 - (400 - 100*std::cos(this->_angle*3.14159/180)))/(640-(640 - 100*std::sin(this->_angle*3.14159/180)));
+    
+    float b = 400 - m*640;
+    
+    //std::cout << m << std::endl;
+    
+    //std::cout << this->_angle << std::endl;
+    
+    //graphics.drawPoint(400, 400);
+    
+    //float collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    
+    //float collisiony = this->_collisionRects.at(0).getX() * m + b;
+    
+    //graphics.drawRect(400 - 5, 400-5, 10, 10);
+    
+    //graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
+    
+    /*
+    //the top
+    if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+        graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
+    }
+    */
+    /*
+    if((this->_collisionRects.at(0).getY() + this->_positiony < 0) && this->_angle < 0) {
+        //player is below the rectangle
+    }
+     */
+    
+    //check bottom
+    float collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
+    float collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() < 400-this->_collisionRects.at(0).getHeight() && std::abs(this->_angle) < 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()-5, 10, 10);
+        }
+    }
+    
+    //std::cout << this->_collisionRects.at(0).getY() << " " << this->_positiony <<std::endl;
+    
+    //check top                                         //if angle is over 2 pi, subtract 2 pi
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() > 400 && std::abs(this->_angle) > 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
+        }
+    }
+    
+    //std::cout << this->_collisionRects.at(0).getY() << " " << this->_positiony <<std::endl;
+    
+    //check left
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    //if((this->_collisionRects.at(0).getX() + this->_positionx > 0 && std::abs(this->_angle) > 90)) {
+    if((this->_collisionRects.at(0).getX() > 640) && this->_angle < 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
+        }
+    }
+    
+    //std::cout << this->_collisionRects.at(0).getX() <<std::endl;
+    //std::cout << this->_angle << std::endl;
+    
+    //check right
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
+    //if((this->_collisionRects.at(0).getX() + this->_positionx > 0 && std::abs(this->_angle) > 90)) {
+    if((this->_collisionRects.at(0).getX() < 640 - this->_collisionRects.at(0).getWidth()) && this->_angle > 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            graphics.drawRect(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth() - 5, collisiony-5, 10, 10);
+        }
+    }
+    
+    //std::cout << this->_collisionRects.at(0).getX() << " " << this->_positionx <<std::endl;
+    
+    
+    graphics.drawLine(0, b, -b/m, 0);
 }
 
 
@@ -611,14 +702,14 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, flo
 
 
 void Level::changeY(int newY, int newCollisionY) {
-    this->_position.y = newY;
+    this->_positiony = newY;
     for(int i = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).changeY(newCollisionY);
     }
 }
 
 void Level::changeX(int newX, int newCollisionX) {
-    this->_position.x = newX;
+    this->_positionx = newX;
     for(int i = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).changeX(newCollisionX);
     }
@@ -627,6 +718,12 @@ void Level::changeX(int newX, int newCollisionX) {
 
 void Level::changeAngle(float angle) {
     this->_angle += angle;
+    if(this->_angle > 180) {
+        this->_angle = this->_angle - 360;
+    }
+    else if(this->_angle < -180) {
+        this->_angle = this->_angle + 360;
+    }
 }
 
 float Level::getAngle() {

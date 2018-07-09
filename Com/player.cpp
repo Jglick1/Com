@@ -203,4 +203,7 @@ void Player::draw(Graphics &graphics) {
     Sprite::draw(graphics, this->_x, this->_y);
     graphics.drawRect(this->_x, this->_y+10, 30, 30);
     //Sprite::drawAngle(graphics, this->_x, this->_y);
+    
+    //graphics.drawLine(640,400,640,0);
+
 }

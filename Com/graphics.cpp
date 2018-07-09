@@ -60,3 +60,11 @@ void Graphics::drawRect(int x, int y, int width, int height) {
     SDL_Rect destRect = {x, y, width, height};
     SDL_RenderDrawRect(this->_renderer, &destRect);
 }
+
+void Graphics::drawLine(int x1, int y1, int x2, int y2) {
+    SDL_RenderDrawLine(this->_renderer, x1, y1, x2, y2);
+}
+
+void Graphics::drawPoint(int x, int y) {
+    SDL_RenderDrawPoint(this->_renderer, x, y);
+}

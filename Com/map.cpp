@@ -13,8 +13,8 @@
 
 Map::Map() {}
 
-Map::Map(Graphics &graphics, const std::string &filePath, int sourceX, int sourceY, int width, int height, float posX, float posY) :
-_x(posX), _y(posY)
+Map::Map(Graphics &graphics, const std::string &filePath, int sourceX, int sourceY, int width, int height, float posX, float posY) //:
+//_x(posX), _y(posY)
 {
     
     this->_sourceRect.x = sourceX;

@@ -44,6 +44,8 @@ void Game::gameLoop() {
     this->_player = Player(graphics, Vector2(3,3));
     this->_unit = Unit(graphics, Vector2(0,0));
     
+    this->_unit.moveToPosition(1280, 0);
+    
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test1", graphics);
     //this->_hud = HUD(graphics, this->_player);
     //this->_inventory = Inventory(graphics, this->_player);
@@ -102,12 +104,16 @@ void Game::gameLoop() {
         SDL_GetMouseState(&xm, &ym);
 
         if (std::abs((xm - old_xm)) < 100) {
-            this->_level.changeAngle(-0.2*(xm - old_xm));
+            this->_level.changeAngle(-0.5*(xm - old_xm));
         }
 
     
         if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE)) {
             return;
+        }
+        
+        if(input.wasKeyPressed(SDL_SCANCODE_X)) {
+            this->_unit.moveToPosition(1280, 800);
         }
 
         
@@ -152,6 +158,9 @@ void Game::gameLoop() {
 
 void Game::handleMovement(Direction &inPower, Input &input) {
     
+    //this->_unit.moveForward();
+    
+    //this->_unit.handleMovement();
     
     switch (inPower) {
         case UP:
@@ -219,7 +228,7 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.stopMoving();
-                this->_unit.stopMoving();
+                this->_unit.stopMovingParallax();
             }
             
     }
@@ -251,17 +260,6 @@ void Game::update(float elapsedTime, Direction &inPower) {
         this->_unit.handleTileCollisions();
     }
      */
-    
-    
-    
-    
-    /*
-    std::vector<Door> otherDoors;
-    if((otherDoors = this->_level.checkDoorCollisions(this->_player.getBoundingBox())).size() > 0) {
-        this->_player.handleDoorCollision(otherDoors, this->_level, this->_graphics);
-        this->_isOutside = 0;
-    }
-    */
 
 
     //this->_unit.moveForward();
@@ -274,18 +272,12 @@ void Game::update(float elapsedTime, Direction &inPower) {
     this->_level.update(elapsedTime);
     
     this->_player.update(elapsedTime, mx, my);
-    //this->_unit.setDXDY(0.0, 0.0);
-    //this->_unit.update(elapsedTime, this->_level.getAngle());
-    //this->_hud.update(elapsedTime, this->_player);
-    
-    //std::cout << this->_level.getDX() << " " << this->_level.getDY() << " ";
-    
-    //std::cout << this->_unit.getX() << " " << this->_unit.getY() << " ";
-    
+
+    //this->_unit.moveToPosition(1280, 0);
     
     this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
     this->_unit.update(elapsedTime, this->_level.getAngle());
-    
+
     
     
     
@@ -297,17 +289,7 @@ void Game::update(float elapsedTime, Direction &inPower) {
         this->_unit.handleTileCollisions(others, elapsedTime);
     }
 
-    //std::cout << this->_unit.getX() << " " << this->_unit.getY() << std::endl;
-    
-    //std::cout << this->_level.getX() << " " << this->_level.getY() << std::endl;
-    
-    
-    //std::cout << this->_player.getX() << " " << this->_player.getY() << std::endl;
-    
-    //std::cout << this->_level.getDX() << " " << this->_level.getDY() << std::endl;
 
-    //this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
-    //this->_unit.update(elapsedTime, this->_level.getAngle());
 
    
 }

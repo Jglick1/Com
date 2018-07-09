@@ -76,7 +76,10 @@ private:
 	
 	float _dx, _dy;
     float _angle; // really player angle
-    Vector2 _position;
+    //Vector2 _position;
+    
+    float _positionx;
+    float _positiony;
     
     int _transx;
     int _transy;

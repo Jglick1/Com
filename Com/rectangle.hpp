@@ -68,8 +68,12 @@ public:
     
     void update(float elapsedTime, float dx, float dy) {
         
-        this->_x += std::round(dx * elapsedTime);
-        this->_y += std::round(dy * elapsedTime);
+        //this->_x += std::round(dx * elapsedTime);
+        //this->_y += std::round(dy * elapsedTime);
+        
+        
+        this->_x += dx * elapsedTime;
+        this->_y += dy * elapsedTime;
         
     }
     
@@ -124,7 +128,8 @@ public:
     }
     
 private:
-    int _x, _y, _width, _height;
+    float _x, _y;
+    int _width, _height;
     int _startX;
     int _startY;
     

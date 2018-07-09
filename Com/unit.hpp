@@ -33,6 +33,7 @@ public:
     void moveBackwardParallax();
     void moveRightParallax();
     void moveLeftParallax();
+    void stopMovingParallax();
     
     void moveUpAndRight();
     void moveUpAndLeft();
@@ -80,7 +81,10 @@ public:
     void changeY(int newY);
     
     void moveToPosition(int posX, int posY);
+    
+    State getState();
 
+    void handleMovement();
     
 private:
     float _dx, _dy;
@@ -92,6 +96,12 @@ private:
     float _playerAngle;
     
     State _state;
+    
+    float _destinationAngle;
+    float _destinationx;
+    float _destinationy;
+    
+    Direction _destinationDirection;
     
     
 };

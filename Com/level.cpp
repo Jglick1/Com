@@ -444,6 +444,8 @@ void Level::draw(Graphics &graphics) {
     
     float b = 400 - m*640;
     
+    
+    
     //std::cout << m << std::endl;
     
     //std::cout << this->_angle << std::endl;
@@ -518,7 +520,7 @@ void Level::draw(Graphics &graphics) {
     //std::cout << this->_collisionRects.at(0).getX() << " " << this->_positionx <<std::endl;
     
     
-    graphics.drawLine(0, b, -b/m, 0);
+    //graphics.drawLine(0, b, -b/m, 0);
 }
 
 

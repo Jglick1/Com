@@ -251,6 +251,14 @@ void Unit::draw(Graphics &graphics) {
 
     
     //this->stopMoving();
+    
+    //graphics.drawLine(this->_staticx+15, this->_staticy+30, this->_staticx+15 - 100*std::sin(this->_angle*3.14159/180), this->_staticy+30 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    graphics.drawLine(this->_staticx + this->_x+15, this->_staticy + this->_y+30, this->_staticx + this->_x+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy + this->_y+30 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    
+    //this->_angle++;
+    //std::cout << this->_angle << std::endl;
 
 }
 

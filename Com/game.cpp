@@ -16,13 +16,15 @@
 
 
 namespace {
-    const int FPS = 60;
+    const int FPS = 30;
     const int MAX_FRAME_TIME = 1000 / FPS;
 }
 
 
 Game::Game() {
+    //printf("SDL_Init\n");
     SDL_Init(SDL_INIT_EVERYTHING);
+    TTF_Init();
     this->gameLoop();
     
 }
@@ -32,19 +34,26 @@ Game::~Game() {
 }
 
 void Game::gameLoop() {
+    //printf("beginning game loop\n");
+    
     Graphics graphics;
     SDL_Event event;
     Input input;
     
+    textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
+    if(textSheet == NULL) {
+        printf("Error: Unable to load text\n");
+    }
     
+
 
     
     //this->_player = Player(graphics, this->_level.getPlayerSpawnPoint());
     
     this->_player = Player(graphics, Vector2(3,3));
-    this->_unit = Unit(graphics, Vector2(0,0));
+    //this->_unit = Unit(graphics, Vector2(0,0));
     
-    this->_unit.moveToPosition(1280, 0);
+    //this->_unit.moveToPosition(1280, 0);
     
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test1", graphics);
     //this->_hud = HUD(graphics, this->_player);
@@ -113,7 +122,7 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
-            this->_unit.moveToPosition(1280, 800);
+            this->_level.moveUnitToPosition(1280, 800);
         }
 
         
@@ -121,7 +130,8 @@ void Game::gameLoop() {
         //handle movement
         //render
         
-        this->_unit.setPlayerAngle(this->_level.getAngle());
+        //this->_unit.setPlayerAngle(this->_level.getAngle());
+        this->_level.setUnitAngle();
         
         
         //if(wasThereAnEvent) {
@@ -134,7 +144,7 @@ void Game::gameLoop() {
         const int CURRENT_TIME_MS = SDL_GetTicks();
         int ELAPSED_TIME_MS = CURRENT_TIME_MS - LAST_UPDATE_TIME;
         
-        this->_graphics = graphics;
+        //this->_graphics = graphics;
         
         this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower);
         
@@ -146,7 +156,7 @@ void Game::gameLoop() {
         }
         
         this->draw(graphics);
-        this->_unit.stopMoving();
+        //this->_unit.stopMoving();
         
         //handle movement
         //update
@@ -158,9 +168,9 @@ void Game::gameLoop() {
 
 void Game::handleMovement(Direction &inPower, Input &input) {
     
-    //this->_unit.moveForward();
-    
     //this->_unit.handleMovement();
+    
+    //this->_level.handleUnitMovement();
     
     switch (inPower) {
         case UP:
@@ -170,7 +180,6 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.moveBackward();
-                this->_unit.moveBackwardParallax();
             }
             
             break;
@@ -182,7 +191,6 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.moveForward();
-                this->_unit.moveForwardParallax();
             }
             
             break;
@@ -194,7 +202,6 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.moveLeft();
-                this->_unit.moveLeftParallax();
             }
             break;
             
@@ -205,7 +212,6 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.moveRight();
-                this->_unit.moveRightParallax();
             }
             
             break;
@@ -228,10 +234,11 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             else {
                 this->_level.stopMoving();
-                this->_unit.stopMovingParallax();
             }
             
     }
+    
+    this->_level.handleUnitMovement();
 }
 
 
@@ -242,8 +249,10 @@ void Game::draw(Graphics &graphics) {
     this->_level.draw(graphics);
     this->_player.draw(graphics);
     
-    this->_unit.draw(graphics);
-
+    //SDL_Rect destinationRectangle = { 0, 0, 200, 200};
+    //graphics.blitSurface(this->textSheet, NULL, &destinationRectangle);
+    
+    //graphics.renderText();
     
     graphics.flip();
     
@@ -275,8 +284,8 @@ void Game::update(float elapsedTime, Direction &inPower) {
 
     //this->_unit.moveToPosition(1280, 0);
     
-    this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
-    this->_unit.update(elapsedTime, this->_level.getAngle());
+    //this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
+    //this->_unit.update(elapsedTime, this->_level.getAngle());
 
     
     
@@ -285,8 +294,12 @@ void Game::update(float elapsedTime, Direction &inPower) {
     std::vector<Rectangle> others;
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);
-        this->_level.handleTileCollisions(others, this->_unit, elapsedTime);
-        this->_unit.handleTileCollisions(others, elapsedTime);
+        this->_level.handleTileCollisions(others, elapsedTime);
+        
+        
+        
+        
+        //this->_unit.handleTileCollisions(others, elapsedTime);
     }
 
 

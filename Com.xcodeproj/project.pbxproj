@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41064C9020F56828004E1EF4 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41064C8F20F56828004E1EF4 /* SDL2_ttf.framework */; };
 		41D4195620DB531C00A97956 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195520DB531C00A97956 /* main.cpp */; };
 		41D4196120DB538200A97956 /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195C20DB538200A97956 /* game.cpp */; };
 		41D4196220DB538200A97956 /* graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195F20DB538200A97956 /* graphics.cpp */; };
@@ -35,6 +36,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		41064C8F20F56828004E1EF4 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		41D4195220DB531C00A97956 /* Com */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Com; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D4195520DB531C00A97956 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		41D4195C20DB538200A97956 /* game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = game.cpp; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41064C9020F56828004E1EF4 /* SDL2_ttf.framework in Frameworks */,
 				41D4196720DB541800A97956 /* SDL2.framework in Frameworks */,
 				41D4196920DB542800A97956 /* SDL2_image.framework in Frameworks */,
 			);
@@ -142,6 +145,7 @@
 		41D4196520DB541800A97956 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				41064C8F20F56828004E1EF4 /* SDL2_ttf.framework */,
 				41D4196820DB542800A97956 /* SDL2_image.framework */,
 				41D4196620DB541800A97956 /* SDL2.framework */,
 			);
@@ -352,6 +356,7 @@
 				41D4195B20DB531C00A97956 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

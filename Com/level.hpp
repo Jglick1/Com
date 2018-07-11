@@ -43,7 +43,7 @@ public:
 	void moveLeft();
 	void stopMoving();
 	
-    void handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, float elapsedTime);
+    void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime);
     
     void changeAngle(float angle);
 	
@@ -57,6 +57,12 @@ public:
     
     float getDX();
     float getDY();
+    
+    void setUnitAngle();
+    
+    void handleUnitMovement();
+    
+    void moveUnitToPosition(int posX, int posY);
     
 private:
     //Map _map;
@@ -86,6 +92,8 @@ private:
     int _ang;
     
     bool _cameraMove;
+    
+    Unit _unit;
     
 
 };

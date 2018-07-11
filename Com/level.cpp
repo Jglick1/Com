@@ -45,6 +45,10 @@ Level::Level(std::string mapName, Graphics &graphics) :
 {
 
 	this->loadMap(mapName, graphics);
+    
+    this->_unit = Unit(graphics, Vector2(0,0));
+    
+    this->_unit.moveToPosition(1280, 0);
 
     
     //this->_map = Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0);
@@ -404,6 +408,7 @@ void Level::update(int elapsedTime) {
     
     //std::cout << this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
     
+    this->_unit.update(elapsedTime, this->_angle);
     
     
 }
@@ -521,6 +526,8 @@ void Level::draw(Graphics &graphics) {
     
     
     //graphics.drawLine(0, b, -b/m, 0);
+    
+    this->_unit.draw(graphics);
 }
 
 
@@ -582,22 +589,26 @@ void Level::moveLeft() {
 void Level::moveForward() {
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_unit.moveForwardParallax();
 }
 
 void Level::moveBackward() {
     this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
+    this->_unit.moveBackwardParallax();
 }
 
 
 void Level::moveRight() {
     this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+    this->_unit.moveRightParallax();
 }
 
 void Level::moveLeft() {
     this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
+    this->_unit.moveLeftParallax();
 }
 
 
@@ -614,6 +625,7 @@ void Level::cameraStill() {
 void Level::stopMoving() {
 	this->_dx = 0.0f;
 	this->_dy = 0.0f;
+    this->_unit.stopMovingParallax();
 }
 
 
@@ -633,7 +645,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, Direction &inPo
 */
 
 
-void Level::handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, float elapsedTime) { //other are the level's collision rects
+void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
     //rectangle for the player
     //Rectangle playerRec = Rectangle(625, 375, 30, 40);          //collsion rectangle for player
     
@@ -697,6 +709,12 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, Unit &unit, flo
 
         
     }
+    
+    
+    this->_unit.handleTileCollisions(others, elapsedTime);
+    
+    
+    
 }
 
 
@@ -738,5 +756,17 @@ float Level::getDX() {
 
 float Level::getDY() {
     return this->_dy;
+}
+
+void Level::setUnitAngle() {
+    this->_unit.setPlayerAngle(this->_angle);
+}
+
+void Level::handleUnitMovement() {
+    this->_unit.handleMovement();
+}
+
+void Level::moveUnitToPosition(int posX, int posY) {
+    this->_unit.moveToPosition(posX, posY);
 }
 

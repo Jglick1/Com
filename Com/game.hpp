@@ -37,12 +37,15 @@ private:
     
     //Inventory _inventory;
     
-    Graphics _graphics;
+    //Graphics _graphics;
     
     float _deltaX;
     float _deltaY;
     
-    Unit _unit;
+    //Unit _unit;
+    
+                    //erase eventually
+    SDL_Texture* textSheet;
     
     
 };

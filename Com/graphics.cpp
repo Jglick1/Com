@@ -9,11 +9,25 @@
 #include "graphics.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #include "globals.hpp"
+
 
 Graphics::Graphics() {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
     SDL_SetWindowTitle(this->_window, "Com");
+    
+    this->_font = NULL;
+    
+    printf("loading font\n");
+    this->_font =  TTF_OpenFont("/Users/jonahglick/Documents/Com/OpenSans_Semibold.ttf", 28 );
+    
+    if( this->_font == NULL ) {
+        printf( "Failed to load font\n");
+    }
+    else{
+        //printf( "Sucessfully loaded Font\n");
+    }
     
     //SDL_WarpMouseInWindow(this->_window, 10, 10);
     //SDL_SetWindowFullscreen(this->_window, SDL_WINDOW_FULLSCREEN);
@@ -21,8 +35,18 @@ Graphics::Graphics() {
 }
 
 Graphics::~Graphics() {
+    
+    //TTF_CloseFont(this->_font);
+    
+    //printf("graphics destructor\n");
+    
     SDL_DestroyWindow(this->_window);
     SDL_DestroyRenderer(this->_renderer);
+    
+
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
 }
 
 SDL_Surface* Graphics::loadImage(const std::string &filePath) {
@@ -32,6 +56,14 @@ SDL_Surface* Graphics::loadImage(const std::string &filePath) {
     return this->_spriteSheets[filePath];
 }
 
+SDL_Surface * Graphics::loadText(const std::string &text) {
+    SDL_Color textColor = { 0, 0, 0 };
+    if(this->_textSheets.count(text) == 0) {
+        this->_textSheets[text] = TTF_RenderText_Solid(this->_font, text.c_str(), textColor);
+    }
+    return this->_textSheets[text];
+}
+
 
 void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_Rect* destinationRectangle) {
     
@@ -39,6 +71,17 @@ void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_
     
     
 }
+
+/*
+void Graphics::renderText() {
+    std::string aMessage = "Hello World";
+    SDL_Color textColor = { 0, 0, 0 };
+    SDL_Surface* textSurface = TTF_RenderText_Solid( this->_font, aMessage.c_str(), textColor );
+    SDL_CreateTextureFromSurface( this->_renderer, textSurface );
+    SDL_FreeSurface( textSurface );
+    
+}
+ */
 
 void Graphics::flip() {
     SDL_RenderPresent(this->_renderer);

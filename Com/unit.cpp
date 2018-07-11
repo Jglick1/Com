@@ -158,6 +158,9 @@ void Level::moveLeft() {
  */
 
 void Unit::moveToPosition(int posX, int posY) {
+    
+    stopMoving();
+    
     //find the angle the unit will need to be at
     float xdiff = posX - (this->_staticx+15);
     float ydiff = posY - (this->_staticy+30);
@@ -197,7 +200,7 @@ void Unit::moveToPosition(int posX, int posY) {
         this->_destinationDirection = UPLEFT;
     }
     
-
+    
     
     //std::cout << xdiff << " " << ydiff << std::endl;
     //std::cout << this->_angle << std::endl;
@@ -264,16 +267,6 @@ void Unit::draw(Graphics &graphics) {
 
 void Unit::update(float elapsedTime, float playerAngle) {
     //movement
-    /*
-    this->_y += std::round(this->_dy * elapsedTime);
-    this->_x += std::round(this->_dx * elapsedTime);
-    
-    this->_staticy += std::round(this->_staticdy * elapsedTime);
-    this->_staticx += std::round(this->_staticdx * elapsedTime);
-    */
-    
-    //this->_playerAngle = playerAngle;
-    
 
 
     this->_y += this->_dy * elapsedTime;
@@ -281,8 +274,7 @@ void Unit::update(float elapsedTime, float playerAngle) {
     
     this->_staticy += this->_staticdy * elapsedTime;
     this->_staticx += this->_staticdx * elapsedTime;
-    
-    //this->_angle++;
+
     
     Sprite::update();
     
@@ -292,10 +284,6 @@ void Unit::setPlayerAngle(float playerAngle) {
     this->_playerAngle = playerAngle;
 }
 
-void Unit::handleTileCollisions() {
-    this->_dx = 0.0;
-    this->_dy = 0.0;
-}
 
 float Unit::getDX() {
     return this->_dx;
@@ -386,8 +374,7 @@ State Unit::getState() {
 }
 
 void Unit::handleMovement() {
-    
-    //std::cout << this->_staticx << " " << this->_staticy << std::endl;
+
     
     switch(this->_state) {
         case CHANGE_ANGLE_UP:
@@ -424,9 +411,6 @@ void Unit::handleMovement() {
             
             if(!((std::floor(this->_staticx) == std::floor(this->_destinationx)) && (std::floor(this->_staticy) == std::floor(this->_destinationy)))) { // don't need y because angle is already defined
                 
-                
-                
-                
                 moveForward();
             }
             else {
@@ -435,6 +419,7 @@ void Unit::handleMovement() {
             }
             break;
         case STILL:
+            //stopMoving();
             break;
     }
     

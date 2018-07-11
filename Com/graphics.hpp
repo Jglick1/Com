@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include <SDL2/SDL.h>
+#include <SDL2_ttf/SDL_ttf.h>
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -40,11 +41,19 @@ public:
     
     void drawPoint(int x, int y);
     
+    void renderText();
+    
+    SDL_Surface * loadText(const std::string &text);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;
     
+    TTF_Font* _font;
+    
     std::map<std::string, SDL_Surface*> _spriteSheets;
+    
+    std::map<std::string, SDL_Surface*> _textSheets;
     
     
 };

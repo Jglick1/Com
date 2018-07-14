@@ -29,7 +29,7 @@ namespace player_constants {
 Level::Level() {}
 
 Level::Level(std::string mapName, Graphics &graphics) :
-    Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0),
+    Map(graphics, "/Users/jonahglick/Documents/Com/com_test2.png", 0, 0, 1280, 800, 0, 0),
 	_mapName(mapName),
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),

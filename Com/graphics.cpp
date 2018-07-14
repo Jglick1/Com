@@ -44,7 +44,10 @@ Graphics::~Graphics() {
     SDL_DestroyWindow(this->_window);
     SDL_DestroyRenderer(this->_renderer);
     
+    Mix_FreeChunk(this->_shot);
+    this->_shot = NULL;
 
+    Mix_Quit();
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
@@ -65,6 +68,16 @@ SDL_Surface * Graphics::loadText(const std::string &text) {
     return this->_textSheets[text];
 }
 
+void Graphics::loadSound() {
+    this->_shot = Mix_LoadWAV("/Users/jonahglick/Documents/Com/kar98_fp.wav");
+    if(this->_shot == NULL) {
+        printf( "Failed to load shot sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+    }
+}
+
+void Graphics::playShot() {
+    Mix_PlayChannel( -1, this->_shot, 0 );
+}
 
 void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_Rect* destinationRectangle) {
     

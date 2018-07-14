@@ -47,6 +47,10 @@ public:
     
     SDL_Surface * loadText(const std::string &text);
     
+    void loadSound();
+    
+    void playShot();
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

@@ -59,11 +59,14 @@ void Game::gameLoop() {
     SDL_Event event;
     Input input;
     
+    graphics.loadSound();
+    
+    /*
     textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
     if(textSheet == NULL) {
         printf("Error: Unable to load text\n");
     }
-    
+     */
 
 
     
@@ -142,6 +145,10 @@ void Game::gameLoop() {
         
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
             this->_level.moveUnitToPosition(1280, 800);
+        }
+        
+        if(input.wasKeyPressed(SDL_SCANCODE_G)) {
+            graphics.playShot();
         }
 
         

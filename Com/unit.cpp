@@ -74,6 +74,26 @@ void Unit::stopMovingParallax() {
     this->_dy = 0.0;
 }
 
+void Unit::moveUpRightParallax() {                 //should have said forwardRight and backwardRight instead
+    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
+    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
+    //this->_unit.moveForwardRightParallax();
+}
+void Unit::moveUpLeftParallax() {
+    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
+    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
+    //this->_unit.moveForwardRightParallax();
+}
+void Unit::moveDownRightParallax() {
+    this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
+    this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
+}
+void Unit::moveDownLeftParallax() {
+    this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
+    this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
+}
+
+
 void Unit::setDXDY(float dx, float dy) {
     this->_dx = dx;
     this->_dy = dy;

@@ -25,6 +25,25 @@ Game::Game() {
     //printf("SDL_Init\n");
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
+    
+    //Initialize PNG loading
+    int imgFlags = IMG_INIT_PNG;
+    if( !( IMG_Init( imgFlags ) & imgFlags ) )
+    {
+        printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
+        return;
+    }
+    
+    //Initialize SDL_mixer
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+    {
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+        return;
+    }
+    
+    
+    
+    
     this->gameLoop();
     
 }
@@ -172,10 +191,20 @@ void Game::handleMovement(Direction &inPower, Input &input) {
     
     //this->_level.handleUnitMovement();
     
+    //this->printDirection(inPower);
+    
     switch (inPower) {
         case UP:
             if (input.wasKeyReleased(SDL_SCANCODE_W)) {
                 inPower = NONE;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
+                inPower = UPRIGHT;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
+                inPower = UPLEFT;
                 this->handleMovement(inPower, input);
             }
             else {
@@ -189,6 +218,14 @@ void Game::handleMovement(Direction &inPower, Input &input) {
                 inPower = NONE;
                 this->handleMovement(inPower, input);
             }
+            else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
+                inPower = DOWNRIGHT;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
+                inPower = DOWNLEFT;
+                this->handleMovement(inPower, input);
+            }
             else {
                 this->_level.moveForward();
             }
@@ -200,14 +237,30 @@ void Game::handleMovement(Direction &inPower, Input &input) {
                 inPower = NONE;
                 this->handleMovement(inPower, input);
             }
+            else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
+                inPower = UPRIGHT;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
+                inPower = DOWNRIGHT;
+                this->handleMovement(inPower, input);
+            }
             else {
                 this->_level.moveLeft();
             }
             break;
             
         case LEFT:
-            if (!input.isKeyHeld(SDL_SCANCODE_A)) {
+            if (input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = NONE;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
+                inPower = UPLEFT;
+                this->handleMovement(inPower, input);
+            }
+            else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
+                inPower = DOWNLEFT;
                 this->handleMovement(inPower, input);
             }
             else {
@@ -215,14 +268,110 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             }
             
             break;
-        case NONE:
-            if(input.isKeyHeld(SDL_SCANCODE_W)) {
+        case UPRIGHT:
+            if(input.wasKeyReleased(SDL_SCANCODE_W)) {
+                if(input.wasKeyReleased(SDL_SCANCODE_D)) {
+                    inPower = NONE;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = RIGHT;
+                    this->handleMovement(inPower, input);
+                }
+            }
+            else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = UP;
                 this->handleMovement(inPower, input);
             }
-            else if(input.isKeyHeld(SDL_SCANCODE_S)) {
+            else {
+                this->_level.moveDownLeft();
+            }
+            break;
+        case UPLEFT:
+            if(input.wasKeyReleased(SDL_SCANCODE_W)) {
+                if(input.wasKeyReleased(SDL_SCANCODE_A)) {
+                    inPower = NONE;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = LEFT;
+                    this->handleMovement(inPower, input);
+                }
+            }
+            else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
+                inPower = UP;
+                this->handleMovement(inPower, input);
+            }
+            else {
+                this->_level.moveDownRight();
+            }
+            break;
+        case DOWNRIGHT:
+            if(input.wasKeyReleased(SDL_SCANCODE_S)) {
+                if(input.wasKeyReleased(SDL_SCANCODE_D)) {
+                    inPower = NONE;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = RIGHT;
+                    this->handleMovement(inPower, input);
+                }
+            }
+            else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = DOWN;
                 this->handleMovement(inPower, input);
+            }
+            else {
+                this->_level.moveUpLeft();
+            }
+            break;
+        case DOWNLEFT:
+            if(input.wasKeyReleased(SDL_SCANCODE_S)) {
+                if(input.wasKeyReleased(SDL_SCANCODE_A)) {
+                    inPower = NONE;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = LEFT;
+                    this->handleMovement(inPower, input);
+                }
+            }
+            else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
+                inPower = DOWN;
+                this->handleMovement(inPower, input);
+            }
+            else {
+                this->_level.moveUpRight();
+            }
+            break;
+        case NONE:
+            if(input.isKeyHeld(SDL_SCANCODE_W)) {
+                if(input.isKeyHeld(SDL_SCANCODE_D)) {
+                    inPower = UPRIGHT;
+                    this->handleMovement(inPower, input);
+                }
+                else if(input.isKeyHeld(SDL_SCANCODE_A)) {
+                    inPower = UPLEFT;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = UP;
+                    this->handleMovement(inPower, input);
+                }
+            }
+            else if(input.isKeyHeld(SDL_SCANCODE_S)) {
+                if(input.isKeyHeld(SDL_SCANCODE_D)) {
+                    inPower = DOWNRIGHT;
+                    this->handleMovement(inPower, input);
+                }
+                else if(input.isKeyHeld(SDL_SCANCODE_A)) {
+                    inPower = DOWNLEFT;
+                    this->handleMovement(inPower, input);
+                }
+                else {
+                    inPower = DOWN;
+                    this->handleMovement(inPower, input);
+                }
             }
             else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                 inPower = LEFT;
@@ -235,6 +384,7 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             else {
                 this->_level.stopMoving();
             }
+            break;
             
     }
     
@@ -305,4 +455,36 @@ void Game::update(float elapsedTime, Direction &inPower) {
 
 
    
+}
+
+void Game::printDirection(Direction inPower) {
+    switch(inPower) {
+        case UP:
+            printf("UP\n");
+            break;
+        case DOWN:
+            printf("DOWN\n");
+            break;
+        case RIGHT:
+            printf("RIGHT\n");
+            break;
+        case LEFT:
+            printf("LEFT\n");
+            break;
+        case UPRIGHT:
+            printf("UPRIGHT\n");
+            break;
+        case UPLEFT:
+            printf("UPLEFT\n");
+            break;
+        case DOWNRIGHT:
+            printf("DOWNRIGHT\n");
+            break;
+        case DOWNLEFT:
+            printf("DOWNLEFT\n");
+            break;
+        case NONE:
+            printf("NONE\n");
+            break;
+    }
 }

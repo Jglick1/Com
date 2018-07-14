@@ -91,6 +91,11 @@ public:
 
     void handleMovement();
     
+    void moveUpRightParallax();
+    void moveUpLeftParallax();
+    void moveDownRightParallax();
+    void moveDownLeftParallax();
+    
 private:
     float _dx, _dy;
     float _angle;

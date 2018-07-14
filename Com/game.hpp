@@ -22,6 +22,8 @@ class Game {
 public:
     Game();
     ~Game();
+    void printDirection(Direction inPower);
+    
     
 private:
     void gameLoop();

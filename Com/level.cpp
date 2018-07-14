@@ -667,6 +667,30 @@ void Level::moveLeft() {
     this->_unit.moveLeftParallax();
 }
 
+//  dxForward/1.41421 + dxRight/1.41421
+//  dyForward/1.41421 + dyRight/1.41421
+void Level::moveUpRight() {                 //should have said forwardRight and backwardRight instead
+    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
+    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
+    this->_unit.moveUpRightParallax();
+}
+void Level::moveUpLeft() {
+    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
+    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
+    this->_unit.moveUpLeftParallax();
+}
+void Level::moveDownRight() {
+    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
+    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
+    this->_unit.moveDownRightParallax();
+}
+void Level::moveDownLeft() {
+    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
+    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
+    this->_unit.moveDownLeftParallax();
+}
+
+
 
 void Level::cameraMove() {
     this->_cameraMove = 1;

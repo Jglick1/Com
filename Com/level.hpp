@@ -64,6 +64,11 @@ public:
     
     void moveUnitToPosition(int posX, int posY);
     
+    void moveUpRight();
+    void moveUpLeft();
+    void moveDownRight();
+    void moveDownLeft();
+    
 private:
     //Map _map;
 	std::string _mapName;

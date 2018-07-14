@@ -12,7 +12,9 @@
 #include <map>
 #include <string>
 #include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
 #include <SDL2_ttf/SDL_ttf.h>
+#include <SDL2_mixer/SDL_mixer.h>
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -50,6 +52,9 @@ private:
     SDL_Renderer* _renderer;
     
     TTF_Font* _font;
+    
+    Mix_Chunk* _shot = NULL;
+    Mix_Music *gMusic = NULL;
     
     std::map<std::string, SDL_Surface*> _spriteSheets;
     

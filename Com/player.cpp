@@ -24,6 +24,7 @@ Player::Player(Graphics &graphics, Vector2 spawnPoint) :
 //AnimatedSprite(graphics, "/Users/jonahglick/Documents/Io/Link1.png", 171, 129, 16, 22, spawnPoint.x, spawnPoint.y, 75),
 //Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 660),
 Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 375),
+//Sprite(graphics, "/Users/jonahglick/Documents/Com/16x16_rifleman.png", 0, 0, 16, 16, 625, 375),
 _dx(0),
 _dy(0),
 _mx(0),

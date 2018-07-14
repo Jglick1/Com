@@ -19,7 +19,7 @@ Graphics::Graphics() {
     
     this->_font = NULL;
     
-    printf("loading font\n");
+    //printf("loading font\n");
     this->_font =  TTF_OpenFont("/Users/jonahglick/Documents/Com/OpenSans_Semibold.ttf", 28 );
     
     if( this->_font == NULL ) {

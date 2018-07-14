@@ -48,10 +48,14 @@ Level::Level(std::string mapName, Graphics &graphics) :
     
     this->_unit = Unit(graphics, Vector2(0,0));
     
-    this->_unit.moveToPosition(1280, 0);
+    //this->_unit.moveToPosition(600, 800);
 
     
     //this->_map = Map(graphics, "/Users/jonahglick/Documents/Com/com_test1.png", 0, 0, 320, 200, 0, 0);
+    
+    
+    //vector of unit types <enemies>
+    //vector of unit types <allies>
 
 }
 
@@ -528,6 +532,58 @@ void Level::draw(Graphics &graphics) {
     //graphics.drawLine(0, b, -b/m, 0);
     
     this->_unit.draw(graphics);
+    
+    float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+15;
+    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+30;
+    float angleEquivalent = this->_unit.getAngle();
+    
+    //in both cases we change the - sin for x into a + sin
+    graphics.drawLine(xEquivalent, yEquivalent, xEquivalent + 100*std::sin(angleEquivalent*3.14159/180), yEquivalent - 100*std::cos(angleEquivalent*3.14159/180) );
+    
+    m = (yEquivalent - (yEquivalent - 100*std::cos(angleEquivalent*3.14159/180)))/(xEquivalent-(xEquivalent + 100*std::sin(angleEquivalent*3.14159/180)));
+    
+    b = yEquivalent - m*xEquivalent;
+    
+    //graphics.drawLine(0, b, -b/m, 0);
+
+    collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() < yEquivalent-this->_collisionRects.at(0).getHeight() && std::abs(angleEquivalent) < 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()-5, 10, 10);
+        }
+    }
+    
+    //check top                                         //if angle is over 2 pi, subtract 2 pi
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() > yEquivalent && std::abs(angleEquivalent) > 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
+        }
+    }
+    
+    //check left
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getX() > xEquivalent) && angleEquivalent < 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
+        }
+    }
+
+    
+    //check right
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
+    if((this->_collisionRects.at(0).getX() < xEquivalent - this->_collisionRects.at(0).getWidth()) && angleEquivalent > 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            graphics.drawRect(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth() - 5, collisiony-5, 10, 10);
+        }
+    }
+    
+    
+    
 }
 
 

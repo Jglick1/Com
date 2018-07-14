@@ -77,6 +77,11 @@ public:
     const float getMX() const;
     const float getMY() const;
     
+    float getStaticX();
+    float getStaticY();
+    
+    float getAngle();
+    
     void changeX(int newX);
     void changeY(int newY);
     

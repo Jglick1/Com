@@ -162,8 +162,10 @@ void Unit::moveToPosition(int posX, int posY) {
     stopMoving();
     
     //find the angle the unit will need to be at
-    float xdiff = posX - (this->_staticx+15);
-    float ydiff = posY - (this->_staticy+30);
+    //float xdiff = posX - (this->_staticx+15);
+    //float ydiff = posY - (this->_staticy+30);
+    float xdiff = posX - (this->_staticx);
+    float ydiff = posY - (this->_staticy+10);
     float angle = 0.0;
     
     if(ydiff < 0) {
@@ -173,34 +175,48 @@ void Unit::moveToPosition(int posX, int posY) {
         angle = -std::atan(xdiff/ydiff) - 3.14159;
     }
     
-    this->_destinationAngle = angle * 180/3.14159;
+    if((xdiff == 0) && (ydiff == 0)) {
+        this->_destinationAngle = this->_angle;
+    }
+    else {
+        this->_destinationAngle = angle * 180/3.14159;
+    }
+    
+    if(this->_destinationAngle > 180) {
+        this->_destinationAngle -= 360;
+    }
+    else if(this->_destinationAngle < -180) {
+        this->_destinationAngle += 360;
+    }
 
+    
+    
     //this->_angle = angle * 180/3.14159;
     
     this->_destinationx = posX;
     this->_destinationy = posY;
     
-    if(this->_angle > this->_destinationAngle) {
+    if(this->_angle >= this->_destinationAngle) {
         this->_state = CHANGE_ANGLE_DOWN;
     }
     else {
         this->_state = CHANGE_ANGLE_UP;         //TODO. decided whether to go up or down
     }
 
-    if(this->_destinationx > this->_staticx && this->_destinationy > this->_staticy) {
+    if(this->_destinationx >= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNRIGHT;
     }
-    else if(this->_destinationx < this->_staticx && this->_destinationy > this->_staticy) {
+    else if(this->_destinationx <= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNLEFT;
     }
-    else if(this->_destinationx > this->_staticx && this->_destinationy < this->_staticy) {
+    else if(this->_destinationx >= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPRIGHT;
     }
-    else if(this->_destinationx < this->_staticx && this->_destinationy < this->_staticy) {
+    else if(this->_destinationx <= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPLEFT;
     }
     
-    
+    printf("angle: %f, destAngle: %f\n", this->_angle, this->_destinationAngle);
     
     //std::cout << xdiff << " " << ydiff << std::endl;
     //std::cout << this->_angle << std::endl;
@@ -255,13 +271,32 @@ void Unit::draw(Graphics &graphics) {
     
     //this->stopMoving();
     
-    //graphics.drawLine(this->_staticx+15, this->_staticy+30, this->_staticx+15 - 100*std::sin(this->_angle*3.14159/180), this->_staticy+30 - 100*std::cos(this->_angle*3.14159/180) );
-    
-    graphics.drawLine(this->_staticx + this->_x+15, this->_staticy + this->_y+30, this->_staticx + this->_x+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy + this->_y+30 - 100*std::cos(this->_angle*3.14159/180) );
+    //graphics.drawLine(this->_staticx+15, this->_staticy+30, this->_staticx+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy+30 - 100*std::cos(this->_angle*3.14159/180) );
     
     
-    //this->_angle++;
-    //std::cout << this->_angle << std::endl;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //graphics.drawLine(this->_staticx + this->_x+15, this->_staticy + this->_y+30, this->_staticx + this->_x+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy + this->_y+30 - 100*std::cos(this->_angle*3.14159/180) );
+    
+
+    
+    
+
+    
+    
 
 }
 
@@ -324,6 +359,13 @@ int Unit::getY() {
     return this->_y;
 }
 
+float Unit::getStaticX() {
+    return this->_staticx;
+}
+float Unit::getStaticY() {
+    return this->_staticy;
+}
+
 void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
 
     
@@ -373,6 +415,10 @@ State Unit::getState() {
     return this->_state;
 }
 
+float Unit::getAngle() {
+    return this->_angle;
+}
+
 void Unit::handleMovement() {
 
     
@@ -382,6 +428,7 @@ void Unit::handleMovement() {
                 this->_angle++;
             }
             else {
+                this->_angle = this->_destinationAngle;
                 this->_state = MOVE_FORWARD;
             }
             break;
@@ -390,25 +437,67 @@ void Unit::handleMovement() {
                 this->_angle--;
             }
             else {
+                this->_angle = this->_destinationAngle;
                 this->_state = MOVE_FORWARD;
             }
             break;
         case MOVE_FORWARD:
-            /*
+            
             switch(this->_destinationDirection) {
                 case UPRIGHT:
-                    if(
+                    if((this->_staticx >= this->_destinationx) && (this->_staticy+10 <= this->_destinationy)) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 10;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                    }
+                    else {
+                        moveForward();
+                    }
                     break;
                 case UPLEFT:
+                    if((this->_staticx <= this->_destinationx) && (this->_staticy+10 <= this->_destinationy)) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 10;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                    }
+                    else {
+                        moveForward();
+                    }
                     break;
                 case DOWNRIGHT:
+                    if((this->_staticx >= this->_destinationx) && (this->_staticy+10 >= this->_destinationy)) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 10;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                    }
+                    else {
+                        moveForward();
+                    }
                     break;
                 case DOWNLEFT:
+                    if((this->_staticx <= this->_destinationx) && (this->_staticy+10 >= this->_destinationy)) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 10;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                    }
+                    else {
+                        moveForward();
+                    }
                     break;
             }
-            */
+            
+            //printf("sx: %f sy: %f dx: %f dy: %f\n", this->_staticx, this->_staticy, this->_destinationx, this->_destinationy);
             
             
+            /*
             if(!((std::floor(this->_staticx) == std::floor(this->_destinationx)) && (std::floor(this->_staticy) == std::floor(this->_destinationy)))) { // don't need y because angle is already defined
                 
                 moveForward();
@@ -417,7 +506,9 @@ void Unit::handleMovement() {
                 stopMoving();
                 this->_state = STILL;
             }
+             */
             break;
+            
         case STILL:
             //stopMoving();
             break;

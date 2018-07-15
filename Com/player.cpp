@@ -24,7 +24,7 @@ Player::Player(Graphics &graphics, Vector2 spawnPoint) :
 //AnimatedSprite(graphics, "/Users/jonahglick/Documents/Io/Link1.png", 171, 129, 16, 22, spawnPoint.x, spawnPoint.y, 75),
 //Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 660),
 //Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 625, 375),
-Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman.png", 0, 0, 16, 20, 625, 375),
+Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman.png", 0, 0, 16, 20, 640 - 8, 400 - 4 - 8),
 _dx(0),
 _dy(0),
 _mx(0),
@@ -202,9 +202,20 @@ void Player::draw(Graphics &graphics) {
     */
     
     Sprite::draw(graphics, this->_x, this->_y);
-    graphics.drawRect(this->_x, this->_y+10, 30, 30);
+    //graphics.drawRect(this->_x, this->_y+4, 16, 16);
+    
+    //graphics.drawRect(640 - 8, 400 - 8, 16, 16);
+    
+    graphics.drawRect(640 - 8, 400 - 8, 16, 16);
+    
+    //printf("%f, %f\n", this->_x, this->_y);
     //Sprite::drawAngle(graphics, this->_x, this->_y);
+    //Rectangle(640 - 8, 400 - 8, 16, 16);
     
     //graphics.drawLine(640,400,640,0);
 
+    
+    
+    //x:632
+    //y:388
 }

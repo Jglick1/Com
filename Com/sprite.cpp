@@ -30,12 +30,16 @@ _startX(posX), _startY(posY)
     
     this->_boundingBox = Rectangle(this->_x, this->_y, width * globals::SPRITE_SCALE, height * globals::SPRITE_SCALE);
     
-    this->_playerBoundingBox = Rectangle(this->_x, this->_y+10, width, height-10);
+    
+    //                  CHANGE THIS WHEN YOU CHANGE THE UNIT
+    
+    this->_playerBoundingBox = Rectangle(this->_x, this->_y+4, width, height-4);
 
 
 }
 
 Sprite::~Sprite() {}
+
 
 void Sprite::draw(Graphics &graphics, int x, int y) {
     
@@ -49,12 +53,13 @@ void Sprite::draw(Graphics &graphics, int x, int y) {
 }
 
 
+
 void Sprite::drawAngle(Graphics &graphics, int x, int y, float angle) {
     
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE };
     
 
-    SDL_Point point = {15, 30}; // 96/2 and 32+32+16
+    SDL_Point point = {8, 16}; // 96/2 and 32+32+16
     
     //std::cout << "x: " << x << " y: " << y << std::endl;
     

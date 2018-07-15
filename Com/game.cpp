@@ -41,9 +41,6 @@ Game::Game() {
         return;
     }
     
-    
-    
-    
     this->gameLoop();
     
 }
@@ -61,6 +58,8 @@ void Game::gameLoop() {
     
     graphics.loadSound();
     
+    //graphics.resolutionTest();
+    
     /*
     textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
     if(textSheet == NULL) {
@@ -77,7 +76,7 @@ void Game::gameLoop() {
     
     //this->_unit.moveToPosition(1280, 0);
     
-    this->_level = Level("/Users/jonahglick/Documents/Com/com_test1", graphics);
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test2", graphics);
     //this->_hud = HUD(graphics, this->_player);
     //this->_inventory = Inventory(graphics, this->_player);
     
@@ -144,7 +143,7 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
-            this->_level.moveUnitToPosition(1280, 800);
+            this->_level.moveUnitToPosition(500, 500);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
@@ -199,6 +198,7 @@ void Game::handleMovement(Direction &inPower, Input &input) {
     //this->_level.handleUnitMovement();
     
     //this->printDirection(inPower);
+    
     
     switch (inPower) {
         case UP:
@@ -451,15 +451,11 @@ void Game::update(float elapsedTime, Direction &inPower) {
     std::vector<Rectangle> others;
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);
+        //printf("tile collision!a");
         this->_level.handleTileCollisions(others, elapsedTime);
-        
-        
-        
         
         //this->_unit.handleTileCollisions(others, elapsedTime);
     }
-
-
 
    
 }

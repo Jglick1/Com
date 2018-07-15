@@ -96,6 +96,8 @@ public:
     void moveDownRightParallax();
     void moveDownLeftParallax();
     
+    float getPlayerAngle();
+    
 private:
     float _dx, _dy;
     float _angle;

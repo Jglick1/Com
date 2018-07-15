@@ -51,6 +51,8 @@ public:
     
     void playShot();
     
+    void resolutionTest();
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -66,8 +68,6 @@ private:
     
     
 };
-
-
 
 
 #endif /* graphics_hpp */

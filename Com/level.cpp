@@ -421,6 +421,8 @@ void Level::update(int elapsedTime) {
 void Level::draw(Graphics &graphics) {
     
     
+    //printf("level: %f, unit: %f\n", this->_angle, this->_unit.getPlayerAngle());
+    
     //this->_transx = this->_position.x;
     //this->_transy = this->_position.y;
     
@@ -533,8 +535,8 @@ void Level::draw(Graphics &graphics) {
     
     this->_unit.draw(graphics);
     
-    float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+15;
-    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+30;
+    float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
+    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+16;
     float angleEquivalent = this->_unit.getAngle();
     
     //in both cases we change the - sin for x into a + sin
@@ -594,6 +596,7 @@ std::vector<Rectangle> Level::checkTileCollisions(const Rectangle &other) { //ot
 			others.push_back(this->_collisionRects.at(i));
 		}
 	}
+    //printf("%d, %d\n", this->_collisionRects.at(0).getY() + this->_collisionRects.at(0).getHeight()*0, other.getY());
 	return others;                                                          //returning level collision rects
 }
 
@@ -726,26 +729,41 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, Direction &inPo
 
 
 void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
-    //rectangle for the player
-    //Rectangle playerRec = Rectangle(625, 375, 30, 40);          //collsion rectangle for player
     
-    Rectangle playerRec = Rectangle(625, 385, 30, 30);
+    //Rectangle playerRec = Rectangle(625, 385, 30, 30);
+    Rectangle playerRec = Rectangle(640 - 8, 400 - 8, 16, 16);
     
-    //this->_position.x -= std::round(elapsedTime * this->_dx);
-    //this->_position.y -= std::round(elapsedTime * this->_dy);
-    
-    //this->_dx = 0.0;
-    //this->_dy = 0.0;
-    
-    //std::cout << this->_dx << " " << this->_dy << std::endl;
+    //y: 392
     
     for (int i = 0; i < others.size(); i++) {
+        
+        //printf("y: %d, height: %d\n", others.at(i).getY(), others.at(i).getHeight());
+        
         sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
+        
+        //printf("map: %d, player: %d",others.at(i).getHeight(),playerRec.getHeight());
+        
+        /*
+        if(collisionSide == sides::Side::TOP) {
+            printf("top\n");
+        }
+        else if(collisionSide == sides::Side::BOTTOM) {
+            printf("bottom\n");
+        }
+        else if(collisionSide == sides::Side::LEFT) {
+            printf("left\n");
+        }
+        else if(collisionSide == sides::Side::RIGHT) {
+            printf("right\n");
+        }
+        */
+        
+        
         
         if (collisionSide != sides::NONE) {
             switch (collisionSide) {
                 case sides::TOP:                    //top refers to player's box
-                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 385, 385 - others.at(i).getHeight());
+                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 392, 392 - others.at(i).getHeight());
                     //std::cout << others.at(i).getStartY() << " " << others.at(i).getHeight() <<std::endl;
                     this->_dy = 0.0f;
                     
@@ -756,7 +774,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
                     
                     break;
                 case sides::BOTTOM:
-                    this->changeY(-(others.at(i).getStartY()) + 385 + 30, 385 + 30);
+                    this->changeY(-(others.at(i).getStartY()) + 392 + 16, 392 + 16);
                     this->_dy = 0.0f;
                     
 
@@ -766,7 +784,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
                     
                     break;
                 case sides::LEFT:
-                    this->changeX((-others.at(i).getStartX()) + 625 - others.at(i).getWidth(), 625 - others.at(i).getWidth());
+                    this->changeX((-others.at(i).getStartX()) + 632 - others.at(i).getWidth(), 632 - others.at(i).getWidth());
                     this->_dx = 0.0f;
                     
 
@@ -776,7 +794,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
                     
                     break;
                 case sides::RIGHT:
-                    this->changeX((-others.at(i).getStartX()) + 625 + 30, 625 + 30);
+                    this->changeX((-others.at(i).getStartX()) + 632 + 16, 632 + 16);
                     this->_dx = 0.0f;
                     
                     
@@ -786,6 +804,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
                     break;
             }
         }
+        //printf("y: %d, height: %d\n", others.at(i).getY(), others.at(i).getHeight());
 
         
     }
@@ -843,6 +862,7 @@ void Level::setUnitAngle() {
 }
 
 void Level::handleUnitMovement() {
+    this->_unit.setPlayerAngle(this->_angle);
     this->_unit.handleMovement();
 }
 

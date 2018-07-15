@@ -32,6 +32,7 @@ Map::Map(Graphics &graphics, const std::string &filePath, int sourceX, int sourc
 
 Map::~Map() {}
 
+/*
 void Map::draw(Graphics &graphics, int x, int y) {
     
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::LEVEL_SCALE, this->_sourceRect.h * globals::LEVEL_SCALE };
@@ -42,7 +43,8 @@ void Map::draw(Graphics &graphics, int x, int y) {
     graphics.blitSurface(this->_spriteSheet, &this->_sourceRect, &destinationRectangle);
     
 }
-
+*/
+/*
 void Map::drawAngle(Graphics &graphics, int x, int y, float angle) {
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::LEVEL_SCALE, this->_sourceRect.h * globals::LEVEL_SCALE };
     
@@ -52,7 +54,7 @@ void Map::drawAngle(Graphics &graphics, int x, int y, float angle) {
 
     SDL_RenderCopyEx(graphics.getRenderer(), this->_spriteSheet, &this->_sourceRect, &destinationRectangle, angle, &point, SDL_FLIP_NONE);
 }
-
+*/
 
 void Map::update() {
 

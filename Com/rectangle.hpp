@@ -29,11 +29,18 @@ public:
     const int getCenterX() const { return this->_x + this->_width / 2; }
     const int getCenterY() const { return this->_y + this->_height / 2; }
     
+    
     const int getLeft() const { return this->_x; }
     const int getRight() const { return this->_x + this->_width; }
     const int getTop() const { return this->_y; }
     const int getBottom() const{ return this->_y + this->_height; }
     
+    /*
+    const float getLeft() const { return this->_x; }
+    const float getRight() const { return this->_x + this->_width; }
+    const float getTop() const { return this->_y; }
+    const float getBottom() const{ return this->_y + this->_height; }
+    */
     const int getX() const {return this->_x; }
     const int getY() const {return this->_y; }
     
@@ -63,7 +70,7 @@ public:
     
     
     const bool isValidRectangle() const {
-        return (this->_x >= 0 && this->_y >= 0 && this->_width >= 0, this->_height >= 0);
+        return (this->_x >= 0 && this->_y >= 0 && this->_width >= 0 && this->_height >= 0);
     }
     
     void update(float elapsedTime, float dx, float dy) {

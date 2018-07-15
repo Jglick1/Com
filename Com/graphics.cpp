@@ -125,3 +125,7 @@ void Graphics::drawLine(int x1, int y1, int x2, int y2) {
 void Graphics::drawPoint(int x, int y) {
     SDL_RenderDrawPoint(this->_renderer, x, y);
 }
+
+void Graphics::resolutionTest() {
+    SDL_RenderSetLogicalSize(this->_renderer, 1280, 800);
+}

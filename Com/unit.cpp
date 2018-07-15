@@ -20,15 +20,16 @@ namespace player_constants {
 Unit::Unit() {}
 
 Unit::Unit(Graphics &graphics, Vector2 spawnPoint) :
-Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 500, 400),
+//Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 500, 400),
+Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman.png", 0, 0, 16, 20, 0, 0),
 _dx(0),
 _dy(0),
 _angle(0.0),
 _playerAngle(0.0),
 _staticdx(0.0),
 _staticdy(0.0),
-_staticx(500),
-_staticy(400),
+_staticx(0),
+_staticy(0),
 _state(STILL),
 _destinationx(0),
 _destinationy(0),
@@ -185,7 +186,7 @@ void Unit::moveToPosition(int posX, int posY) {
     //float xdiff = posX - (this->_staticx+15);
     //float ydiff = posY - (this->_staticy+30);
     float xdiff = posX - (this->_staticx);
-    float ydiff = posY - (this->_staticy+10);
+    float ydiff = posY - (this->_staticy+4);
     float angle = 0.0;
     
     if(ydiff < 0) {
@@ -225,18 +226,22 @@ void Unit::moveToPosition(int posX, int posY) {
 
     if(this->_destinationx >= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNRIGHT;
+        printf("DOWNRIGHT\n");
     }
     else if(this->_destinationx <= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNLEFT;
+        printf("DOWNLEFT\n");
     }
     else if(this->_destinationx >= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPRIGHT;
+        printf("UPRIGHT\n");
     }
     else if(this->_destinationx <= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPLEFT;
+        printf("UPLEFT\n");
     }
     
-    printf("angle: %f, destAngle: %f\n", this->_angle, this->_destinationAngle);
+    //printf("angle: %f, destAngle: %f\n", this->_angle, this->_destinationAngle);
     
     //std::cout << xdiff << " " << ydiff << std::endl;
     //std::cout << this->_angle << std::endl;
@@ -268,8 +273,13 @@ void Unit::draw(Graphics &graphics) {
     //  (unit.staticx)  -   (player.staticx)
     //  (unit.staticy)      (player.staticy)
     
-    int posx = std::round(this->_x+this->_staticx);
-    int posy = std::round(this->_y+this->_staticy);
+    //int posx = std::round(this->_x+this->_staticx);
+    //int posy = std::round(this->_y+this->_staticy);
+    
+    float posx = this->_x+this->_staticx;
+    float posy = this->_y+this->_staticy;
+    
+    
     
     //std::cout << this->_staticdx << " " << this->_staticdy << std::endl;
     
@@ -278,7 +288,7 @@ void Unit::draw(Graphics &graphics) {
     
     
     
-    Sprite::drawAngle(graphics, 640-15 + ( (posx)-640+15)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+30) * std::sin(this->_playerAngle*3.14159/180), 400-30 + ( ((posy)-400+30) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+15) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+16) * std::sin(this->_playerAngle*3.14159/180), 400-16 + ( ((posy)-400+16) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
     
     
     //graphics.drawLine(posx, posy, 0, 0);
@@ -389,7 +399,7 @@ float Unit::getStaticY() {
 void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
 
     
-    Rectangle playerRec = Rectangle(625, 385, 30, 30);
+    Rectangle playerRec = Rectangle(632, 392, 16, 16);
 
     for (int i = 0; i < others.size(); i++) {
         sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
@@ -397,22 +407,22 @@ void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTim
         if (collisionSide != sides::NONE) {
             switch (collisionSide) {
                 case sides::TOP:                    //top refers to player's box
-                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 385); //this->_staticy);
+                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 400 - 8); //this->_staticy);
                     this->_dy = 0.0f;
                     
                     break;
                 case sides::BOTTOM:
-                    this->changeY(-(others.at(i).getStartY()) + 385 + 30);// + this->_staticy);
+                    this->changeY(-(others.at(i).getStartY()) + 385 + 16);// + this->_staticy);
                     this->_dy = 0.0f;
                     
                     break;
                 case sides::LEFT:
-                    this->changeX((-others.at(i).getStartX()) + 625 - others.at(i).getWidth());// + this->_staticx);
+                    this->changeX((-others.at(i).getStartX()) + 640 - 8 - others.at(i).getWidth());// + this->_staticx);
                     this->_dx = 0.0f;
 
                     break;
                 case sides::RIGHT:
-                    this->changeX((-others.at(i).getStartX()) + 625 + 30);// + this->_staticx);
+                    this->changeX((-others.at(i).getStartX()) + 625 + 16);// + this->_staticx);
                     this->_dx = 0.0f;
                     
                     break;
@@ -439,7 +449,13 @@ float Unit::getAngle() {
     return this->_angle;
 }
 
+float Unit::getPlayerAngle() {
+    return this->_playerAngle;
+}
+
 void Unit::handleMovement() {
+    
+    printf("staticx: %f, staticy: %f\n", this->_staticx, this->_staticy);
 
     
     switch(this->_state) {
@@ -465,10 +481,10 @@ void Unit::handleMovement() {
             
             switch(this->_destinationDirection) {
                 case UPRIGHT:
-                    if((this->_staticx >= this->_destinationx) && (this->_staticy+10 <= this->_destinationy)) {
+                    if((this->_staticx >= this->_destinationx) && (this->_staticy+4 <= this->_destinationy)) {
                         stopMoving();
                         this->_staticx = this->_destinationx - 0;
-                        this->_staticy = this->_destinationy - 10;
+                        this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
                     }
@@ -477,10 +493,10 @@ void Unit::handleMovement() {
                     }
                     break;
                 case UPLEFT:
-                    if((this->_staticx <= this->_destinationx) && (this->_staticy+10 <= this->_destinationy)) {
+                    if((this->_staticx <= this->_destinationx) && (this->_staticy+4 <= this->_destinationy)) {
                         stopMoving();
                         this->_staticx = this->_destinationx - 0;
-                        this->_staticy = this->_destinationy - 10;
+                        this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
                     }
@@ -489,10 +505,10 @@ void Unit::handleMovement() {
                     }
                     break;
                 case DOWNRIGHT:
-                    if((this->_staticx >= this->_destinationx) && (this->_staticy+10 >= this->_destinationy)) {
+                    if((this->_staticx >= this->_destinationx) && (this->_staticy+4 >= this->_destinationy)) {
                         stopMoving();
                         this->_staticx = this->_destinationx - 0;
-                        this->_staticy = this->_destinationy - 10;
+                        this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
                     }
@@ -501,10 +517,10 @@ void Unit::handleMovement() {
                     }
                     break;
                 case DOWNLEFT:
-                    if((this->_staticx <= this->_destinationx) && (this->_staticy+10 >= this->_destinationy)) {
+                    if((this->_staticx <= this->_destinationx) && (this->_staticy+4 >= this->_destinationy)) {
                         stopMoving();
                         this->_staticx = this->_destinationx - 0;
-                        this->_staticy = this->_destinationy - 10;
+                        this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
                     }

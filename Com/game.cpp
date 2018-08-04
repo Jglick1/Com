@@ -41,6 +41,8 @@ Game::Game() {
         return;
     }
     
+    this->_gameState = NORMAL;
+    
     this->gameLoop();
     
 }
@@ -80,6 +82,10 @@ void Game::gameLoop() {
     //this->_hud = HUD(graphics, this->_player);
     //this->_inventory = Inventory(graphics, this->_player);
     
+    this->_hud = HUD(graphics, this->_player);
+    
+    this->_cursor = Cursor(graphics);
+    
     int LAST_UPDATE_TIME = SDL_GetTicks();
     
     Direction inPower = NONE;
@@ -88,11 +94,22 @@ void Game::gameLoop() {
     this->_deltaY = 0.0;
 
     int old_xm = 0;
+    int old_ym = 0;
     
     int xm = 0;
     int ym = 0;
     
     bool wasThereAnEvent = 0;
+    
+    //GameState game_state = NORMAL;
+    
+    bool rightMouseDown = 0;
+    //bool rightMouseHeld = 0;
+    bool centerHold = 0;
+    
+    bool double_time = 0;
+    
+    bool rightMouseClick = 0;
     
     while(true) {
 
@@ -118,7 +135,29 @@ void Game::gameLoop() {
             //    this->_deltaX = event.motion.xrel;
             //    this->_deltaY += event.motion.y;
             //}
-
+            else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    rightMouseDown = 1;
+                    if(this->_gameState == NORMAL) {
+                        this->_gameState = COMMAND;
+                    }
+                    //printf("mouse down\n");
+                    
+                    
+                }
+                else if(event.button.button == SDL_BUTTON_LEFT) {
+                    this->_gameState = NORMAL;
+                    //printf("other mouse down\n");
+                }
+            }
+            else if (event.type == SDL_MOUSEBUTTONUP) {
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    rightMouseDown = 0;
+                    //printf("mouse up\n");
+                }
+            }
+            
+            
             
             //else if (event.type == SDL_MOUSEBUTTONDOWN) {
             //    if(event.button.button == SDL_BUTTON_LEFT) {
@@ -127,16 +166,41 @@ void Game::gameLoop() {
             //    }
             //}
             
-
         }
+        
+        
+        //check for click
+        if(rightMouseDown == 1) {
+            if(double_time == 0) {
+                rightMouseClick = 1;
+                //this->_gameState = SLIDE_MOVE;
+            }
+            else {
+                rightMouseClick = 0;
+            }
+            double_time = 1;
+        }
+        else {
+            rightMouseClick = 0;
+            double_time = 0;
+        }
+        
+        
+        //printf("%d\n", rightMouseClick);
+        
 
         old_xm = xm;
+        old_ym = ym;
         SDL_GetMouseState(&xm, &ym);
+        
 
-        if (std::abs((xm - old_xm)) < 100) {
+/*
+        if ((game_state == NORMAL) && std::abs((xm - old_xm)) < 100) {
             this->_level.changeAngle(-0.5*(xm - old_xm));
+            //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
         }
 
+        */
     
         if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE)) {
             return;
@@ -149,18 +213,55 @@ void Game::gameLoop() {
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
             graphics.playShot();
         }
-
+        
+        
+        
+        
+        if((this->_gameState == COMMAND) && rightMouseClick) {
+            if(this->_level.checkSlideCollision(xm, ym)) {
+                this->_gameState = SLIDE_MOVE;
+                //printf("collision!\n");
+            }
+        }
+        
+        if(this->_gameState == SLIDE_MOVE) {
+            if(rightMouseDown == 0) {
+                this->_gameState = NORMAL;
+                this->_level.centerSlideToZero();
+            }
+        }
+        
+        
+        
+        
+        /*
+        else {
+            this->_level.centerSlideToZero();
+            //this->handleMovement(inPower, input);
+        }
+        */
+        
+        this->_level.handleSlideMovement(xm, ym);
+        
+        
         
         //handle input
         //handle movement
         //render
         
         //this->_unit.setPlayerAngle(this->_level.getAngle());
-        this->_level.setUnitAngle();
+        
+        //this->_level.setUnitAngle();
         
         
         //if(wasThereAnEvent) {
+        
+        
+        
             this->handleMovement(inPower, input);
+        
+        
+        
         //}
         
         //this->_unit.moveForward();
@@ -171,7 +272,7 @@ void Game::gameLoop() {
         
         //this->_graphics = graphics;
         
-        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower);
+        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym);
         
 
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
@@ -180,8 +281,12 @@ void Game::gameLoop() {
             SDL_Delay(MAX_FRAME_TIME - ELAPSED_TIME_MS);
         }
         
+        //printf("Test\n");
+        
         this->draw(graphics);
         //this->_unit.stopMoving();
+        
+        //printf("test\n");
         
         //handle movement
         //update
@@ -192,8 +297,6 @@ void Game::gameLoop() {
 }
 
 void Game::handleMovement(Direction &inPower, Input &input) {
-    
-    //this->_unit.handleMovement();
     
     //this->_level.handleUnitMovement();
     
@@ -411,12 +514,16 @@ void Game::draw(Graphics &graphics) {
     
     //graphics.renderText();
     
+    this->_hud.draw(graphics);
+    
+    this->_cursor.draw(graphics);
+    
     graphics.flip();
     
     
 }
 
-void Game::update(float elapsedTime, Direction &inPower) {
+void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym) {
     
     /*
     std::vector<Rectangle> others;
@@ -431,20 +538,32 @@ void Game::update(float elapsedTime, Direction &inPower) {
     //this->_unit.moveForward();
     
     
-    int mx;
-    int my;
+    //int mx;
+    //int my;
     
-    SDL_GetMouseState(&mx, &my);
+    //SDL_GetMouseState(&mx, &my);
+    
+    //printf("%d\n",this->_gameState == NORMAL);
+    
+    if ((this->_gameState == NORMAL) && std::abs((xm - old_xm)) < 100) {
+        this->_level.changeAngle(-0.5*(xm - old_xm));
+        //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
+    }
+     
+    
+    this->_level.setUnitAngle();
+    
+    
     this->_level.update(elapsedTime);
     
-    this->_player.update(elapsedTime, mx, my);
+    this->_player.update(elapsedTime, xm, ym);
 
     //this->_unit.moveToPosition(1280, 0);
     
     //this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
     //this->_unit.update(elapsedTime, this->_level.getAngle());
 
-    
+    this->_cursor.update(elapsedTime, ym, old_ym);
     
     
                                                                 //handle collisions shoudl come after update for some reason
@@ -457,6 +576,8 @@ void Game::update(float elapsedTime, Direction &inPower) {
         //this->_unit.handleTileCollisions(others, elapsedTime);
     }
 
+    
+    this->_hud.update(elapsedTime, this->_player);
    
 }
 

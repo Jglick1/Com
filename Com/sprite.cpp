@@ -67,6 +67,15 @@ void Sprite::drawAngle(Graphics &graphics, int x, int y, float angle) {
     
 }
 
+void Sprite::drawControlSlider(Graphics &graphics, int x, int y, float angle) {
+    
+    SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE };
+    
+    SDL_Point point = {75, 12};
+    
+    SDL_RenderCopyEx(graphics.getRenderer(), this->_spriteSheet, &this->_sourceRect, &destinationRectangle, angle, &point, SDL_FLIP_NONE);
+}
+
 void Sprite::update() {
     this->_boundingBox = Rectangle(this->_x, this->_y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE);
 }

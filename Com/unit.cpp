@@ -180,6 +180,22 @@ void Level::moveLeft() {
 
 void Unit::moveToPosition(int posX, int posY) {
     
+    
+    //if there is a (bullet) collision when pointed towards destination position
+        //find nearest corner without collision closest to destination location
+    
+        //find the next corner (has either the same x or y) that is closest to the destination
+    
+    //position vector
+        //decide the best path to take and fill the positon array
+    
+    
+    
+    
+    
+    
+    
+    
     stopMoving();
     
     //find the angle the unit will need to be at
@@ -455,7 +471,7 @@ float Unit::getPlayerAngle() {
 
 void Unit::handleMovement() {
     
-    printf("staticx: %f, staticy: %f\n", this->_staticx, this->_staticy);
+    //printf("staticx: %f, staticy: %f\n", this->_staticx, this->_staticy);
 
     
     switch(this->_state) {

@@ -18,6 +18,7 @@
 #include "map.hpp"
 #include "unit.hpp"
 //#include "door.hpp"
+#include "controlSlide.hpp"
 
 class Graphics;
 struct SDL_Texture;
@@ -69,6 +70,12 @@ public:
     void moveDownRight();
     void moveDownLeft();
     
+    bool checkSlideCollision(int xm, int ym);
+    void handleSlideMovement(int xm, int ym);
+    
+    
+    void centerSlideToZero();
+    
 private:
     //Map _map;
 	std::string _mapName;
@@ -100,6 +107,9 @@ private:
     
     Unit _unit;
     
+    ControlSlide _slide;
+    
+    std::vector<Vector2> _building;
 
 };
 

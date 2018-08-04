@@ -56,6 +56,14 @@ Level::Level(std::string mapName, Graphics &graphics) :
     
     //vector of unit types <enemies>
     //vector of unit types <allies>
+    //printf("test\n");
+    
+    
+    this->_slide = ControlSlide(graphics);
+    
+    //this->_building.push_back(Vector2(1,2));
+    
+    //printf("test\n");
 
 }
 
@@ -413,6 +421,7 @@ void Level::update(int elapsedTime) {
     //std::cout << this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
     
     this->_unit.update(elapsedTime, this->_angle);
+    this->_slide.update(elapsedTime);
     
     
 }
@@ -585,6 +594,8 @@ void Level::draw(Graphics &graphics) {
     }
     
     
+    this->_slide.draw(graphics);
+    
     
 }
 
@@ -649,12 +660,14 @@ void Level::moveForward() {
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_unit.moveForwardParallax();
+    this->_slide.moveForwardParallax();
 }
 
 void Level::moveBackward() {
     this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_unit.moveBackwardParallax();
+    this->_slide.moveBackwardParallax();
 }
 
 
@@ -662,12 +675,14 @@ void Level::moveRight() {
     this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_unit.moveRightParallax();
+    this->_slide.moveRightParallax();
 }
 
 void Level::moveLeft() {
     this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
     this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_unit.moveLeftParallax();
+    this->_slide.moveLeftParallax();
 }
 
 //  dxForward/1.41421 + dxRight/1.41421
@@ -676,21 +691,25 @@ void Level::moveUpRight() {                 //should have said forwardRight and 
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
     this->_unit.moveUpRightParallax();
+    this->_slide.moveUpRightParallax();
 }
 void Level::moveUpLeft() {
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
     this->_unit.moveUpLeftParallax();
+    this->_slide.moveUpLeftParallax();
 }
 void Level::moveDownRight() {
     this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
     this->_unit.moveDownRightParallax();
+    this->_slide.moveDownRightParallax();
 }
 void Level::moveDownLeft() {
     this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
     this->_unit.moveDownLeftParallax();
+    this->_slide.moveDownLeftParallax();
 }
 
 
@@ -709,6 +728,7 @@ void Level::stopMoving() {
 	this->_dx = 0.0f;
 	this->_dy = 0.0f;
     this->_unit.stopMovingParallax();
+    this->_slide.stopMovingParallax();
 }
 
 
@@ -822,16 +842,46 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
 
 void Level::changeY(int newY, int newCollisionY) {
     this->_positiony = newY;
-    for(int i = 0; i < this->_collisionRects.size(); i++) {
-        this->_collisionRects.at(i).changeY(newCollisionY);
-    }
+    
+    //392 - others.at(i).getHeight()
+    
+    
+     for(int i = 0; i < this->_collisionRects.size(); i++) {
+         this->_collisionRects.at(i).changeY(this->_collisionRects.at(i).getStartY() + newY);
+     }
+     
+    
+    
+    //this->_collisionRects.at(0).changeY(newCollisionY);
+    
+    //printf("x: %d, y: %d\n", this->_collisionRects.at(1).getX(), this->_collisionRects.at(1).getY());
+    
+    
+    
+    //this->_collisionRects.at(1).changeY(this->_collisionRects.at(1).getStartY() + 56);
+    //this->_collisionRects.at(2).changeY(this->_collisionRects.at(2).getStartY() + 56);
+    
+    //printf("y: %f", this->_positiony); //this is 56
+    
+    
+
+    //printf("newCollisionY: %d, newY: %d , startY: %d\n", newCollisionY, newY, this->_collisionRects.at(0).getStartY());
+    
+
+    
+
 }
 
 void Level::changeX(int newX, int newCollisionX) {
     this->_positionx = newX;
+    
+    //this->_collisionRects.at(0).changeX(newCollisionX);
+    
+    
     for(int i = 0; i < this->_collisionRects.size(); i++) {
-        this->_collisionRects.at(i).changeX(newCollisionX);
+        this->_collisionRects.at(i).changeX(this->_collisionRects.at(i).getStartX() + newX);
     }
+    
 }
 
 
@@ -859,6 +909,7 @@ float Level::getDY() {
 
 void Level::setUnitAngle() {
     this->_unit.setPlayerAngle(this->_angle);
+    this->_slide.setPlayerAngle(this->_angle);
 }
 
 void Level::handleUnitMovement() {
@@ -868,5 +919,19 @@ void Level::handleUnitMovement() {
 
 void Level::moveUnitToPosition(int posX, int posY) {
     this->_unit.moveToPosition(posX, posY);
+}
+
+bool Level::checkSlideCollision(int xm, int ym) {
+    
+    return this->_slide.checkSlideCollision(xm, ym);
+    
+}
+
+void Level::handleSlideMovement(int xm, int ym) {
+    this->_slide.handleSlideMovement(xm, ym);
+}
+
+void Level::centerSlideToZero(){
+    this->_slide.centerSlideToZero();
 }
 

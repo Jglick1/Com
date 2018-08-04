@@ -40,6 +40,9 @@ namespace sides {
     }
 }
 
+enum GameState {
+    SLIDE_MOVE, PAUSE, NORMAL, COMMAND
+};
 
 enum Direction {
     LEFT, RIGHT, UP, DOWN, UPRIGHT, UPLEFT, DOWNRIGHT, DOWNLEFT, NONE

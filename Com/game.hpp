@@ -14,7 +14,8 @@
 #include "graphics.hpp"
 #include "unit.hpp"
 #include "input.hpp"
-//#include "hud.hpp"
+#include "hud.hpp"
+#include "cursor.hpp"
 //#include "inventory.hpp"
 
 
@@ -28,7 +29,7 @@ public:
 private:
     void gameLoop();
     void draw(Graphics &graphics);
-    void update(float elapsedTime, Direction &inPower);
+    void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym);
     void handleMovement(Direction &inPower, Input &input);
     
     Player _player;
@@ -48,6 +49,12 @@ private:
     
                     //erase eventually
     SDL_Texture* textSheet;
+    
+    HUD _hud;
+    
+    Cursor _cursor;
+    
+    GameState _gameState;
     
     
 };

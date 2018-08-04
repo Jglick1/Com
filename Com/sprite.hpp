@@ -32,6 +32,8 @@ public:
     const inline float getX() const { return this->_x; }
     const inline float getY() const { return this->_y; }
     
+    void drawControlSlider(Graphics &graphics, int x, int y, float angle);
+    
     
 protected:
     SDL_Rect _sourceRect;

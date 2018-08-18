@@ -26,7 +26,9 @@ namespace player_constants {
     const float WALK_SPEED = 0.2f;
 }
 
-Level::Level() {}
+Level::Level() {
+    //printf("level default constructor\n");
+}
 
 Level::Level(std::string mapName, Graphics &graphics) :
     Map(graphics, "/Users/jonahglick/Documents/Com/com_test2.png", 0, 0, 1280, 800, 0, 0),
@@ -43,7 +45,8 @@ Level::Level(std::string mapName, Graphics &graphics) :
     _transy(0),
     _ang(0)
 {
-
+    //printf("level contructor\n");
+    
 	this->loadMap(mapName, graphics);
     
     this->_unit = Unit(graphics, Vector2(0,0));
@@ -64,10 +67,12 @@ Level::Level(std::string mapName, Graphics &graphics) :
     //this->_building.push_back(Vector2(1,2));
     
     //printf("test\n");
+    
 
 }
 
-Level::~Level() {}
+Level::~Level() {//printf("level destructor\n");
+}
 
 /*
 void Level::loadMap(std::string mapName, Graphics &graphics) {
@@ -80,6 +85,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 	//this->_backgroundTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("C:\\Users\\Jglick\\Documents\\Io\\Test.png"));
 	//this->_size = Vector2(1280, 960);
 	
+    
 	XMLDocument doc;
 	std::stringstream ss;
 	ss << mapName << ".tmx";
@@ -150,144 +156,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 		}
 	}
 	
-	//loading the layers
-	XMLElement *pLayer = mapNode->FirstChildElement("layer");
-	if (pLayer != NULL) {
-		while (pLayer) {
-			//loading the data element
-			XMLElement * pData = pLayer->FirstChildElement("data");
-			if (pData != NULL) {
-				while (pData) {
-					//loading the tile element
-					XMLElement * pTile = pData->FirstChildElement("tile");
-					
-					if (pTile != NULL) {
-						int tileCounter = 0;
-						while (pTile) {
-							//build each tile, if gid is 0, no tile is drawn
-							
-							if (pTile->IntAttribute("gid") == 0) {
-								tileCounter++;
-								if (pTile->NextSiblingElement("tile")) {
-									pTile = pTile->NextSiblingElement("tile");
-									continue;
-								}
-								else {
-									break;
-								}
-							}
-							//get the tileset for this gid
-							int gid = pTile->IntAttribute("gid");
-							Tileset tls;
-							/*												THIS I CHANGED.
-							for (int i = 0; i < this->_tileSets.size(); i++) {
-								if (this->_tileSets[i].FirstGid <= gid) {
-									std::cout << "tileSet for gid ";
-									std::cout << gid;
-									std::cout << " = ";
-									std::cout << i << std::endl;
-									
-									
-									//this is the tileset we want
-									tls = this->_tileSets.at(i);
-									break;
-								}
-							}
-							*/
-							for (int i = (this->_tileSets.size()-1); i >= 0; i--) {
-								if (this->_tileSets[i].FirstGid <= gid) {
-									//std::cout << "tileSet for gid ";
-									//std::cout << gid;
-									//std::cout << " = ";
-									//std::cout << i << std::endl;
-									
-									
-									//this is the tileset we want
-									tls = this->_tileSets.at(i);
-									break;
-								}
-							}
-							
-							if (tls.FirstGid == -1) {
-								//no tileset was found for this gid
-								tileCounter++;
-								if (pTile->NextSiblingElement("tile")) {
-									pTile = pTile->NextSiblingElement("tile");
-									continue;
-								}
-								else {
-									break;
-								}
-							}
-							
-							
-							//get the position of the tile in the level
-							
-							int xx = 0;
-							int yy = 0;
-							
-							xx = tileCounter % width;
-							xx *= tileWidth;
-							
-							yy += tileHeight * (tileCounter / width);
-							
-							Vector2 finalTilePosition = Vector2(xx, yy);
-							
-							//std::cout << "xx: ";
-							//std::cout << xx << std::endl;
-							//std::cout << "yy: ";
-							//std::cout << yy << std::endl;
-							//std::cout << std::endl;
-							
-							//Calculate the position of the tile in the tileset (the png file)
-							
-							int tilesetWidth, tilesetHeight;						//CHANGE THIS!!! (56:00)
-							SDL_QueryTexture(tls.Texture, NULL, NULL, &tilesetWidth, &tilesetHeight);
-							
-							//std::cout << "tilesetWidth: ";
-							//std::cout << tileWidth << std::endl;
-							//std::cout << "tilesetHeight: ";
-							//std::cout << tileHeight << std::endl;
-							//std::cout << std::endl;
-							
-							int tsxx = (gid - (tls.FirstGid - 1)) % (tilesetWidth / tileWidth) - 1;
-							
-							//std::cout << "tsxx: ";
-							//std::cout << tsxx << std::endl;
-							
-							tsxx *= tileWidth;
-							
-							int tsyy = 0;
-							int amt = ((gid - (tls.FirstGid - 1)) / (tilesetWidth / tileWidth));
-							tsyy = tileHeight * amt;
-							
-							//std::cout << "tsxx: ";
-							//std::cout << tsxx << std::endl;
-							//std::cout << "tsyy: ";
-							//std::cout << tsyy << std::endl;
-							//std::cout << std::endl;
-							
-							Vector2 finalTilesetPosition = Vector2(tsxx, tsyy);
-							
-							//build the actual tile and add it to the level's tile list
-							Tile tile(tls.Texture, Vector2(tileWidth, tileHeight), finalTilesetPosition, finalTilePosition);
-							
-							this->_tileList.push_back(tile);
-							tileCounter++;
-							
-							pTile = pTile->NextSiblingElement("tile");
-						}
-						
-					}
-					
-					pData = pData->NextSiblingElement("data");
-				}
-			}
-			
-			pLayer = pLayer->NextSiblingElement("layer");
-		}
-	}
-	
+
 	//collisions
 	
 	XMLElement * pObjectGroup = mapNode->FirstChildElement("objectgroup");
@@ -334,55 +203,86 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 					}
 				}
 			}
-			/*
-			else if (ss.str() == "doors") {
-				XMLElement * pObject = pObjectGroup->FirstChildElement("object");
-				if(pObject != NULL) {
-					while(pObject) {
-						float x = pObject->FloatAttribute("x");
-						float y = pObject->FloatAttribute("y");
-						float w = pObject->FloatAttribute("width");
-						float h = pObject->FloatAttribute("height");
-						
-						Rectangle rect = Rectangle(x, y, w, h);
-						
-						XMLElement* pProperties = pObject->FirstChildElement("properties");
-						if(pProperties != NULL) {
-							while(pProperties) {
-								XMLElement* pProperty = pProperties->FirstChildElement("property");
-								while(pProperty) {
-									const char* name = pProperty->Attribute("name");
-									std::stringstream ss;
-									ss << name;
-									if(ss.str() == "destination") {
-										const char* value = pProperty->Attribute("value");
-										std::stringstream ss2;
-										ss2 << value;
-										Door door = Door(rect, ss2.str());
-										this->_doorList.push_back(door);
-									}
-									
-									
-									pProperty = pProperty->NextSiblingElement("property");
-								}
-								pProperties = pProperties->NextSiblingElement("properties");
-							}
-						}
-						
-						
-						pObject = pObject->NextSiblingElement("object");
-						
-					}
-				}
-					
-			}
-			*/
+            
+            //this->_graph = Graph(4);
+            
+            //Graph test = Graph(4);
+            
+            //Graph test(1);
+            
+            
+            
+            else if (ss.str() == "corners") {
+                
+                int vertexCount = 0;
+                
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        vertexCount++;
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                this->_graph = Graph(vertexCount+1);    //  nodes should start at 0
+                
+                //this->_graph.printAdjacencyMatrix();
+                
+                printf("vertex count: %d\n", vertexCount);
+                
+                pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        int id = pObject->IntAttribute("name");
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        this->_graph.addToVertexTable(id, x, y);
+                        
+                        
+                        //int idNext = pObject->IntAttribute("edge")
+                        
+
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        
+                        int id = pObject->IntAttribute("name");
+                        XMLElement * pProperty1 = pObject->FirstChildElement("properties");
+                        XMLElement * pProperty2 = pProperty1->FirstChildElement("property");
+                        int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
+                        
+                        //this->_map[id].y - this->_map[otherId].y
+                        
+                        double weight = this->_graph.getWeight(id, otherId);
+                        
+                        //double weight = 0.0;
+                        
+                        this->_graph.addEdge(id, otherId, weight);
+                        printf("node: %d to %d weight: %f\n", id, otherId, weight);
+                        
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                
+            }
+            
 			
 			pObjectGroup = pObjectGroup->NextSiblingElement("objectgroup");
 		}
 	}
-	
-	
+    
+    //printf("end load map\n");
+    
+    this->_graph.printAdjacencyMatrix();
+    
+    
 }
 
 void Level::update(int elapsedTime) {
@@ -464,6 +364,7 @@ void Level::draw(Graphics &graphics) {
     
     float b = 400 - m*640;
     
+    checkPathCollision(int beginx, int beginy, double angle);
     
     
     //std::cout << m << std::endl;
@@ -918,6 +819,20 @@ void Level::handleUnitMovement() {
 }
 
 void Level::moveUnitToPosition(int posX, int posY) {
+    //check if the path is clear
+    
+    
+    //add unit position and destination to the graph object
+    
+        //search around for all corners, edges where there is nothing blocking the path to those corners
+    
+    //use A* search algorithm to find the shortest path
+    
+    
+    
+    //add those paths to the unit movement orders
+    
+    
     this->_unit.moveToPosition(posX, posY);
 }
 
@@ -935,3 +850,6 @@ void Level::centerSlideToZero(){
     this->_slide.centerSlideToZero();
 }
 
+Vector2 Level::checkPathCollision(int beginx, int beginy, double angle) {
+    
+}

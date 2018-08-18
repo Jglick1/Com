@@ -18,6 +18,7 @@
 #include "cursor.hpp"
 //#include "inventory.hpp"
 
+//class Level;
 
 class Game {
 public:

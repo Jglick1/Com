@@ -12,6 +12,7 @@
 #include "sprite.hpp"
 #include "globals.hpp"
 //#include "level.hpp"
+#include <vector>
 
 
 class Graphics;
@@ -114,6 +115,8 @@ private:
     float _destinationy;
     
     Direction _destinationDirection;
+    
+    std::vector<Vector2> _unitMovementOrders;
     
     
 };

@@ -221,6 +221,8 @@ void ControlSlide::handleSlideMovement(int xm, int ym) {
     xm += this->_x;
     ym -= this->_y;
     
+    //printf("%f, %f\n", this->_x, this->_y);
+    
     if(this->_centerHold) {
         this->_staticx = xm - width/2;
         this->_staticy = ym - height/2;

@@ -21,6 +21,8 @@ namespace {
 }
 
 
+
+//Game::Game() : _graphics(Graphics()), _level("/Users/jonahglick/Documents/Com/com_test2", this->_graphics){
 Game::Game() {
     //printf("SDL_Init\n");
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -55,6 +57,8 @@ void Game::gameLoop() {
     //printf("beginning game loop\n");
     
     Graphics graphics;
+    
+    
     SDL_Event event;
     Input input;
     
@@ -78,9 +82,17 @@ void Game::gameLoop() {
     
     //this->_unit.moveToPosition(1280, 0);
     
+    //printf("test1\n");
+    
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test2", graphics);
+    
+    
+    
+    
     //this->_hud = HUD(graphics, this->_player);
     //this->_inventory = Inventory(graphics, this->_player);
+    
+    //printf("test2\n");
     
     this->_hud = HUD(graphics, this->_player);
     
@@ -207,11 +219,11 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
-            this->_level.moveUnitToPosition(500, 500);
+            this->_level.moveUnitToPosition(480, 336);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
-            graphics.playShot();
+            //graphics.playShot();
         }
         
         

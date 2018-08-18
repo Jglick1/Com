@@ -19,6 +19,7 @@
 #include "unit.hpp"
 //#include "door.hpp"
 #include "controlSlide.hpp"
+#include "graph.hpp"
 
 class Graphics;
 struct SDL_Texture;
@@ -76,6 +77,8 @@ public:
     
     void centerSlideToZero();
     
+    Vector2 checkPathCollision(int beginx, int beginy, double angle);
+    
 private:
     //Map _map;
 	std::string _mapName;
@@ -109,7 +112,7 @@ private:
     
     ControlSlide _slide;
     
-    std::vector<Vector2> _building;
+    Graph _graph;
 
 };
 

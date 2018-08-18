@@ -303,8 +303,13 @@ void Unit::draw(Graphics &graphics) {
     
     
     
+//R(a-b)+b
     
-    Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+16) * std::sin(this->_playerAngle*3.14159/180), 400-16 + ( ((posy)-400+16) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180), 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    
+    //Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+16) * std::sin(this->_playerAngle*3.14159/180), 400-16 + ( ((posy)-400+16) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
     
     
     //graphics.drawLine(posx, posy, 0, 0);
@@ -358,6 +363,7 @@ void Unit::update(float elapsedTime, float playerAngle) {
 
     
     Sprite::update();
+    
     
 }
 

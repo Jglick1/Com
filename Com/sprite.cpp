@@ -59,7 +59,7 @@ void Sprite::drawAngle(Graphics &graphics, int x, int y, float angle) {
     SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE, this->_sourceRect.h * globals::SPRITE_SCALE };
     
 
-    SDL_Point point = {8, 16}; // 96/2 and 32+32+16
+    SDL_Point point = {8, 12}; // 96/2 and 32+32+16
     
     //std::cout << "x: " << x << " y: " << y << std::endl;
     

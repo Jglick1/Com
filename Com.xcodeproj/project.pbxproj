@@ -11,6 +11,7 @@
 		41064C9420FA5923004E1EF4 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41064C9320FA5923004E1EF4 /* SDL2_mixer.framework */; };
 		41064C9720FB2C23004E1EF4 /* fireteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41064C9520FB2C23004E1EF4 /* fireteam.cpp */; };
 		41064C9A20FB2C9A004E1EF4 /* controlSlide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41064C9820FB2C9A004E1EF4 /* controlSlide.cpp */; };
+		411011D421278D96002F6A09 /* graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411011D221278D96002F6A09 /* graph.cpp */; };
 		419E04C6211541A300FBF9C3 /* hud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04C4211541A300FBF9C3 /* hud.cpp */; };
 		419E04CC2115685300FBF9C3 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04CA2115685300FBF9C3 /* cursor.cpp */; };
 		41D4195620DB531C00A97956 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195520DB531C00A97956 /* main.cpp */; };
@@ -48,6 +49,8 @@
 		41064C9620FB2C23004E1EF4 /* fireteam.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fireteam.hpp; sourceTree = "<group>"; };
 		41064C9820FB2C9A004E1EF4 /* controlSlide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = controlSlide.cpp; sourceTree = "<group>"; };
 		41064C9920FB2C9A004E1EF4 /* controlSlide.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = controlSlide.hpp; sourceTree = "<group>"; };
+		411011D221278D96002F6A09 /* graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graph.cpp; sourceTree = "<group>"; };
+		411011D321278D96002F6A09 /* graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = graph.hpp; sourceTree = "<group>"; };
 		419E04C4211541A300FBF9C3 /* hud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hud.cpp; sourceTree = "<group>"; };
 		419E04C5211541A300FBF9C3 /* hud.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = hud.hpp; sourceTree = "<group>"; };
 		419E04CA2115685300FBF9C3 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
@@ -139,6 +142,7 @@
 				41064C9520FB2C23004E1EF4 /* fireteam.cpp */,
 				419E04C4211541A300FBF9C3 /* hud.cpp */,
 				419E04CA2115685300FBF9C3 /* cursor.cpp */,
+				411011D221278D96002F6A09 /* graph.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -162,6 +166,7 @@
 				41064C9620FB2C23004E1EF4 /* fireteam.hpp */,
 				419E04C5211541A300FBF9C3 /* hud.hpp */,
 				419E04CB2115685300FBF9C3 /* cursor.hpp */,
+				411011D321278D96002F6A09 /* graph.hpp */,
 			);
 			name = headers;
 			sourceTree = "<group>";
@@ -247,6 +252,7 @@
 				41D4197320DB592900A97956 /* player.cpp in Sources */,
 				41D4198220DF46F800A97956 /* map.cpp in Sources */,
 				41D4197920DDF5B600A97956 /* tinyxml2.cpp in Sources */,
+				411011D421278D96002F6A09 /* graph.cpp in Sources */,
 				41D4196C20DB548900A97956 /* input.cpp in Sources */,
 				41D4196220DB538200A97956 /* graphics.cpp in Sources */,
 				41D4196F20DB578000A97956 /* sprite.cpp in Sources */,

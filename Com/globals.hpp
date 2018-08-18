@@ -61,4 +61,20 @@ struct Vector2 {
     }
 };
 
+/*
+struct Edge;
+
+struct Vertex {
+    
+    Edge * _edges;
+    
+};
+
+struct Edge {
+    
+    Vertex * _vertex;
+    
+};
+*/
+
 #endif /* globals_h */

@@ -9,6 +9,8 @@
 #ifndef globals_h
 #define globals_h
 
+#include <cmath>
+
 namespace globals {
     
     const int SCREEN_WIDTH = 1280; //640;

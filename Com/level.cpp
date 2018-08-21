@@ -19,6 +19,7 @@
 #include <cmath>
 #include <iostream>
 //#include "unit.hpp"
+#include <math.h>
 
 using namespace tinyxml2;
 
@@ -224,9 +225,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                     }
                 }
                 
-                this->_graph = Graph(vertexCount+1);    //  nodes should start at 0
-                
-                //this->_graph.printAdjacencyMatrix();
+                this->_graph = Graph(vertexCount+2); //+2 for source and destination nodes
                 
                 printf("vertex count: %d\n", vertexCount);
                 
@@ -280,7 +279,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
     
     //printf("end load map\n");
     
-    this->_graph.printAdjacencyMatrix();
+    //this->_graph.printAdjacencyMatrix();
     
     
 }
@@ -329,172 +328,49 @@ void Level::update(int elapsedTime) {
 
 void Level::draw(Graphics &graphics) {
     
-    
-    //printf("level: %f, unit: %f\n", this->_angle, this->_unit.getPlayerAngle());
-    
-    //this->_transx = this->_position.x;
-    //this->_transy = this->_position.y;
-    
-    
+
     int posx = std::round(this->_positionx);
     int posy = std::round(this->_positiony);
     
-
-    //this->_map.drawAngle(graphics, this->_position.x, this->_position.y, this->_angle);
-    //this->_map.drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
-    
-    //Map::drawTrans(graphics, this->_transx, this->_transy, this->_angle, this->_position.x, this->_position.y, this->_cameraMove);
     
     Map::drawTrans(graphics, posx, posy, this->_angle, posx, posy, this->_cameraMove);
     
-    
+    //draw collision rects
     for(int i = 0; i<this->_collisionRects.size(); i++) {
         graphics.drawRect(std::round(this->_collisionRects.at(i).getX()), std::round(this->_collisionRects.at(i).getY()), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
     }
-    
-    //std::cout <<this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
-    
-    //std::cout << this->_positionx << " " << this->_positiony << std::endl;
-    
-    //graphics.drawLine(-this->_positionx + 640, -this->_positiony + 400, -this->_positionx + 640 + 100*std::sin(this->_angle*3.14159/180), -this->_positiony + 400 - 100*std::cos(this->_angle*3.14159/180) );
+
     
     graphics.drawLine(640, 400, 640 - 100*std::sin(this->_angle*3.14159/180), 400 - 100*std::cos(this->_angle*3.14159/180) );
     
-    float m = (400 - (400 - 100*std::cos(this->_angle*3.14159/180)))/(640-(640 - 100*std::sin(this->_angle*3.14159/180)));
     
-    float b = 400 - m*640;
+    Vector2 coll = checkPathCollision(640, 400, this->_angle);
     
-    checkPathCollision(int beginx, int beginy, double angle);
-    
-    
-    //std::cout << m << std::endl;
-    
-    //std::cout << this->_angle << std::endl;
-    
-    //graphics.drawPoint(400, 400);
-    
-    //float collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    
-    //float collisiony = this->_collisionRects.at(0).getX() * m + b;
-    
-    //graphics.drawRect(400 - 5, 400-5, 10, 10);
-    
-    //graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
-    
-    /*
-    //the top
-    if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-        graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
-    }
-    */
-    /*
-    if((this->_collisionRects.at(0).getY() + this->_positiony < 0) && this->_angle < 0) {
-        //player is below the rectangle
-    }
-     */
-    
-    //check bottom
-    float collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
-    float collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() < 400-this->_collisionRects.at(0).getHeight() && std::abs(this->_angle) < 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()-5, 10, 10);
-        }
+    if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
+        graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
     }
     
-    //std::cout << this->_collisionRects.at(0).getY() << " " << this->_positiony <<std::endl;
     
-    //check top                                         //if angle is over 2 pi, subtract 2 pi
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() > 400 && std::abs(this->_angle) > 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
-        }
-    }
-    
-    //std::cout << this->_collisionRects.at(0).getY() << " " << this->_positiony <<std::endl;
-    
-    //check left
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    //if((this->_collisionRects.at(0).getX() + this->_positionx > 0 && std::abs(this->_angle) > 90)) {
-    if((this->_collisionRects.at(0).getX() > 640) && this->_angle < 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
-        }
-    }
-    
-    //std::cout << this->_collisionRects.at(0).getX() <<std::endl;
-    //std::cout << this->_angle << std::endl;
-    
-    //check right
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
-    //if((this->_collisionRects.at(0).getX() + this->_positionx > 0 && std::abs(this->_angle) > 90)) {
-    if((this->_collisionRects.at(0).getX() < 640 - this->_collisionRects.at(0).getWidth()) && this->_angle > 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            graphics.drawRect(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth() - 5, collisiony-5, 10, 10);
-        }
-    }
-    
-    //std::cout << this->_collisionRects.at(0).getX() << " " << this->_positionx <<std::endl;
-    
-    
-    //graphics.drawLine(0, b, -b/m, 0);
-    
+    //unit
     this->_unit.draw(graphics);
     
     float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
-    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+16;
-    float angleEquivalent = this->_unit.getAngle();
+    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
+    float angleEquivalent = -this->_unit.getAngle();    //the opposite angle of level
     
     //in both cases we change the - sin for x into a + sin
-    graphics.drawLine(xEquivalent, yEquivalent, xEquivalent + 100*std::sin(angleEquivalent*3.14159/180), yEquivalent - 100*std::cos(angleEquivalent*3.14159/180) );
-    
-    m = (yEquivalent - (yEquivalent - 100*std::cos(angleEquivalent*3.14159/180)))/(xEquivalent-(xEquivalent + 100*std::sin(angleEquivalent*3.14159/180)));
-    
-    b = yEquivalent - m*xEquivalent;
-    
-    //graphics.drawLine(0, b, -b/m, 0);
+    graphics.drawLine(xEquivalent, yEquivalent, xEquivalent - 100*std::sin(angleEquivalent*3.14159/180), yEquivalent - 100*std::cos(angleEquivalent*3.14159/180) );
 
-    collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() < yEquivalent-this->_collisionRects.at(0).getHeight() && std::abs(angleEquivalent) < 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()-5, 10, 10);
-        }
-    }
     
-    //check top                                         //if angle is over 2 pi, subtract 2 pi
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() > yEquivalent && std::abs(angleEquivalent) > 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            graphics.drawRect(collisionx - 5, this->_collisionRects.at(0).getY()-5, 10, 10);
-        }
-    }
+    coll = checkPathCollision(xEquivalent, yEquivalent, angleEquivalent);
     
-    //check left
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getX() > xEquivalent) && angleEquivalent < 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            graphics.drawRect(this->_collisionRects.at(0).getX() - 5, collisiony-5, 10, 10);
-        }
+    
+    if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
+        graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
     }
 
     
-    //check right
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
-    if((this->_collisionRects.at(0).getX() < xEquivalent - this->_collisionRects.at(0).getWidth()) && angleEquivalent > 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            graphics.drawRect(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth() - 5, collisiony-5, 10, 10);
-        }
-    }
-    
-    
+    //slide
     this->_slide.draw(graphics);
     
     
@@ -821,19 +697,95 @@ void Level::handleUnitMovement() {
 void Level::moveUnitToPosition(int posX, int posY) {
     //check if the path is clear
     
+    Vector2 temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY(), posX, posY);
     
-    //add unit position and destination to the graph object
+    //printf("%d, %d\n", temp.x, temp.y);
     
-        //search around for all corners, edges where there is nothing blocking the path to those corners
+    std::vector<int> vertexPath;
     
-    //use A* search algorithm to find the shortest path
+    //no collision
+    if((temp.x == 0)&&(temp.y == 0)) {
+        this->_unit.moveToPosition(posX, posY);
+        printf("no collision\n");
+    }
+    else {
+        
+        std::map<int, Vector2> vertices = this->_graph.getVertexTable();
+        
+        this->_graph.removeEdgesForSourceAndDestinationVertices();
+        
+        Vector2 tempDestination;
+        double weight = 0.0;
+        
+        for(const auto& iter : vertices) {
+            temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY(), iter.second.x, iter.second.y);
+            
+            tempDestination = checkPathCollision(posX, posY, iter.second.x, iter.second.y);
+            
+            
+            if((temp.x == 0)&&(temp.y == 0)) {
+                weight = std::sqrt(std::pow(this->_unit.getStaticX()-iter.second.x,2)+std::pow(this->_unit.getStaticY()-iter.second.y,2));
+                
+                //printf("%d, %d\n", iter.first, this->_graph.getVertexCount());
+                
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount(), weight);
+
+            }
+            
+            if((tempDestination.x == 0)&&(tempDestination.y == 0)) {
+                weight = std::sqrt(std::pow(posX-iter.second.x,2)+std::pow(posY-iter.second.y,2));
+                
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight);
+                
+            }
+            
+        }
+        this->_graph.printAdjacencyMatrix();
+        
+        //find h values for all vertices
+        std::map<int, double> h;
+        
+        for(const auto& iter : vertices) {
+            double manhattan = std::sqrt(std::pow(posX-iter.second.x,2) + std::pow(posY-iter.second.y,2));
+            h.insert(std::make_pair(iter.first, manhattan));
+        }
+
+        
+        
+        vertexPath = this->_graph.getAStarVertexPath(h);
+        
+        
+        for(int i = 0; i < vertexPath.size(); i++) {
+            printf("%d, ", vertexPath[i]);
+        }
+        printf("\n");
+        
+        /*
+        //pick starting vertex (vertexCount)
+        for(int i = 0; i < this->_graph.getVertexCount(); i++) { //no need to check connections with destination
+            double min = this->_
+            
+        }
+        
+        */
+        
+        
+        
+    }
+
+    
+    std::vector<Vector2> movementOrders = this->_graph.convertToMovementOrders(vertexPath);
+    
+    movementOrders.push_back(Vector2(posX, posY)); //put desination in there
+    
+    //this->_unit.addToMovementOrders(movementOrders);
+    
+    printf("movement orders:\n");
+    this->_unit.printMovementOrders();
     
     
     
-    //add those paths to the unit movement orders
-    
-    
-    this->_unit.moveToPosition(posX, posY);
+    //this->_unit.moveToPosition(posX, posY);
 }
 
 bool Level::checkSlideCollision(int xm, int ym) {
@@ -850,6 +802,104 @@ void Level::centerSlideToZero(){
     this->_slide.centerSlideToZero();
 }
 
-Vector2 Level::checkPathCollision(int beginx, int beginy, double angle) {
+
+Vector2 Level::checkPathCollision(double beginx, double beginy, double endx, double endy) {
+    
+
+    double xdiff = endx - (this->_unit.getStaticX());
+    double ydiff = endy - (this->_unit.getStaticY()+4);
+    double angle = 0.0;
+    
+    if(ydiff < 0) {
+        angle = (-std::atan(xdiff/ydiff)*180/3.14159);
+    }
+    else {
+        angle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
+    }
+    
+    angle = -angle;
+    
+    if(angle > 180) {
+        angle -= 360;
+    }
+    else if(angle < -180) {
+        angle += 360;
+    }
+
+    
+    //printf("%f, %f\n", angle, this->_angle);
+    
+    Vector2 temp = checkPathCollision(beginx, beginy, angle);
+    
+    //printf("%d, %d\n", temp.x, temp.y);
+    
+    return checkPathCollision(beginx, beginy, angle);
+}
+
+
+Vector2 Level::checkPathCollision(double beginx, double beginy, double angle) {
+    
+    
+    float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
+
+    
+    float b = beginy - m*beginx;
+    
+
+    //check bottom
+    float collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
+    float collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() < (beginy - this->_collisionRects.at(0).getHeight()) && std::abs(angle) < 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            
+            return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
+
+        }
+    }
+    
+
+    
+    //check top
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getY() > beginy && std::abs(angle) > 90)) {
+        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
+            
+            //printf("top ");
+            
+            return Vector2(collisionx,this->_collisionRects.at(0).getY());
+
+        }
+    }
+
+
+    
+    
+    //check left
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = this->_collisionRects.at(0).getX() * m + b;
+    if((this->_collisionRects.at(0).getX() > beginx) && angle < 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            
+            return Vector2(this->_collisionRects.at(0).getX(),collisiony);
+            
+        }
+    }
+    
+    //check right
+    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
+    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
+    if((this->_collisionRects.at(0).getX() < beginx - this->_collisionRects.at(0).getWidth()) && angle > 0) {
+        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
+            
+            return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
+            
+        }
+    }
+    
+    //no collision
+    return Vector2(0, 0);
+    
+
     
 }

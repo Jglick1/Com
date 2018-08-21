@@ -99,6 +99,9 @@ public:
     
     float getPlayerAngle();
     
+    void addToMovementOrders(std::vector<Vector2> pos);
+    void printMovementOrders();
+    
 private:
     float _dx, _dy;
     float _angle;

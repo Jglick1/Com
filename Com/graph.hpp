@@ -25,6 +25,14 @@ public:
     void addToVertexTable(int vertex1, int x, int y); // map from id to position
     double getWeight(int vertex1, int vertex2);
     void printAdjacencyMatrix();
+    std::map<int, Vector2> getVertexTable();
+    int getVertexCount();
+    void removeEdgesForSourceAndDestinationVertices();
+    std::vector<int> getAStarVertexPath(std::map<int, double> & h);
+    void findNextNode(std::vector<int> & vertexPath,std::map<int, double> & h, int currentVertex);
+    std::vector<Vector2> convertToMovementOrders(std::vector<int> vertices);
+
+    
 private:
     //double** _adjacencyMatrix;
     std::vector< std::vector<double> > _adjacencyMatrix;

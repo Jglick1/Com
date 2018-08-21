@@ -574,8 +574,11 @@ void Unit::handleMovement() {
     
 }
 
-
-
+void Unit::printMovementOrders() {
+    for(Vector2 i : this->_unitMovementOrders) {
+        printf("%d, %d\n", i.x, i.y);
+    }
+}
 
 
 

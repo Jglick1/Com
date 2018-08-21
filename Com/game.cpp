@@ -219,7 +219,9 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
-            this->_level.moveUnitToPosition(480, 336);
+            //this->_level.moveUnitToPosition(480, 336);
+            //this->_level.moveUnitToPosition(610, 290);
+            this->_level.moveUnitToPosition(800, 400);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {

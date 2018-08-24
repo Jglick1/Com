@@ -64,7 +64,7 @@ public:
     
     void handleUnitMovement();
     
-    void moveUnitToPosition(int posX, int posY);
+    void moveUnitToPosition(int posX, int posY, Graphics &graphics);
     
     void moveUpRight();
     void moveUpLeft();
@@ -110,6 +110,8 @@ private:
     bool _cameraMove;
     
     Unit _unit;
+    
+    std::vector<Unit> _units;
     
     ControlSlide _slide;
     

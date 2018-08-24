@@ -26,6 +26,20 @@ public:
     _startY(y)
     {}
     
+    /*
+    Rectangle(int x, int y, int width, int height, int unitID) :
+    _x(x),
+    _y(y),
+    _width(width),
+    _height(height),
+    _startX(x),
+    _startY(y),
+    _type(2),   //  0 is a structure, 1 is a soft structure, 2 is a unit
+    _unitID(unitID)
+    {}
+    */
+    
+    
     const int getCenterX() const { return this->_x + this->_width / 2; }
     const int getCenterY() const { return this->_y + this->_height / 2; }
     
@@ -139,7 +153,8 @@ private:
     int _width, _height;
     int _startX;
     int _startY;
-    
+    int _type;      //  0 is a structure, 1 is a soft structure, 2 is a unit
+    int _unitID;    // rectangle belonging to what unit
 };
 
 

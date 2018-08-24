@@ -221,7 +221,7 @@ void Game::gameLoop() {
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
             //this->_level.moveUnitToPosition(480, 336);
             //this->_level.moveUnitToPosition(610, 290);
-            this->_level.moveUnitToPosition(800, 400);
+            this->_level.moveUnitToPosition(800, 400, graphics);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
@@ -240,10 +240,13 @@ void Game::gameLoop() {
         
         if(this->_gameState == SLIDE_MOVE) {
             if(rightMouseDown == 0) {
-                this->_gameState = NORMAL;
+                this->_gameState = COMMAND;
                 this->_level.centerSlideToZero();
             }
         }
+        
+        //printGameState(this->_gameState);
+        
         
         
         
@@ -530,7 +533,7 @@ void Game::draw(Graphics &graphics) {
     
     this->_hud.draw(graphics);
     
-    this->_cursor.draw(graphics);
+    //this->_cursor.draw(graphics);
     
     graphics.flip();
     
@@ -559,10 +562,12 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     //printf("%d\n",this->_gameState == NORMAL);
     
+    
     if ((this->_gameState == NORMAL) && std::abs((xm - old_xm)) < 100) {
         this->_level.changeAngle(-0.5*(xm - old_xm));
         //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
     }
+    
      
     
     this->_level.setUnitAngle();
@@ -620,6 +625,23 @@ void Game::printDirection(Direction inPower) {
             break;
         case DOWNLEFT:
             printf("DOWNLEFT\n");
+            break;
+        case NONE:
+            printf("NONE\n");
+            break;
+    }
+}
+
+void Game::printGameState(GameState gameState) {
+    switch(gameState) {
+        case NORMAL:
+            printf("NORMAL\n");
+            break;
+        case SLIDE_MOVE:
+            printf("SLIDE_MOVE\n");
+            break;
+        case COMMAND:
+            printf("COMMAND\n");
             break;
         case NONE:
             printf("NONE\n");

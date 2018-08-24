@@ -23,7 +23,7 @@ public:
     void update(float elapsedTime);
     
     bool checkSlideCollision(int xm, int ym);
-    void handleSlideMovement(int xm, int ym);
+    void handleSlideMovement(int xm, int ym, double angle, float levelx, float levely);
     
     void centerSlideToZero();
     

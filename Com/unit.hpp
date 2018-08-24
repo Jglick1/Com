@@ -102,6 +102,10 @@ public:
     void addToMovementOrders(std::vector<Vector2> pos);
     void printMovementOrders();
     
+    void moveToNextPosition();
+    
+    Rectangle getCollisionRect();
+    
 private:
     float _dx, _dy;
     float _angle;
@@ -120,6 +124,8 @@ private:
     Direction _destinationDirection;
     
     std::vector<Vector2> _unitMovementOrders;
+    
+    Rectangle _collisionRect;
     
     
 };

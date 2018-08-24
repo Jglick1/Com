@@ -52,6 +52,10 @@ Level::Level(std::string mapName, Graphics &graphics) :
     
     this->_unit = Unit(graphics, Vector2(0,0));
     
+
+    
+    
+    
     //this->_unit.moveToPosition(600, 800);
 
     
@@ -307,6 +311,10 @@ void Level::update(int elapsedTime) {
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).update(elapsedTime, this->_dx, this->_dy);
     }
+    
+
+    
+    
     /*
     for(int i = 0; i < this->_doorList.size(); i++) {
         this->_doorList.at(i).update(elapsedTime, this->_dx, this->_dy);
@@ -327,7 +335,6 @@ void Level::update(int elapsedTime) {
 
 
 void Level::draw(Graphics &graphics) {
-    
 
     int posx = std::round(this->_positionx);
     int posy = std::round(this->_positiony);
@@ -339,9 +346,19 @@ void Level::draw(Graphics &graphics) {
     for(int i = 0; i<this->_collisionRects.size(); i++) {
         graphics.drawRect(std::round(this->_collisionRects.at(i).getX()), std::round(this->_collisionRects.at(i).getY()), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
     }
+    
+    //draw unit collision rects
+    Rectangle unitRec = this->_unit.getCollisionRect();
 
+    graphics.drawRect(std::round(unitRec.getX()), std::round(unitRec.getY()), unitRec.getWidth(), unitRec.getHeight());
+    
+    
+    
+    
     
     graphics.drawLine(640, 400, 640 - 100*std::sin(this->_angle*3.14159/180), 400 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    //graphics.drawLine(10,10,800,800);
     
     
     Vector2 coll = checkPathCollision(640, 400, this->_angle);
@@ -349,6 +366,23 @@ void Level::draw(Graphics &graphics) {
     if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
         graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
     }
+    
+    
+    /*
+    std::map<int, Vector2> vertices = this->_graph.getVertexTable();
+    Vector2 temp;
+    for(const auto& iter : vertices) {
+        temp = checkPathCollision(this->_unit.getStaticX()+this->_unit.getX(), this->_unit.getStaticY()+this->_unit.getY(), iter.second.x, iter.second.y);
+    
+        //if(!(temp.x == 0)&&(temp.y == 0)) {
+
+            graphics.drawRect(temp.x-5, temp.y-5, 10, 10);
+            
+        //}
+    }
+    */
+    
+    
     
     
     //unit
@@ -694,10 +728,10 @@ void Level::handleUnitMovement() {
     this->_unit.handleMovement();
 }
 
-void Level::moveUnitToPosition(int posX, int posY) {
+void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graphics for testing
     //check if the path is clear
     
-    Vector2 temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY(), posX, posY);
+    Vector2 temp = checkPathCollision(this->_unit.getStaticX()+this->_unit.getX(), this->_unit.getStaticY()+this->_unit.getY(), posX, posY);
     
     //printf("%d, %d\n", temp.x, temp.y);
     
@@ -707,6 +741,7 @@ void Level::moveUnitToPosition(int posX, int posY) {
     if((temp.x == 0)&&(temp.y == 0)) {
         this->_unit.moveToPosition(posX, posY);
         printf("no collision\n");
+        return;                                 //CHANGE THIS
     }
     else {
         
@@ -718,28 +753,30 @@ void Level::moveUnitToPosition(int posX, int posY) {
         double weight = 0.0;
         
         for(const auto& iter : vertices) {
-            temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY(), iter.second.x, iter.second.y);
+            temp = checkPathCollision(this->_unit.getStaticX()+this->_unit.getX(), this->_unit.getStaticY()+this->_unit.getY(), iter.second.x, iter.second.y);
             
             tempDestination = checkPathCollision(posX, posY, iter.second.x, iter.second.y);
-            
             
             if((temp.x == 0)&&(temp.y == 0)) {
                 weight = std::sqrt(std::pow(this->_unit.getStaticX()-iter.second.x,2)+std::pow(this->_unit.getStaticY()-iter.second.y,2));
                 
-                //printf("%d, %d\n", iter.first, this->_graph.getVertexCount());
+                printf("%d, %d\n", iter.first, this->_graph.getVertexCount());
                 
-                this->_graph.addEdge(iter.first, this->_graph.getVertexCount(), weight);
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount(), weight); //source
 
             }
             
             if((tempDestination.x == 0)&&(tempDestination.y == 0)) {
                 weight = std::sqrt(std::pow(posX-iter.second.x,2)+std::pow(posY-iter.second.y,2));
                 
-                this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight);
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight); //destination
                 
             }
             
         }
+        
+        
+        
         this->_graph.printAdjacencyMatrix();
         
         //find h values for all vertices
@@ -766,8 +803,8 @@ void Level::moveUnitToPosition(int posX, int posY) {
             double min = this->_
             
         }
-        
         */
+        
         
         
         
@@ -778,7 +815,7 @@ void Level::moveUnitToPosition(int posX, int posY) {
     
     movementOrders.push_back(Vector2(posX, posY)); //put desination in there
     
-    //this->_unit.addToMovementOrders(movementOrders);
+    this->_unit.addToMovementOrders(movementOrders);
     
     printf("movement orders:\n");
     this->_unit.printMovementOrders();
@@ -786,6 +823,7 @@ void Level::moveUnitToPosition(int posX, int posY) {
     
     
     //this->_unit.moveToPosition(posX, posY);
+    this->_unit.moveToPosition(movementOrders[0].x, movementOrders[0].y);
 }
 
 bool Level::checkSlideCollision(int xm, int ym) {
@@ -795,7 +833,7 @@ bool Level::checkSlideCollision(int xm, int ym) {
 }
 
 void Level::handleSlideMovement(int xm, int ym) {
-    this->_slide.handleSlideMovement(xm, ym);
+    this->_slide.handleSlideMovement(xm, ym, this->_angle, this->_positionx, this->_positiony);
 }
 
 void Level::centerSlideToZero(){

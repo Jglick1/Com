@@ -25,6 +25,7 @@ public:
     Game();
     ~Game();
     void printDirection(Direction inPower);
+    void printGameState(GameState state);
     
     
 private:

@@ -43,6 +43,10 @@ _destinationDirection(NONE)
     //this->_staticx = 500;
     //this->_staticy = 400;
     
+    Rectangle rec(0,4,16,16);
+    
+    this->_collisionRect = rec;
+    
     //this->_fov = Sprite(graphics, "/Users/jonahglick/Documents/Com/view_direction.png", 0, 0, 96, 128, 600, 600);
 
 }
@@ -177,6 +181,13 @@ void Level::moveLeft() {
     this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
 }
  */
+
+void Unit::moveToNextPosition() {
+    this->_unitMovementOrders.erase(this->_unitMovementOrders.begin());//erase last order
+    if(this->_unitMovementOrders.size() > 0) {
+        moveToPosition(this->_unitMovementOrders[0].x, this->_unitMovementOrders[0].y);
+    }
+}
 
 void Unit::moveToPosition(int posX, int posY) {
     
@@ -360,6 +371,8 @@ void Unit::update(float elapsedTime, float playerAngle) {
     
     this->_staticy += this->_staticdy * elapsedTime;
     this->_staticx += this->_staticdx * elapsedTime;
+    
+    this->_collisionRect.update(elapsedTime, this->_dx+this->_staticdx, this->_dy+this->_staticdy);
 
     
     Sprite::update();
@@ -509,6 +522,7 @@ void Unit::handleMovement() {
                         this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
+                        moveToNextPosition();
                     }
                     else {
                         moveForward();
@@ -521,6 +535,7 @@ void Unit::handleMovement() {
                         this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
+                        moveToNextPosition();
                     }
                     else {
                         moveForward();
@@ -533,6 +548,7 @@ void Unit::handleMovement() {
                         this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
+                        moveToNextPosition();
                     }
                     else {
                         moveForward();
@@ -545,6 +561,7 @@ void Unit::handleMovement() {
                         this->_staticy = this->_destinationy - 4;
                         //this->_angle = 0.0;
                         this->_state = STILL;
+                        moveToNextPosition();
                     }
                     else {
                         moveForward();
@@ -574,11 +591,19 @@ void Unit::handleMovement() {
     
 }
 
+void Unit::addToMovementOrders(std::vector<Vector2> pos) {
+    for(Vector2 i : pos) {
+        this->_unitMovementOrders.push_back(i);
+    }
+}
+
 void Unit::printMovementOrders() {
     for(Vector2 i : this->_unitMovementOrders) {
         printf("%d, %d\n", i.x, i.y);
     }
 }
 
-
+Rectangle Unit::getCollisionRect() {
+    return this->_collisionRect;
+}
 

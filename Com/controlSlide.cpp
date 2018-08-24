@@ -212,20 +212,32 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     
 }
 
-void ControlSlide::handleSlideMovement(int xm, int ym) {
+void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float levelx, float levely) {
     
     int width = std::round(this->_width);
     int height = std::round(this->_height);
     //printf("%d\n", this->_centerHold);
     
-    xm += this->_x;
-    ym -= this->_y;
+    //xm += this->_x;
+    //ym -= this->_y;
     
     //printf("%f, %f\n", this->_x, this->_y);
     
     if(this->_centerHold) {
-        this->_staticx = xm - width/2;
-        this->_staticy = ym - height/2;
+        //this->_staticx = xm - width/2 - levelx;
+        //this->_staticy = ym - height/2 - levely;
+        
+        double ax = (xm - width/2 - levelx);
+        double ay = (ym - height/2 - levely);
+        
+        double bx = 640;
+        double by = 400;
+        
+        this->_staticx = std::cos(-angle*3.14159/180)*(ax-bx) - std::sin(-angle*3.14159/180)*(ay-by) + bx;
+        this->_staticy = std::sin(-angle*3.14159/180)*(ax-bx) + std::cos(-angle*3.14159/180)*(ay-by) + by;
+        
+
+        
     }
     else if (this->_sideHoldR) {
         float xdiff = xm - (this->_staticx + width/2);

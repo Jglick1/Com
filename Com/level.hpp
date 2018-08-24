@@ -77,8 +77,13 @@ public:
     
     void centerSlideToZero();
     
-    Vector2 checkPathCollision(double beginx, double beginy, double angle);
-    Vector2 checkPathCollision(double beginx, double beginy, double endx, double endy);
+    bool checkPathCollision(double beginx, double beginy, double angle);
+    bool checkPathCollision(double beginx, double beginy, double endx, double endy);
+    
+    Vector2 checkShotCollision(double beginx, double beginy, double angle);
+
+    
+    
     
 private:
     //Map _map;

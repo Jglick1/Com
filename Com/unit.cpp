@@ -372,8 +372,8 @@ void Unit::update(float elapsedTime, float playerAngle) {
     this->_staticy += this->_staticdy * elapsedTime;
     this->_staticx += this->_staticdx * elapsedTime;
     
-    this->_collisionRect.update(elapsedTime, this->_dx+this->_staticdx, this->_dy+this->_staticdy);
-
+    //this->_collisionRect.update(elapsedTime, this->_dx+this->_staticdx, this->_dy+this->_staticdy);
+    this->_collisionRect.setXY(this->_x+this->_staticx, this->_y+this->_staticy + 4);
     
     Sprite::update();
     

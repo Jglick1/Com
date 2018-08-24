@@ -148,6 +148,12 @@ public:
         
     }
     
+    void setXY(float newX, float newY) {
+        this->_x = newX;
+        this->_y = newY;
+        //printf("%f, %f\n", this->_x, this->_y);
+    }
+    
 private:
     float _x, _y;
     int _width, _height;

@@ -65,7 +65,27 @@ void ControlSlide::draw(Graphics &graphics) {
     
     //Sprite::drawControlSlider(graphics, 640-75 + ( (posx)-640+75)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180), 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+75) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
     
+    
+    
+    
+    
+    
+    
     Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + this->_playerAngle);
+    //Sprite::drawControlSlider(graphics, this->_staticx, this->_staticy, this->_angle);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     //graphics.drawPoint(posx + width - height/2, posy + height/2);
     
@@ -140,8 +160,8 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     int width = std::round(this->_width);
     int height = std::round(this->_height);
     
-    int posx = std::round(this->_x + this->_staticx);
-    int posy = std::round(this->_y + this->_staticy);
+    int posx = std::round(this->_staticx);
+    int posy = std::round(this->_staticy);
     
     tx = std::round(this->_camerax);
     ty = std::round(this->_cameray);
@@ -150,10 +170,35 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     //this->_cameray = 400-16 + ( ((posy)-400+16) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180));
     
     
+    /*
+    //the left box
+    if(std::sqrt(std::pow(xm - this->_LrotatedX,2) + std::pow(ym - this->_LrotatedY,2)) < (height/2) ) {
+        printf("left collision!\n");
+        this->_sideHoldL = 1;
+        return 1;
+    }
     
-    //printf("xm: %d, ym: %d\n", xm, ym);
+    //the middle circle
+    if(std::sqrt(std::pow(xm - (posx + width/2),2) + std::pow(ym - (posy + height/2),2)) < (height/2) ) {
+        printf("middle collision!\n");
+        
+        this->_centerHold = 1;
+        return 1;
+    }
     
-    //printf("xm: %d, ym: %d\n", x, x + height);
+    
+    //the right box
+    if(std::sqrt(std::pow(xm - this->_RrotatedX,2) + std::pow(ym - this->_RrotatedY,2)) < (height/2) ) {
+        printf("right collision!\n");
+        this->_sideHoldR = 1;
+        return 1;
+    }
+    */
+    
+     
+     
+     
+     
     
     
     //the left box
@@ -227,19 +272,32 @@ void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float level
         //this->_staticx = xm - width/2 - levelx;
         //this->_staticy = ym - height/2 - levely;
         
-        double ax = (xm - width/2 - levelx);
-        double ay = (ym - height/2 - levely);
-        
         double bx = 640;
         double by = 400;
         
-        this->_staticx = std::cos(-angle*3.14159/180)*(ax-bx) - std::sin(-angle*3.14159/180)*(ay-by) + bx;
-        this->_staticy = std::sin(-angle*3.14159/180)*(ax-bx) + std::cos(-angle*3.14159/180)*(ay-by) + by;
+        //xm = std::cos(angle*3.14159/180)*(xm-bx) - std::sin(angle*3.14159/180)*(ym-by) + bx;
+        //ym = std::sin(angle*3.14159/180)*(xm-bx) + std::cos(angle*3.14159/180)*(ym-by) + by;
         
+        
+        //double ax = (xm - width/2 - levelx);
+        //double ay = (ym - height/2 - levely);
+        
+        double ax = (xm);
+        double ay = (ym);
+        
+        //this->_staticx = std::cos(-angle*3.14159/180)*(ax-bx) - std::sin(-angle*3.14159/180)*(ay-by) + bx;
+        //this->_staticy = std::sin(-angle*3.14159/180)*(ax-bx) + std::cos(-angle*3.14159/180)*(ay-by) + by;
+        
+        xm = std::cos(-angle*3.14159/180)*(ax-bx) - std::sin(-angle*3.14159/180)*(ay-by) + bx;
+        ym = std::sin(-angle*3.14159/180)*(ax-bx) + std::cos(-angle*3.14159/180)*(ay-by) + by;
+        
+        this->_staticx = xm - width/2 - levelx;
+        this->_staticy = ym - height/2 - levely;
 
         
     }
     else if (this->_sideHoldR) {
+        /*
         float xdiff = xm - (this->_staticx + width/2);
         float ydiff = ym - (this->_staticy + height/2);
         float angle = 0.0;
@@ -252,8 +310,30 @@ void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float level
         }
         
         this->_angle = angle*180/3.14159;
+         */
+        /*
+        double bx = 640;
+        double by = 400;
+        
+        xm = std::cos(-angle*3.14159/180)*(xm-bx) - std::sin(-angle*3.14159/180)*(ym-by) + bx;
+        ym = std::sin(-angle*3.14159/180)*(xm-bx) + std::cos(-angle*3.14159/180)*(ym-by) + by;
+        */
+         
+        float xdiff = xm - (this->_camerax + width/2);
+        float ydiff = ym - (this->_cameray + height/2);
+        float cAngle = 0.0;
+        
+        if(ydiff < 0) {
+            cAngle = -std::atan(xdiff/ydiff) - 3.14159/2;
+        }
+        else {
+            cAngle = -std::atan(xdiff/ydiff) + 3.14159/2;
+        }
+        
+        this->_angle = cAngle*180/3.14159 - angle;
     }
     else if (this->_sideHoldL) {
+        /*
         float xdiff = xm - (this->_staticx + width/2);
         float ydiff = ym - (this->_staticy + height/2);
         float angle = 0.0;
@@ -266,9 +346,30 @@ void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float level
         }
         
         this->_angle = angle*180/3.14159;
+         */
+        
+        /*
+        double bx = 640;
+        double by = 400;
+        
+        xm = std::cos(-angle*3.14159/180)*(xm-bx) - std::sin(-angle*3.14159/180)*(ym-by) + bx;
+        ym = std::sin(-angle*3.14159/180)*(xm-bx) + std::cos(-angle*3.14159/180)*(ym-by) + by;
+        */
+        
+        
+        float xdiff = xm - (this->_camerax + width/2);
+        float ydiff = ym - (this->_cameray + height/2);
+        float cAngle = 0.0;
+        
+        if(ydiff < 0) {
+            cAngle = -std::atan(xdiff/ydiff) - 3.14159/2 + 3.14159;
+        }
+        else {
+            cAngle = -std::atan(xdiff/ydiff) + 3.14159/2 + 3.14159;
+        }
+        
+        this->_angle = cAngle*180/3.14159 - angle;
     }
-    
-    
     
 }
 

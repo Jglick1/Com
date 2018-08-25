@@ -57,6 +57,9 @@ private:
     float _RrotatedX, _RrotatedY;
     float _LrotatedX, _LrotatedY;
     
+    float _movingx;
+    float _movingy;
+    
 };
 
 

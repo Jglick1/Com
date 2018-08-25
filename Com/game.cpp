@@ -159,7 +159,7 @@ void Game::gameLoop() {
                 }
                 else if(event.button.button == SDL_BUTTON_LEFT) {
                     this->_gameState = NORMAL;
-                    //printf("other mouse down\n");
+                    printf("left mouse down");
                 }
             }
             else if (event.type == SDL_MOUSEBUTTONUP) {
@@ -224,6 +224,10 @@ void Game::gameLoop() {
             this->_level.moveUnitToPosition(800, 400, graphics);
         }
         
+        if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
+            this->_level.moveUnitToPosition(0, 0, graphics);
+        }
+        
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
             //graphics.playShot();
         }
@@ -243,6 +247,9 @@ void Game::gameLoop() {
                 this->_gameState = COMMAND;
                 this->_level.centerSlideToZero();
             }
+            else {
+                this->_level.handleSlideMovement(xm, ym);
+            }
         }
         
         //printGameState(this->_gameState);
@@ -258,7 +265,7 @@ void Game::gameLoop() {
         }
         */
         
-        this->_level.handleSlideMovement(xm, ym);
+        //this->_level.handleSlideMovement(xm, ym);
         
         
         

@@ -447,7 +447,7 @@ void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTim
                     
                     break;
                 case sides::BOTTOM:
-                    this->changeY(-(others.at(i).getStartY()) + 385 + 16);// + this->_staticy);
+                    this->changeY(-(others.at(i).getStartY()) + 400-12 + 20);// + this->_staticy);
                     this->_dy = 0.0f;
                     
                     break;
@@ -457,7 +457,7 @@ void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTim
 
                     break;
                 case sides::RIGHT:
-                    this->changeX((-others.at(i).getStartX()) + 625 + 16);// + this->_staticx);
+                    this->changeX((-others.at(i).getStartX()) + 640 + 8);// + this->_staticx);
                     this->_dx = 0.0f;
                     
                     break;

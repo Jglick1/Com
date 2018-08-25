@@ -184,11 +184,16 @@ void Graph::findNextNode(std::vector<int> & vertexPath,std::map<int, double> & h
     
     //find open vertices
     std::vector<int> openVertices;
-    for(int i = 0; i < this->_vertexCount+2; i++) {             //vertexCount+2
+    for(int i = 0; i < this->_vertexCount; i++) {             //vertexCount+2
         if(this->_adjacencyMatrix[currentVertex][i] > 0.0) {
             openVertices.push_back(i);
         }
     }
+    //if the end vertex is in sight
+    if(this->_adjacencyMatrix[currentVertex][this->_vertexCount+1] > 0.0) {
+        openVertices.push_back(this->_vertexCount+1);
+    }
+    
     
     //find next node
     for(int i : openVertices) {

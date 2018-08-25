@@ -67,7 +67,7 @@ void ControlSlide::draw(Graphics &graphics) {
     
     
     
-    
+    //printf("%f, %f\n",this->_staticx, this->_staticy);
     
     
     
@@ -426,3 +426,9 @@ void ControlSlide::moveDownLeftParallax() {
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
 }
 
+float ControlSlide::getStaticX() {
+    return this->_staticx;
+}
+float ControlSlide::getStaticY() {
+    return this->_staticy;
+}

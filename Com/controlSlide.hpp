@@ -40,6 +40,9 @@ public:
     void moveDownRightParallax();
     void moveDownLeftParallax();
     
+    float getStaticX();
+    float getStaticY();
+    
 private:
     //float _x, _y;
     float _dx, _dy;

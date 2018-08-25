@@ -221,7 +221,7 @@ void Game::gameLoop() {
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
             //this->_level.moveUnitToPosition(480, 336);
             //this->_level.moveUnitToPosition(610, 290);
-            this->_level.moveUnitToPosition(800, 400, graphics);
+            this->_level.moveUnitToPosition(790, 400, graphics);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
@@ -243,9 +243,10 @@ void Game::gameLoop() {
         }
         
         if(this->_gameState == SLIDE_MOVE) {
-            if(rightMouseDown == 0) {
+            if(rightMouseDown == 0) {   //sliders is released
                 this->_gameState = COMMAND;
                 this->_level.centerSlideToZero();
+                //this->_level.moveUnitToSlidePosition(graphics);
             }
             else {
                 this->_level.handleSlideMovement(xm, ym);

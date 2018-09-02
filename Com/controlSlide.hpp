@@ -43,6 +43,8 @@ public:
     float getStaticX();
     float getStaticY();
     
+    void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime);
+    
 private:
     //float _x, _y;
     float _dx, _dy;

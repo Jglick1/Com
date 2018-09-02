@@ -246,7 +246,7 @@ void Game::gameLoop() {
             if(rightMouseDown == 0) {   //sliders is released
                 this->_gameState = COMMAND;
                 this->_level.centerSlideToZero();
-                //this->_level.moveUnitToSlidePosition(graphics);
+                this->_level.moveUnitToSlidePosition(graphics);
             }
             else {
                 this->_level.handleSlideMovement(xm, ym);

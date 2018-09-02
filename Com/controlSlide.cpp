@@ -432,3 +432,41 @@ float ControlSlide::getStaticX() {
 float ControlSlide::getStaticY() {
     return this->_staticy;
 }
+
+void ControlSlide::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) {
+    
+    Rectangle playerRec = Rectangle(632, 392, 16, 16);
+    /*
+    for (int i = 0; i < others.size(); i++) {
+        sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
+        
+        if (collisionSide != sides::NONE) {
+            switch (collisionSide) {
+                case sides::TOP:                    //top refers to player's box
+                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 400 - 8); //this->_staticy);
+                    this->_dy = 0.0f;
+                    
+                    break;
+                case sides::BOTTOM:
+                    this->changeY(-(others.at(i).getStartY()) + 400-12 + 20);// + this->_staticy);
+                    this->_dy = 0.0f;
+                    
+                    break;
+                case sides::LEFT:
+                    this->changeX((-others.at(i).getStartX()) + 640 - 8 - others.at(i).getWidth());// + this->_staticx);
+                    this->_dx = 0.0f;
+                    
+                    break;
+                case sides::RIGHT:
+                    this->changeX((-others.at(i).getStartX()) + 640 + 8);// + this->_staticx);
+                    this->_dx = 0.0f;
+                    
+                    break;
+            }
+        }
+        
+        
+    }
+     */
+
+}

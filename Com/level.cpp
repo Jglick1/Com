@@ -644,6 +644,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
     
     
     this->_unit.handleTileCollisions(others, elapsedTime);
+    this->_slide.handleTileCollisions(others, elapsedTime);
     
     
     
@@ -743,6 +744,7 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
     
     //no collision
     if(temp == 0) {
+        this->_unit.addToMovementOrders(Vector2(posX, posY));
         this->_unit.moveToPosition(posX, posY);
         printf("no collision\n");
         return;                                 //CHANGE THIS
@@ -987,7 +989,89 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
     
     float b = beginy - m*beginx;
     
-
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    
+    std::vector<Vector2> collisionPoints;
+    
+    for(Rectangle i : this->_collisionRects) {
+        //check bottom
+        collisionx = (i.getY()+i.getHeight() - b)/m;
+        collisiony = i.getX() * m + b;
+        if((i.getY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
+            if(collisionx > i.getX() && collisionx < i.getX()+i.getWidth()) {
+                
+                //return Vector2(collisionx, i.getY()+i.getHeight());
+                collisionPoints.push_back(Vector2(collisionx, i.getY()+i.getHeight()));
+                
+            }
+        }
+        
+        
+        
+        //check top
+        collisionx = (i.getY() - b)/m;
+        collisiony = i.getX() * m + b;
+        if((i.getY() > beginy && std::abs(angle) > 90)) {
+            if(collisionx > i.getX() && collisionx < i.getX()+i.getWidth()) {
+                
+                //printf("top ");
+                
+                //return Vector2(collisionx, i.getY());
+                collisionPoints.push_back(Vector2(collisionx, i.getY()));
+                
+            }
+        }
+        
+        
+        
+        
+        //check left
+        collisionx = (i.getY() - b)/m;
+        collisiony = i.getX() * m + b;
+        if((i.getX() > beginx) && angle < 0) {
+            if(collisiony > i.getY() && collisiony < i.getY()+i.getHeight()) {
+                
+                //return Vector2(i.getX(),collisiony);
+                collisionPoints.push_back(Vector2(i.getX(),collisiony));
+                
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getY() - b)/m;
+        collisiony = (i.getX()+i.getWidth()) * m + b;
+        if((i.getX() < beginx - i.getWidth()) && angle > 0) {
+            if(collisiony > i.getY() && collisiony < i.getY()+i.getHeight()) {
+                
+                //return Vector2(i.getX()+i.getWidth(), collisiony);
+                collisionPoints.push_back(Vector2(i.getX()+i.getWidth(), collisiony));
+                
+            }
+        }
+    }
+    
+    if(collisionPoints.size() > 0) {
+        
+        double min = 1000000;
+        double weight = 0.0;
+        int nearest = -1;
+        
+        for(int i = 0; i<collisionPoints.size(); i++) {
+            weight = std::sqrt(std::pow(collisionPoints[i].x - 640,2) + std::pow(collisionPoints[i].y - 400,2));
+            if(weight < min) {
+                min = weight;
+                nearest = i;
+            }
+        }
+        
+        return collisionPoints[nearest];
+        
+    }
+        
+        
+    /*
     //check bottom
     float collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
     float collisiony = this->_collisionRects.at(0).getX() * m + b;
@@ -1038,7 +1122,7 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
             
         }
     }
-    
+    */
     
     //now check the collisions with other units
     Rectangle unitRec = this->_unit.getCollisionRect();
@@ -1097,5 +1181,5 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
 }
 
 void Level::moveUnitToSlidePosition(Graphics &graphics) {
-    moveUnitToPosition(std::round(this->_slide.getStaticX() + 75), std::round(this->_slide.getStaticX() + 12), graphics);
+    moveUnitToPosition(std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8), graphics);
 }

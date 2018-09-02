@@ -496,7 +496,7 @@ void Unit::handleMovement() {
     switch(this->_state) {
         case CHANGE_ANGLE_UP:
             if(this->_angle < this->_destinationAngle) {
-                this->_angle++;
+                this->_angle+=5;
             }
             else {
                 this->_angle = this->_destinationAngle;
@@ -505,7 +505,7 @@ void Unit::handleMovement() {
             break;
         case CHANGE_ANGLE_DOWN:
             if(this->_angle > this->_destinationAngle) {
-                this->_angle--;
+                this->_angle-=5;
             }
             else {
                 this->_angle = this->_destinationAngle;
@@ -595,6 +595,12 @@ void Unit::addToMovementOrders(std::vector<Vector2> pos) {
     for(Vector2 i : pos) {
         this->_unitMovementOrders.push_back(i);
     }
+}
+
+void Unit::addToMovementOrders(Vector2 pos) {
+
+    this->_unitMovementOrders.push_back(pos);
+    
 }
 
 void Unit::printMovementOrders() {

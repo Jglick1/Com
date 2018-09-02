@@ -100,6 +100,7 @@ public:
     float getPlayerAngle();
     
     void addToMovementOrders(std::vector<Vector2> pos);
+    void addToMovementOrders(Vector2 pos);
     void printMovementOrders();
     
     void moveToNextPosition();

@@ -763,7 +763,7 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
             
             tempDestination = checkPathCollision(posX, posY, iter.second.x, iter.second.y);
             
-            printf("destination: %d, %d, %d, %d\n", posX, posY, iter.second.x, iter.second.y);
+            //printf("destination: %d, %d, %d, %d\n", posX, posY, iter.second.x, iter.second.y);
             
             if(temp == 0) {
                 weight = std::sqrt(std::pow(this->_unit.getStaticX()-iter.second.x,2)+std::pow(this->_unit.getStaticY()+4-iter.second.y,2));
@@ -775,7 +775,7 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
             }
             
             if(tempDestination == 0) {
-                printf("no collision\n");
+                //printf("no collision\n");
                 weight = std::sqrt(std::pow(posX-iter.second.x,2)+std::pow(posY-iter.second.y,2));
                 
                 this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight); //destination
@@ -883,93 +883,140 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy) {
     
     //printf("%d, %d\n", temp.x, temp.y);
     
-    return checkPathCollision(beginx, beginy, angle);
+    double distanceToEnd = std::sqrt(std::pow(beginx - endx,2) + std::pow(beginy - endy,2));
+    
+    //double distanceToEnd = 0;
+    
+    return checkPathCollisionHelp(beginx, beginy, angle, distanceToEnd);
 }
 
 
-bool Level::checkPathCollision(double beginx, double beginy, double angle) {
+bool Level::checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd) {
     
-    printf("begin: %f, %f, %f\n",beginx, beginy,angle);
+    //printf("begin: %f, %f, %f\n",beginx, beginy,angle);
     
     
     float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
     
     
     float b = beginy - m*beginx;
-    printf("m: %f, b: %f\n", m, b);
+    //printf("m: %f, b: %f\n", m, b);
     
-    //check bottom
-    float collisionx = (this->_collisionRects.at(0).getStartY()+this->_collisionRects.at(0).getHeight() - b)/m;
-    float collisiony = this->_collisionRects.at(0).getStartX() * m + b;
-    if((this->_collisionRects.at(0).getStartY() <= (beginy - this->_collisionRects.at(0).getHeight()) && std::abs(angle) <= 90)) {
-        printf("I'm satisfied\n");
-        printf("\n");
+    //printf("size: %d\n", this->_collisionRects.size());
+    
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    float yhit = 0.0;
+    float xhit = 0.0;
+           
+    for(Rectangle &i : this->_collisionRects) {
         
-        printf("collisionx: %f\n", collisionx);
-        
-        
-        printf("\n");
-        
-        if((collisionx >= this->_collisionRects.at(0).getStartX()) && (collisionx <= (this->_collisionRects.at(0).getStartX()+this->_collisionRects.at(0).getWidth()))) {       //need ">=" to account for corners
+    
+        //check bottom
+        collisionx = (i.getStartY()+i.getHeight() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() <= (beginy - i.getHeight()) && std::abs(angle) <= 90)) {
+            //printf("I'm satisfied\n");
+            //printf("\n");
             
-            //yes collision
-            printf("bottom\n");
+            //printf("collisionx: %f\n", collisionx);
             
-            return 1;
             
-            //return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
+            //printf("\n");
             
+            if((collisionx >= i.getStartX()) && (collisionx <= (i.getStartX()+i.getWidth()))) {       //need ">=" to account for corners
+                
+                //yes collision
+                //printf("bottom\n");
+                
+                yhit = i.getY()+i.getHeight();
+                
+                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                
+                
+                //return 1;
+                
+                //return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
+                
+            }
         }
+        
+        
+        
+        //check top
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        
+        if((i.getStartY() >= beginy && std::abs(angle) >= 90)) {
+            if(collisionx >= i.getStartX() && collisionx <= i.getStartX()+i.getWidth()) {
+                
+                //printf("top\n");
+                //return 1;
+                
+                //return Vector2(collisionx,this->_collisionRects.at(0).getY());
+                
+                yhit = i.getY();
+                
+                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+            }
+        }
+        
+        
+        
+        
+        //check left
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartX() >= beginx) && angle <= 0) {
+            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
+                
+                //printf("left\n");
+                
+                //return 1;
+                
+                xhit = i.getX();
+                
+                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                //return Vector2(this->_collisionRects.at(0).getX(),collisiony);
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = (i.getStartX()+i.getWidth()) * m + b;
+        if((i.getStartX() <= beginx - i.getWidth()) && angle >= 0) {
+            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
+                
+                //printf("right\n");
+                
+                //return 1;
+                
+                xhit = i.getX()+i.getWidth();
+                
+                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                //return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
+                
+            }
+        }
+    
+    
+    
     }
     
-    
-    
-    //check top
-    collisionx = (this->_collisionRects.at(0).getStartY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getStartX() * m + b;
-    if((this->_collisionRects.at(0).getStartY() >= beginy && std::abs(angle) >= 90)) {
-        if(collisionx >= this->_collisionRects.at(0).getStartX() && collisionx <= this->_collisionRects.at(0).getStartX()+this->_collisionRects.at(0).getWidth()) {
-            
-            printf("top\n");
-            return 1;
-            
-            //return Vector2(collisionx,this->_collisionRects.at(0).getY());
-            
-        }
-    }
-    
-    
-    
-    
-    //check left
-    collisionx = (this->_collisionRects.at(0).getStartY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getStartX() * m + b;
-    if((this->_collisionRects.at(0).getStartX() >= beginx) && angle <= 0) {
-        if(collisiony >= this->_collisionRects.at(0).getStartY() && collisiony <= this->_collisionRects.at(0).getStartY()+this->_collisionRects.at(0).getHeight()) {
-            
-            printf("left\n");
-            
-            return 1;
-            
-            //return Vector2(this->_collisionRects.at(0).getX(),collisiony);
-            
-        }
-    }
-    
-    //check right
-    collisionx = (this->_collisionRects.at(0).getStartY() - b)/m;
-    collisiony = (this->_collisionRects.at(0).getStartX()+this->_collisionRects.at(0).getWidth()) * m + b;
-    if((this->_collisionRects.at(0).getStartX() <= beginx - this->_collisionRects.at(0).getWidth()) && angle >= 0) {
-        if(collisiony >= this->_collisionRects.at(0).getStartY() && collisiony <= this->_collisionRects.at(0).getStartY()+this->_collisionRects.at(0).getHeight()) {
-            
-            printf("right\n");
-            
-            return 1;
-            
-            //return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
-            
-        }
-    }
+
     
     //no collision
     return 0;
@@ -1182,4 +1229,8 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
 
 void Level::moveUnitToSlidePosition(Graphics &graphics) {
     moveUnitToPosition(std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8), graphics);
+    
+    printf("%f, %f\n", std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8));
+    
+    
 }

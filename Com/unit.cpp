@@ -244,27 +244,90 @@ void Unit::moveToPosition(int posX, int posY) {
     this->_destinationx = posX;
     this->_destinationy = posY;
     
-    if(this->_angle >= this->_destinationAngle) {
+    double tempAngle = this->_angle;
+    
+    if(this->_angle < 0.0 && this->_destinationAngle > 0.0) {
+        tempAngle = this->_angle + 360;
+    }
+    else if (this->_angle > 0.0 && this->_destinationAngle < 0.0) {
+        tempAngle = this->_angle - 360;
+    }
+    
+    if(tempAngle >= this->_destinationAngle) {
         this->_state = CHANGE_ANGLE_DOWN;
     }
     else {
         this->_state = CHANGE_ANGLE_UP;         //TODO. decided whether to go up or down
     }
 
+    this->_angle = tempAngle;
+    
+    
+    
+    
     if(this->_destinationx >= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNRIGHT;
+        
+        if(std::round(this->_destinationy) == std::round(this->_staticy+4)) {
+            this->_destinationDirection = RIGHT;
+            printf("right\n");
+        }
+        
+        else if(std::round(this->_destinationx) == std::round(this->_staticx)) {
+            this->_destinationDirection = DOWN;
+            printf("down\n");
+        }
+        
         printf("DOWNRIGHT\n");
     }
     else if(this->_destinationx <= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNLEFT;
+        
+        
+        if(std::round(this->_destinationy) == std::round(this->_staticy+4)) {
+            this->_destinationDirection = LEFT;
+            printf("left\n");
+        }
+        
+        else if(std::round(this->_destinationx) == std::round(this->_staticx)) {
+            this->_destinationDirection = DOWN;
+            printf("down\n");
+        }
+        
+        //printf("%f, %f\n", std::round(this->_destinationy), std::round(this->_staticy));
         printf("DOWNLEFT\n");
     }
     else if(this->_destinationx >= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPRIGHT;
+        
+        
+        if(std::round(this->_destinationy) == std::round(this->_staticy+4)) {
+            this->_destinationDirection = RIGHT;
+            printf("right\n");
+        }
+        
+        else if(std::round(this->_destinationx) == std::round(this->_staticx)) {
+            this->_destinationDirection = UP;
+            printf("up\n");
+        }
+        
+        
         printf("UPRIGHT\n");
     }
     else if(this->_destinationx <= this->_staticx && this->_destinationy <= this->_staticy) {
         this->_destinationDirection = UPLEFT;
+        
+        
+        if(std::round(this->_destinationy) == std::round(this->_staticy+4)) {
+            this->_destinationDirection = LEFT;
+            printf("left\n");
+        }
+    
+        else if(std::round(this->_destinationx) == std::round(this->_staticx)) {
+            this->_destinationDirection = UP;
+            printf("up\n");
+        }
+        
         printf("UPLEFT\n");
     }
     
@@ -272,6 +335,8 @@ void Unit::moveToPosition(int posX, int posY) {
     
     //std::cout << xdiff << " " << ydiff << std::endl;
     //std::cout << this->_angle << std::endl;
+    
+    
     
 }
 
@@ -567,6 +632,57 @@ void Unit::handleMovement() {
                         moveForward();
                     }
                     break;
+                case DOWN:
+                    if(this->_staticy+4 >= this->_destinationy) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 4;
+                        this->_state = STILL;
+                        moveToNextPosition();
+                    }
+                    else {
+                        moveForward();
+                    }
+                    break;
+                case UP:
+                    if(this->_staticy+4 <= this->_destinationy) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 4;
+                        this->_state = STILL;
+                        moveToNextPosition();
+                    }
+                    else {
+                        moveForward();
+                    }
+                    break;
+                case RIGHT:
+                    if(this->_staticx >= this->_destinationx) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 4;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                        moveToNextPosition();
+                    }
+                    else {
+                        moveForward();
+                    }
+                    break;
+                case LEFT:
+                    if(this->_staticx <= this->_destinationx) {
+                        stopMoving();
+                        this->_staticx = this->_destinationx - 0;
+                        this->_staticy = this->_destinationy - 4;
+                        //this->_angle = 0.0;
+                        this->_state = STILL;
+                        moveToNextPosition();
+                    }
+                    else {
+                        moveForward();
+                    }
+                    break;
+                    
             }
             
             //printf("sx: %f sy: %f dx: %f dy: %f\n", this->_staticx, this->_staticy, this->_destinationx, this->_destinationy);

@@ -1230,7 +1230,7 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
 void Level::moveUnitToSlidePosition(Graphics &graphics) {
     moveUnitToPosition(std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8), graphics);
     
-    printf("%f, %f\n", std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8));
+    //printf("%f, %f\n", std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8));
     
     
 }

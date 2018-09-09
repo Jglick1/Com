@@ -20,7 +20,7 @@ public:
     ControlSlide(Graphics &graphics);
 
     void draw(Graphics &graphics);
-    void update(float elapsedTime);
+    void update(float elapsedTime, Graphics &graphics);
     
     bool checkSlideCollision(int xm, int ym);
     void handleSlideMovement(int xm, int ym, double angle, float levelx, float levely);

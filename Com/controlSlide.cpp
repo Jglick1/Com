@@ -45,86 +45,45 @@ _sideHoldL(0)
 //ControlSlide::~ControlSlide() {}
 
 void ControlSlide::draw(Graphics &graphics) {
-    //printf("test");
-    
-    int tx = std::round(this->_x + this->_staticx);
-    int ty = std::round(this->_y + this->_staticy);
-    int width = std::round(this->_width);
-    int height = std::round(this->_height);
 
-    //graphics.drawRect(x, y, width, height);
-    //graphics.drawRect(x, y, height, height);
-    //graphics.drawRect(x + width - height, y, height, height);
     
     
-    //Sprite::drawControlSlider(graphics, tx, ty, this->_playerAngle);
-    
-    int posx = std::round(this->_x + this->_staticx);
-    int posy = std::round(this->_y + this->_staticy);
-    
-    
-    //Sprite::drawControlSlider(graphics, 640-75 + ( (posx)-640+75)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180), 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+75) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
-    
-    
-    
-    //printf("%f, %f\n",this->_staticx, this->_staticy);
-    
-    
-    
-    Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + this->_playerAngle);
-    //Sprite::drawControlSlider(graphics, this->_staticx, this->_staticy, this->_angle);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    //graphics.drawPoint(posx + width - height/2, posy + height/2);
-    
-    //a -> this->_camerax + width - height/2
-    //b -> this->_camerax + width / 2
-    
-    /*
-    double a_x = this->_camerax + width - height/2;
-    double b_x = this->_camerax + width / 2;
-    
-    double a_y = this->_cameray + height / 2;
-    double b_y = this->_cameray + height / 2;
-    
-    int rotated_x = std::round(std::cos(this->_angle*3.14159/180) * (a_x - b_x) - std::sin(this->_angle*3.14159/180) * (a_y - b_y) + b_x);
-    int rotated_y = std::round(std::sin(this->_angle*3.14159/180) * (a_x - b_x) + std::cos(this->_angle*3.14159/180) * (a_y - b_y) + b_y);
-    */
+    //Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + this->_playerAngle);
+
+    Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + graphics.getCameraAngle());
     
     graphics.drawPoint(this->_RrotatedX, this->_RrotatedY);
     graphics.drawPoint(this->_LrotatedX, this->_LrotatedY);
     
-    //printf("%f\n", this->_playerAngle);
-    //Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + this->_playerAngle);
-    
-    //Sprite::draw(graphics, 300, 300);
+
     
 }
 
 
-void ControlSlide::update(float elapsedTime) {
-    this->_x += this->_dx * elapsedTime;
-    this->_y += this->_dy * elapsedTime;
+void ControlSlide::update(float elapsedTime, Graphics &graphics) {
+    //this->_x += this->_dx * elapsedTime;
+    //this->_y += this->_dy * elapsedTime;
     
-    double totAngle = this->_angle + this->_playerAngle;
+    //double totAngle = this->_angle + this->_playerAngle;
     
-    int posx = std::round(this->_x + this->_staticx);
-    int posy = std::round(this->_y + this->_staticy);
+    double totAngle = this->_angle + graphics.getCameraAngle();
     
+    //int posx = std::round(this->_x + this->_staticx);
+    //int posy = std::round(this->_y + this->_staticy);
+    
+    int posx = std::round(graphics.getCameraX() + this->_staticx);
+    int posy = std::round(graphics.getCameraY() + this->_staticy);
+    
+    double playerAngle = graphics.getCameraAngle();
+    
+    /*
     this->_camerax = 640-75 + ( (posx)-640+75)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180);
     this->_cameray = 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+75) * std::sin(this->_playerAngle*3.14159/180));
+    */
+    
+    this->_camerax = 640-75 + ( (posx)-640+75)* std::cos(playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(playerAngle*3.14159/180);
+    this->_cameray = 400-12 + ( ((posy)-400+12) * std::cos(playerAngle*3.14159/180) + ((posx)-640+75) * std::sin(playerAngle*3.14159/180));
+    
     
     
     
@@ -381,6 +340,12 @@ void ControlSlide::centerSlideToZero() {
     
 }
 
+void ControlSlide::stopMovingParallax() {
+    this->_dx = 0.0;
+    this->_dy = 0.0;
+}
+
+/*
 void ControlSlide::moveForwardParallax() {
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
@@ -425,6 +390,7 @@ void ControlSlide::moveDownLeftParallax() {
     this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
     this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
 }
+*/
 
 float ControlSlide::getStaticX() {
     return this->_staticx;

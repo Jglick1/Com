@@ -249,7 +249,7 @@ void Game::gameLoop() {
                 this->_level.moveUnitToSlidePosition(graphics);
             }
             else {
-                this->_level.handleSlideMovement(xm, ym);
+                this->_level.handleSlideMovement(xm, ym, graphics);
             }
         }
         
@@ -283,7 +283,7 @@ void Game::gameLoop() {
         
         
         
-            this->handleMovement(inPower, input);
+            this->handleMovement(inPower, input, graphics);
         
         
         
@@ -297,7 +297,7 @@ void Game::gameLoop() {
         
         //this->_graphics = graphics;
         
-        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym);
+        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym, graphics);
         
 
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
@@ -321,7 +321,7 @@ void Game::gameLoop() {
     
 }
 
-void Game::handleMovement(Direction &inPower, Input &input) {
+void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) {
     
     //this->_level.handleUnitMovement();
     
@@ -332,18 +332,19 @@ void Game::handleMovement(Direction &inPower, Input &input) {
         case UP:
             if (input.wasKeyReleased(SDL_SCANCODE_W)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
                 inPower = UPRIGHT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
                 inPower = UPLEFT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveBackward();
+                //this->_level.moveBackward();
+                graphics.moveCameraForward();
             }
             
             break;
@@ -351,18 +352,19 @@ void Game::handleMovement(Direction &inPower, Input &input) {
         case DOWN:
             if (input.wasKeyReleased(SDL_SCANCODE_S)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
                 inPower = DOWNRIGHT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
                 inPower = DOWNLEFT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveForward();
+                //this->_level.moveForward();
+                graphics.moveCameraBackward();
             }
             
             break;
@@ -370,36 +372,38 @@ void Game::handleMovement(Direction &inPower, Input &input) {
         case RIGHT:
             if (input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
                 inPower = UPRIGHT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
                 inPower = DOWNRIGHT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveLeft();
+                //this->_level.moveLeft();
+                graphics.moveCameraRight();
             }
             break;
             
         case LEFT:
             if (input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
                 inPower = UPLEFT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
                 inPower = DOWNLEFT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveRight();
+                //this->_level.moveRight();
+                graphics.moveCameraLeft();
             }
             
             break;
@@ -407,117 +411,122 @@ void Game::handleMovement(Direction &inPower, Input &input) {
             if(input.wasKeyReleased(SDL_SCANCODE_W)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = RIGHT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = UP;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveDownLeft();
+                //this->_level.moveDownLeft();
+                graphics.moveCameraUpRight();
             }
             break;
         case UPLEFT:
             if(input.wasKeyReleased(SDL_SCANCODE_W)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = LEFT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = UP;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveDownRight();
+                //this->_level.moveDownRight();
+                graphics.moveCameraUpLeft();
             }
             break;
         case DOWNRIGHT:
             if(input.wasKeyReleased(SDL_SCANCODE_S)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = RIGHT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = DOWN;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveUpLeft();
+                //this->_level.moveUpLeft();
+                graphics.moveCameraDownRight();
             }
             break;
         case DOWNLEFT:
             if(input.wasKeyReleased(SDL_SCANCODE_S)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = LEFT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = DOWN;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.moveUpRight();
+                //this->_level.moveUpRight();
+                graphics.moveCameraDownLeft();
             }
             break;
         case NONE:
             if(input.isKeyHeld(SDL_SCANCODE_W)) {
                 if(input.isKeyHeld(SDL_SCANCODE_D)) {
                     inPower = UPRIGHT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                     inPower = UPLEFT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = UP;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.isKeyHeld(SDL_SCANCODE_S)) {
                 if(input.isKeyHeld(SDL_SCANCODE_D)) {
                     inPower = DOWNRIGHT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                     inPower = DOWNLEFT;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
                 else {
                     inPower = DOWN;
-                    this->handleMovement(inPower, input);
+                    this->handleMovement(inPower, input, graphics);
                 }
             }
             else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                 inPower = LEFT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else if(input.isKeyHeld(SDL_SCANCODE_D)) {
                 inPower = RIGHT;
-                this->handleMovement(inPower, input);
+                this->handleMovement(inPower, input, graphics);
             }
             else {
-                this->_level.stopMoving();
+                //this->_level.stopMoving();
+                graphics.stopCameraMoving();
             }
             break;
             
@@ -548,7 +557,7 @@ void Game::draw(Graphics &graphics) {
     
 }
 
-void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym) {
+void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym, Graphics &graphics) {
     
     /*
     std::vector<Rectangle> others;
@@ -572,7 +581,8 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     
     if ((this->_gameState == NORMAL) && std::abs((xm - old_xm)) < 100) {
-        this->_level.changeAngle(-0.5*(xm - old_xm));
+        //this->_level.changeAngle(-0.5*(xm - old_xm));
+        graphics.changeAngle(-0.5*(xm - old_xm));
         //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
     }
     
@@ -580,15 +590,11 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     this->_level.setUnitAngle();
     
+    graphics.update(elapsedTime);
     
-    this->_level.update(elapsedTime);
+    this->_level.update(elapsedTime, graphics);
     
     this->_player.update(elapsedTime, xm, ym);
-
-    //this->_unit.moveToPosition(1280, 0);
-    
-    //this->_unit.setDXDY(this->_level.getDX(), this->_level.getDY());
-    //this->_unit.update(elapsedTime, this->_level.getAngle());
 
     this->_cursor.update(elapsedTime, ym, old_ym);
     
@@ -598,7 +604,7 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);
         //printf("tile collision!a");
-        this->_level.handleTileCollisions(others, elapsedTime);
+        this->_level.handleTileCollisions(others, elapsedTime, graphics);
         
         //this->_unit.handleTileCollisions(others, elapsedTime);
     }

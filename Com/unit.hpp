@@ -23,7 +23,7 @@ public:
     Unit();
     Unit(Graphics &graphics, Vector2 spawnPoint);
     void draw(Graphics &graphics);
-    void update(float elapsedTime, float playerAngle);
+    void update(float elapsedTime, float playerAngle, Graphics &graphics);
     
     void moveForward();
     void moveBackward();

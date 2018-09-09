@@ -12,9 +12,22 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
 #include "globals.hpp"
+#include <math.h>
+
+namespace player_constants {
+    const float WALK_SPEED = 0.2f;
+}
 
 
-Graphics::Graphics() {
+Graphics::Graphics() :
+    _cameraX(0.0),
+    _cameraY(0.0),
+    _cameraAngle(0.0),
+    _cameraDx(0.0),
+    _cameraDy(0.0),
+    _playerCenterX(640.0),
+    _playerCenterY(400.0)
+    {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
     SDL_SetWindowTitle(this->_window, "Com");
     
@@ -128,4 +141,102 @@ void Graphics::drawPoint(int x, int y) {
 
 void Graphics::resolutionTest() {
     SDL_RenderSetLogicalSize(this->_renderer, 1280, 800);
+}
+
+double Graphics::getCameraX() {
+    return this->_cameraX;
+}
+
+double Graphics::getCameraY() {
+    return this->_cameraY;
+}
+
+double Graphics::getCameraDx() {
+    return this->_cameraDx;
+}
+
+double Graphics::getCameraDy() {
+    return this->_cameraDy;
+}
+
+int Graphics::getPlayerCenterX() {
+    return this->_playerCenterX;
+}
+
+int Graphics::getPlayerCenterY() {
+    return this->_playerCenterY;
+}
+
+double Graphics::getCameraAngle() {
+    return this->_cameraAngle;
+}
+
+void Graphics::update(int elapsedTime) {
+    this->_cameraX += this->_cameraDx * elapsedTime;
+    this->_cameraY += this->_cameraDy * elapsedTime;
+    
+    //printf("%f, %f\n", this->_cameraDx, this->_cameraDy);
+}
+
+void Graphics::moveCameraForward() {
+    this->_cameraDx = player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180);
+    this->_cameraDy = player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180);
+}
+
+void Graphics::moveCameraBackward() {
+    this->_cameraDx = -player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180);
+    this->_cameraDy = -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180);
+}
+
+void Graphics::moveCameraRight() {
+    this->_cameraDx = -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180);
+    this->_cameraDy = player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180);
+}
+
+void Graphics::moveCameraLeft() {
+    this->_cameraDx = player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180);
+    this->_cameraDy = -player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180);
+}
+
+void Graphics::stopCameraMoving() {
+    this->_cameraDx = 0.0f;
+    this->_cameraDy = 0.0f;
+}
+
+void Graphics::moveCameraUpRight() {
+    this->_cameraDx = player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421;
+    this->_cameraDy = player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421;
+}
+
+void Graphics::moveCameraUpLeft() {
+    this->_cameraDx = player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421;
+    this->_cameraDy = player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421;
+}
+
+void Graphics::moveCameraDownRight() {
+    this->_cameraDx = -player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421;
+    this->_cameraDy = -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421;
+}
+
+void Graphics::moveCameraDownLeft() {
+    this->_cameraDx = -player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421;
+    this->_cameraDy = -player_constants::WALK_SPEED * std::cos(this->_cameraAngle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_cameraAngle * 3.14159 / 180)/1.41421;
+}
+
+void Graphics::changeAngle(double angle) {
+    this->_cameraAngle += angle;
+    if(this->_cameraAngle > 180) {
+        this->_cameraAngle = this->_cameraAngle - 360;
+    }
+    else if(this->_cameraAngle < -180) {
+        this->_cameraAngle = this->_cameraAngle + 360;
+    }
+}
+
+void Graphics::setCameraX(double x) {
+    this->_cameraX = x;
+}
+
+void Graphics::setCameraY(double y) {
+    this->_cameraY = y;
 }

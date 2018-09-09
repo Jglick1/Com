@@ -31,7 +31,7 @@ public:
 	Level();
 	Level(std::string mapName, Graphics &graphics);
 	~Level();
-	void update(int elapsedtime);
+	void update(int elapsedtime, Graphics &graphics);
 	void draw(Graphics &graphics);
 	
 	std::vector<Rectangle> checkTileCollisions(const Rectangle &other);
@@ -45,7 +45,7 @@ public:
 	void moveLeft();
 	void stopMoving();
 	
-    void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime);
+    void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime, Graphics &graphics);
     
     void changeAngle(float angle);
 	
@@ -72,7 +72,7 @@ public:
     void moveDownLeft();
     
     bool checkSlideCollision(int xm, int ym);
-    void handleSlideMovement(int xm, int ym);
+    void handleSlideMovement(int xm, int ym, Graphics &graphics);
     
     
     void centerSlideToZero();

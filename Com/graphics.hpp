@@ -15,6 +15,7 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
+//#include "globals.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -53,6 +54,33 @@ public:
     
     void resolutionTest();
     
+    double getCameraX();
+    double getCameraY();
+    double getCameraAngle();
+    
+    int getPlayerCenterX();
+    int getPlayerCenterY();
+    
+    double getCameraDx();
+    double getCameraDy();
+    
+    void moveCameraForward();
+    void moveCameraBackward();
+    void moveCameraRight();
+    void moveCameraLeft();
+    void stopCameraMoving();
+    
+    void moveCameraUpRight();
+    void moveCameraUpLeft();
+    void moveCameraDownRight();
+    void moveCameraDownLeft();
+    
+    void update(int elapsedTime);
+    
+    void changeAngle(double angle);
+    void setCameraX(double x);
+    void setCameraY(double y);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -65,6 +93,15 @@ private:
     std::map<std::string, SDL_Surface*> _spriteSheets;
     
     std::map<std::string, SDL_Surface*> _textSheets;
+    
+    double _cameraX;
+    double _cameraY;
+    double _cameraAngle;
+    double _cameraDx;
+    double _cameraDy;
+    
+    int _playerCenterX;
+    int _playerCenterY;
     
     
 };

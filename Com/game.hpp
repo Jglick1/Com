@@ -31,8 +31,8 @@ public:
 private:
     void gameLoop();
     void draw(Graphics &graphics);
-    void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym);
-    void handleMovement(Direction &inPower, Input &input);
+    void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym, Graphics &graphics);
+    void handleMovement(Direction &inPower, Input &input, Graphics &graphics);
     
     Player _player;
     

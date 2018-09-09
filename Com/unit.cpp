@@ -368,8 +368,16 @@ void Unit::draw(Graphics &graphics) {
     //int posx = std::round(this->_x+this->_staticx);
     //int posy = std::round(this->_y+this->_staticy);
     
-    float posx = this->_x+this->_staticx;
-    float posy = this->_y+this->_staticy;
+    
+    
+    
+    //float posx = this->_x+this->_staticx;
+    //float posy = this->_y+this->_staticy;
+    
+    
+    float posx = graphics.getCameraX() + this->_staticx;
+    float posy = graphics.getCameraY() + this->_staticy;
+    
     
     
     
@@ -380,9 +388,22 @@ void Unit::draw(Graphics &graphics) {
     
     
 //R(a-b)+b
+    int playerx = graphics.getPlayerCenterX();
+    int playery = graphics.getPlayerCenterY();
+    
+    //Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180), 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    double playerAngle = graphics.getCameraAngle();
+    
+    Sprite::drawAngle(graphics, playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180), playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180)), this->_angle + playerAngle);
     
     
-    Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(this->_playerAngle*3.14159/180), 400-12 + ( ((posy)-400+12) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
+    
+    
+    
+    
+    
+    
     
     
     //Sprite::drawAngle(graphics, 640-8 + ( (posx)-640+8)* std::cos(this->_playerAngle*3.14159/180) - ((posy)-400+16) * std::sin(this->_playerAngle*3.14159/180), 400-16 + ( ((posy)-400+16) * std::cos(this->_playerAngle*3.14159/180) + ((posx)-640+8) * std::sin(this->_playerAngle*3.14159/180)), this->_angle + this->_playerAngle);
@@ -427,18 +448,22 @@ void Unit::draw(Graphics &graphics) {
 
 }
 
-void Unit::update(float elapsedTime, float playerAngle) {
+void Unit::update(float elapsedTime, float playerAngle, Graphics &graphics) {
     //movement
 
+    //printf("%f, %f\n", this->_staticdx, this->_staticdy);
+    
 
-    this->_y += this->_dy * elapsedTime;
-    this->_x += this->_dx * elapsedTime;
+    //this->_y += this->_dy * elapsedTime;
+    //this->_x += this->_dx * elapsedTime;
     
     this->_staticy += this->_staticdy * elapsedTime;
     this->_staticx += this->_staticdx * elapsedTime;
     
     //this->_collisionRect.update(elapsedTime, this->_dx+this->_staticdx, this->_dy+this->_staticdy);
-    this->_collisionRect.setXY(this->_x+this->_staticx, this->_y+this->_staticy + 4);
+    //this->_collisionRect.setXY(this->_x+this->_staticx, this->_y+this->_staticy + 4);
+    
+    this->_collisionRect.setXY(graphics.getCameraX()+this->_staticx, graphics.getCameraY()+this->_staticy + 4);
     
     Sprite::update();
     

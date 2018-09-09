@@ -288,47 +288,18 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
     
 }
 
-void Level::update(int elapsedTime) {
-	//std::cout << "dx: " << this->_dx << " dy: " << this->_dy << std::endl;
-    /*
-    for(int i = 0; i < this->_tileList.size(); i++) {
-        this->_tileList.at(i).update(elapsedTime, this->_dx, this->_dy);
-    }
-	*/
-    
-    //std::cout << this->_dx << " " << this->_dy << std::endl;
-    
+void Level::update(int elapsedTime, Graphics &graphics) {
 
-    //this->_position.x += std::round(this->_dx * elapsedTime);   //the ROUND here very important
-    //this->_position.y += std::round(this->_dy * elapsedTime);
-    
-    this->_positionx += this->_dx * elapsedTime;
-    this->_positiony += this->_dy * elapsedTime;
-    
-    //std::cout << this->_dx << " " << this->_dy << " ";
-    
-    
+
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
-        this->_collisionRects.at(i).update(elapsedTime, this->_dx, this->_dy);
+        //this->_collisionRects.at(i).update(elapsedTime, this->_dx, this->_dy);
+        this->_collisionRects.at(i).update(elapsedTime, graphics.getCameraDx(), graphics.getCameraDy());
     }
     
 
     
-    
-    /*
-    for(int i = 0; i < this->_doorList.size(); i++) {
-        this->_doorList.at(i).update(elapsedTime, this->_dx, this->_dy);
-    }
-    */
-    
-    //std::cout << this->_angle << std::endl;
-    //std::cout << this->_dy << std::endl;
-
-    
-    //std::cout << this->_collisionRects.at(0).getX() << " " << this->_collisionRects.at(0).getY() << std::endl;
-    
-    this->_unit.update(elapsedTime, this->_angle);
-    this->_slide.update(elapsedTime);
+    this->_unit.update(elapsedTime, this->_angle, graphics);
+    this->_slide.update(elapsedTime, graphics);
     
     
 }
@@ -336,13 +307,18 @@ void Level::update(int elapsedTime) {
 
 void Level::draw(Graphics &graphics) {
 
-    int posx = std::round(this->_positionx);
-    int posy = std::round(this->_positiony);
-    
-    //printf("x: %f, y: %f\n", this->_unit.getStaticX(), this->_unit.getStaticY());
+    //int posx = std::round(this->_positionx);
+    //int posy = std::round(this->_positiony);
     
     
-    Map::drawTrans(graphics, posx, posy, this->_angle, posx, posy, this->_cameraMove);
+    int posx = std::round(graphics.getCameraX());
+    int posy = std::round(graphics.getCameraY());
+
+    
+    
+    //Map::drawTrans(graphics, posx, posy, this->_angle, posx, posy, this->_cameraMove);
+    
+    Map::drawTrans(graphics, posx, posy, graphics.getCameraAngle(), posx, posy, this->_cameraMove);
     
     //draw collision rects
     for(int i = 0; i<this->_collisionRects.size(); i++) {
@@ -358,12 +334,14 @@ void Level::draw(Graphics &graphics) {
     
     
     
-    graphics.drawLine(640, 400, 640 - 100*std::sin(this->_angle*3.14159/180), 400 - 100*std::cos(this->_angle*3.14159/180) );
+    //graphics.drawLine(640, 400, 640 - 100*std::sin(this->_angle*3.14159/180), 400 - 100*std::cos(this->_angle*3.14159/180) );
+    
+    graphics.drawLine(640, 400, 640 - 100*std::sin(graphics.getCameraAngle()*3.14159/180), 400 - 100*std::cos(graphics.getCameraAngle()*3.14159/180) );
     
     //graphics.drawLine(10,10,800,800);
     
     
-    Vector2 coll = checkShotCollision(640, 400, this->_angle);
+    Vector2 coll = checkShotCollision(640, 400, graphics.getCameraAngle());
     
     if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
         graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
@@ -390,8 +368,12 @@ void Level::draw(Graphics &graphics) {
     //unit
     this->_unit.draw(graphics);
     
-    float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
-    float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
+    //float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
+    //float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
+    
+    float xEquivalent = this->_unit.getStaticX() + graphics.getCameraX() + 8;
+    float yEquivalent = this->_unit.getStaticY() + graphics.getCameraY() + 12;
+    
     float angleEquivalent = -this->_unit.getAngle();    //the opposite angle of level
     
     //in both cases we change the - sin for x into a + sin
@@ -468,7 +450,7 @@ void Level::moveLeft() {
 
 
 
-
+/*
 void Level::moveForward() {
     this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
@@ -524,7 +506,7 @@ void Level::moveDownLeft() {
     this->_unit.moveDownLeftParallax();
     this->_slide.moveDownLeftParallax();
 }
-
+*/
 
 
 void Level::cameraMove() {
@@ -545,25 +527,9 @@ void Level::stopMoving() {
 }
 
 
-/*
-void Level::handleTileCollisions(std::vector<Rectangle> &others, Direction &inPower) {
-	//this->_dx = 0.0;
-	//this->_dy = 0.0;
+void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime, Graphics &graphics) { //other are the level's collision rects
     
-    
-    //std::cout << this->_position.x << " " << this->_position.y << std::endl;
-    //collide up y = -328
-    //collid down y = -257
-    
-    //collide right x = 47
-    //collide left x = -46
-}
-*/
 
-
-void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
-    
-    //Rectangle playerRec = Rectangle(625, 385, 30, 30);
     Rectangle playerRec = Rectangle(640 - 8, 400 - 8, 16, 16);
     
     //y: 392
@@ -597,47 +563,44 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
             switch (collisionSide) {
                 case sides::TOP:                    //top refers to player's box
                     this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 392, 392 - others.at(i).getHeight());
-                    //std::cout << others.at(i).getStartY() << " " << others.at(i).getHeight() <<std::endl;
-                    this->_dy = 0.0f;
+
+                    //this->_dy = 0.0f;
                     
-                    //unit.setY(unit.getStartY() - 385 + 66); //maybe 65
-                    //unit.setDY(0.0f);
-                    //unit.moveForward();
+
+                    
+                    graphics.setCameraY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 392);
 
                     
                     break;
                 case sides::BOTTOM:
                     this->changeY(-(others.at(i).getStartY()) + 392 + 16, 392 + 16);
-                    this->_dy = 0.0f;
+                    //this->_dy = 0.0f;
                     
-
+                    graphics.setCameraY(-(others.at(i).getStartY()) + 392 + 16);
                     
-                    //unit.setY(unit.getStartY() - 385 + 128); //also not exactly right
-                    //unit.setDY(0.0f);
                     
                     break;
                 case sides::LEFT:
                     this->changeX((-others.at(i).getStartX()) + 632 - others.at(i).getWidth(), 632 - others.at(i).getWidth());
-                    this->_dx = 0.0f;
+                    //this->_dx = 0.0f;
+                    
+                    graphics.setCameraX((-others.at(i).getStartX()) + 632 - others.at(i).getWidth());
                     
 
-                    
-                    //unit.setX(unit.getStartX() - 48);
-                    //unit.setDX(0.0f);
                     
                     break;
                 case sides::RIGHT:
                     this->changeX((-others.at(i).getStartX()) + 632 + 16, 632 + 16);
-                    this->_dx = 0.0f;
+                    //this->_dx = 0.0f;
                     
+                    graphics.setCameraX((-others.at(i).getStartX()) + 632 + 16);
                     
-                    //unit.setX(unit.getStartX() + 48);
-                    //unit.setDX(0.0f);
+
                     
                     break;
             }
         }
-        //printf("y: %d, height: %d\n", others.at(i).getY(), others.at(i).getHeight());
+
 
         
     }
@@ -655,41 +618,14 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
 
 
 void Level::changeY(int newY, int newCollisionY) {
-    this->_positiony = newY;
-    
-    //392 - others.at(i).getHeight()
-    
     
      for(int i = 0; i < this->_collisionRects.size(); i++) {
          this->_collisionRects.at(i).changeY(this->_collisionRects.at(i).getStartY() + newY);
      }
-     
-    
-    
-    //this->_collisionRects.at(0).changeY(newCollisionY);
-    
-    //printf("x: %d, y: %d\n", this->_collisionRects.at(1).getX(), this->_collisionRects.at(1).getY());
-    
-    
-    
-    //this->_collisionRects.at(1).changeY(this->_collisionRects.at(1).getStartY() + 56);
-    //this->_collisionRects.at(2).changeY(this->_collisionRects.at(2).getStartY() + 56);
-    
-    //printf("y: %f", this->_positiony); //this is 56
-    
-    
-
-    //printf("newCollisionY: %d, newY: %d , startY: %d\n", newCollisionY, newY, this->_collisionRects.at(0).getStartY());
-    
-
-    
 
 }
 
 void Level::changeX(int newX, int newCollisionX) {
-    this->_positionx = newX;
-    
-    //this->_collisionRects.at(0).changeX(newCollisionX);
     
     
     for(int i = 0; i < this->_collisionRects.size(); i++) {
@@ -698,7 +634,7 @@ void Level::changeX(int newX, int newCollisionX) {
     
 }
 
-
+/*
 void Level::changeAngle(float angle) {
     this->_angle += angle;
     if(this->_angle > 180) {
@@ -708,7 +644,8 @@ void Level::changeAngle(float angle) {
         this->_angle = this->_angle + 360;
     }
 }
-
+*/
+/*
 float Level::getAngle() {
     return this->_angle;
 }
@@ -720,6 +657,7 @@ float Level::getDX() {
 float Level::getDY() {
     return this->_dy;
 }
+*/
 
 void Level::setUnitAngle() {
     this->_unit.setPlayerAngle(this->_angle);
@@ -841,8 +779,8 @@ bool Level::checkSlideCollision(int xm, int ym) {
     
 }
 
-void Level::handleSlideMovement(int xm, int ym) {
-    this->_slide.handleSlideMovement(xm, ym, this->_angle, this->_positionx, this->_positiony);
+void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
+    this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY());
 }
 
 void Level::centerSlideToZero(){

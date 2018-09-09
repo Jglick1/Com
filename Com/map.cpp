@@ -68,8 +68,10 @@ void Map::drawTrans(Graphics &graphics, int transx, int transy, float ang, int x
 
 
     //SDL_Point point = {0, 0};
-
-    SDL_Point point = {640 - x, 400 - y};
+    
+    //SDL_Point point = {640 - x, 400 - y};
+    
+    SDL_Point point = {graphics.getPlayerCenterX() - x, graphics.getPlayerCenterY() - y};
 
     
     SDL_RenderCopyEx(graphics.getRenderer(), this->_spriteSheet, &this->_sourceRect, &destinationRectangle, ang, &point, SDL_FLIP_NONE);

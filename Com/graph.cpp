@@ -143,7 +143,184 @@ void Graph::removeEdgesForSourceAndDestinationVertices() {
 
 std::vector<int> Graph::getAStarVertexPath(std::map<int, double> & h) {
     std::vector<int> vertexPath;
+    //using https://www.youtube.com/watch?v=eSOJ3ARN5FM&t=598s&frags=pl%2Cwn
     
+    printf("start a*\n");
+    
+    std::vector<int> openVertices;
+    std::vector<int> closedVertices;
+    
+    std::map<int, double> distanceFromA;
+    std::map<int, int> previousVertex;
+    std::map<int, double> fValue;
+    int currentVertex = this->_vertexCount+1;   //the start vertex
+    
+    //add current vertex to open vertices
+    openVertices.push_back(currentVertex);
+    //distanceFromA[currentVertex] = 0.0;
+    //fValue[currentVertex] = distanceFromA[currentVertex] + h[currentVertex];
+    
+    
+    
+    while(currentVertex != this->_vertexCount) {    //while it's not the end vertex
+    
+        //find vertices adjacent to the current vetex and add them to the list of open vertices
+        for(int i = 0; i < (this->_vertexCount+1); i++) {
+            if(this->_adjacencyMatrix[currentVertex][i] > 0.0) {
+                //if not already in open vertices and not in closed vertices, add to open vertices
+                bool alreadyIn = 0;
+                for(int j : openVertices) {
+                    if(j == i) {
+                        alreadyIn = 1;
+                    }
+                }
+                bool inClosed = 0;
+                for(int j : closedVertices) {
+                    if(j == i) {
+                        inClosed = 1;
+                    }
+                }
+                if(!alreadyIn && !inClosed) {
+                    openVertices.push_back(i);
+                }
+
+                
+                if(!inClosed) {
+                    //find or update the vertex's DtoA
+                    distanceFromA[i] = this->_adjacencyMatrix[currentVertex][i];
+                    
+                    //find or update the vetex's fValue
+                    fValue[i] = distanceFromA[i] + h[i];
+                    
+                    //find or update the vertex's previous vertex
+                    previousVertex[i] = currentVertex;
+                }
+            }
+        }
+        
+        
+        //put current vetex in list of closed Vertices
+        //https://stackoverflow.com/questions/3385229/c-erase-vector-element-by-value-rather-than-by-position
+        openVertices.erase(std::remove(openVertices.begin(), openVertices.end(), currentVertex), openVertices.end());
+        closedVertices.push_back(currentVertex);
+        
+        /*
+        for (int i : openVertices) {
+            //find or update the vertex's DtoA
+            distanceFromA[i] = this->_adjacencyMatrix[currentVertex][i];
+            
+            //find or update the vetex's fValue
+            fValue[i] = distanceFromA[i] + h[i];
+            
+            //find or update the vertex's previous vertex
+            previousVertex[i] = currentVertex;
+        }
+        
+        */
+        
+        
+        printf("current: %d, open: ", currentVertex);
+        for(int i : openVertices) {
+            printf("%d ", i);
+        }
+        printf("\n");
+        
+        for(std::pair<int,int> k : previousVertex) {
+            printf("\t%d prev is %d\n", k.first, k.second);
+        }
+        
+        
+        //find new current vertex
+        
+        double min = 1000000;
+        double minVertex = -1;
+        
+        for(int i : openVertices) {
+            if (fValue[i] < min) {
+                min = fValue[i];
+                minVertex = i;
+            }
+        }
+        
+        //set new current Vertex
+        currentVertex = minVertex;
+        
+        //printf("end: %d\n",currentVertex);
+        
+    }
+    
+
+    
+    /*
+    //find vertices adjacent to the current vetex and add them to the list of open vertices
+    for(int i = 0; i < this->_vertexCount; i++) {
+        if(this->_adjacencyMatrix[currentVertex][i] > 0.0) {
+            //if not already in open vertices, add to open vertices
+            bool alreadyIn = 0;
+            for(int j : openVertices) {
+                if(j == i) {
+                    alreadyIn = 1;
+                }
+            }
+            if(!alreadyIn) {
+                openVertices.push_back(i);
+            }
+            
+            //find or update the vertex's DtoA
+            distanceFromA[i] = this->_adjacencyMatrix[currentVertex][i] + distanceFromA[currentVertex];
+            
+            //find or update the vetex's fValue
+            fValue[i] = distanceFromA[i] + h[i];
+            
+            //find or update the vertex's previous vertex
+            previousVertex[i] = currentVertex;
+            
+        }
+    }
+    
+    //close the vertex
+    openVertices.erase(std::remove(openVertices.begin(), openVertices.end(), currentVertex), openVertices.end());
+    
+    
+    //choose its sucessor
+    
+    //the same code again
+    
+    
+    */
+    //this loop shoudl be
+    /*
+    while(currentVertex != this->_vertexCount) { //this is the destination vertex
+        
+    }
+    */
+    
+    printf("first while loop calculated\n");
+    
+    
+    
+    //check to see if the next chosen vertex is this->_vertexCount. If so
+
+    
+    
+    
+    while(currentVertex != (this->_vertexCount+1)) { // while current vertex is not the destination
+        
+        printf("current vertex %d\n", currentVertex);
+        
+        vertexPath.insert(vertexPath.begin(), currentVertex);// starts with the destination
+        
+        currentVertex = previousVertex[currentVertex];
+        
+    }
+    
+    
+    
+    vertexPath.pop_back(); //remove the destination /Graph doens't know these coordinates, and when it tries to convert, it thinks they are 0,0
+    
+    
+    
+    /*
     double min = 1000000;               //MAKE THIS INF?
     double minVertex = -1;
     double f = 0.0;
@@ -169,7 +346,9 @@ std::vector<int> Graph::getAStarVertexPath(std::map<int, double> & h) {
     
     //find next node
     findNextNode(vertexPath, h, minVertex);
+    */
     
+    printf("vertex path return\n");
     
     
     return vertexPath;
@@ -223,4 +402,10 @@ std::vector<Vector2> Graph::convertToMovementOrders(std::vector<int> vertices) {
     return orders;
     
 }
+
+void Graph::addCoverNode(int vertex, std::vector<Cover> coverNodes) {
+    this->_vertexToCover.insert(std::make_pair(vertex, coverNodes));
+}
+
+
 

@@ -78,7 +78,8 @@ public:
     void centerSlideToZero();
     
     bool checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd);
-    bool checkPathCollision(int beginx, int beginy, int endx, int endy);
+    bool checkPathCollisionHelp2(double beginx, double beginy, double m, double b, double distanceToEnd, double angle);
+    bool checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics);
     
     Vector2 checkShotCollision(double beginx, double beginy, double angle);
 

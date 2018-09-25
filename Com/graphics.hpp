@@ -16,6 +16,7 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
 //#include "globals.hpp"
+#include <vector>
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -78,8 +79,13 @@ public:
     void update(int elapsedTime);
     
     void changeAngle(double angle);
+    void setAngle(double angle);
     void setCameraX(double x);
     void setCameraY(double y);
+    
+    void drawDebug();
+    void storeLineDebug(int x1, int y1, int x2, int y2, int color);
+    void eraseDebugLines();
     
 private:
     SDL_Window* _window;
@@ -102,6 +108,8 @@ private:
     
     int _playerCenterX;
     int _playerCenterY;
+    
+    std::vector< std::vector<int> > _debugLines;
     
     
 };

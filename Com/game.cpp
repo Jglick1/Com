@@ -84,7 +84,7 @@ void Game::gameLoop() {
     
     //printf("test1\n");
     
-    this->_level = Level("/Users/jonahglick/Documents/Com/com_test2", graphics);
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test4", graphics);
     
     
     
@@ -230,6 +230,7 @@ void Game::gameLoop() {
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
             //graphics.playShot();
+            graphics.eraseDebugLines();
         }
         
         
@@ -552,6 +553,9 @@ void Game::draw(Graphics &graphics) {
     
     //this->_cursor.draw(graphics);
     
+    graphics.drawDebug();       //draw all debug lines
+    //graphics.eraseDebugLines();      //erase all stored debug lines
+    
     graphics.flip();
     
     
@@ -581,9 +585,41 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     
     if ((this->_gameState == NORMAL) && std::abs((xm - old_xm)) < 100) {
-        //this->_level.changeAngle(-0.5*(xm - old_xm));
+
+
+        
         graphics.changeAngle(-0.5*(xm - old_xm));
-        //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
+        
+        
+        /*
+        double xdiff = (xm) - graphics.getPlayerCenterX();
+        double ydiff = (ym) - graphics.getPlayerCenterY();
+        
+        double newAngle = 0.0;
+        
+        if(ydiff < 0) {
+            newAngle = (-std::atan(xdiff/ydiff)*180/3.14159);
+        }
+        else {
+            newAngle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
+        }
+        
+        newAngle = -newAngle;
+        
+        if(newAngle > 180) {
+            newAngle -= 360;
+        }
+        else if(newAngle < -180) {
+            newAngle += 360;
+        }
+        
+        graphics.setAngle(newAngle);
+        */
+        
+        
+        
+        
+        
     }
     
      

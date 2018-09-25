@@ -63,6 +63,18 @@ struct Vector2 {
     }
 };
 
+struct Cover {
+    int x, y;
+    bool occupied;
+    int id;
+    Direction shootDirection;
+    
+    
+    Cover() : x(0), y(0), shootDirection(NONE) {}
+    Cover(int x, int y, Direction direction) : x(x), y(y), shootDirection(direction) {}
+    
+};
+
 /*
 struct Edge;
 

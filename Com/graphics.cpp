@@ -233,10 +233,41 @@ void Graphics::changeAngle(double angle) {
     }
 }
 
+void Graphics::setAngle(double angle) {
+    this->_cameraAngle = angle;
+}
+
 void Graphics::setCameraX(double x) {
     this->_cameraX = x;
 }
 
 void Graphics::setCameraY(double y) {
     this->_cameraY = y;
+}
+
+void Graphics::drawDebug() {
+    for(std::vector<int> line : this->_debugLines) {
+        if(!(line[4] == 0)) {
+            SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
+        }
+           
+        SDL_RenderDrawLine(this->_renderer, line[0], line[1], line[2], line[3]); // x1, y1, x2, y2
+        
+        SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //back to black
+        
+    }
+
+}
+
+
+void Graphics::storeLineDebug(int x1, int y1, int x2, int y2, int color) {
+    std::vector<int> line = {x1, y1, x2, y2, color};
+    
+    this->_debugLines.push_back(line);
+}
+
+void Graphics::eraseDebugLines() {
+    
+    this->_debugLines.clear();
+    
 }

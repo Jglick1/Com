@@ -221,6 +221,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 
                 int vertexCount = 0;
                 
+                //count the total number of vertices
                 XMLElement * pObject = pObjectGroup->FirstChildElement("object");
                 if (pObject != NULL) {
                     while (pObject) {
@@ -233,6 +234,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 
                 printf("vertex count: %d\n", vertexCount);
                 
+                //add vertices to the vertex table
                 pObject = pObjectGroup->FirstChildElement("object");
                 if (pObject != NULL) {
                     while (pObject) {
@@ -250,6 +252,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                     }
                 }
                 
+                //add the edges between the vertices
                 pObject = pObjectGroup->FirstChildElement("object");
                 if (pObject != NULL) {
                     while (pObject) {
@@ -257,17 +260,57 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                         
                         int id = pObject->IntAttribute("name");
                         XMLElement * pProperty1 = pObject->FirstChildElement("properties");
-                        XMLElement * pProperty2 = pProperty1->FirstChildElement("property");
-                        int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
+                        if(pProperty1 != NULL) {
                         
-                        //this->_map[id].y - this->_map[otherId].y
+                            XMLElement * pProperty2 = pProperty1->FirstChildElement("property");
+                            if(pProperty2 != NULL) {
+                                while(pProperty2) {
+                                    
+                            
+                                    
+                                    std::stringstream ssCorner;
+                                    
+                                    std::vector<int> values;
+                                    int n;
+                                    ssCorner << pProperty2->Attribute("value");     //string of the form "1 6 12 15"
+                                        //assumed to be in "connectedVertices" name
+                                    //seperate into ints
+                                    
+                                    printf("read in from %d: ", id);
+                                    while(ssCorner >> n) {
+                                        values.push_back(n);
+                                        printf("%d ", n);
+                                    }
+                                    printf("\n");
+                                    
+                                    
+                                    
+                                    double weight = 0.0;
+                                    for(int otherId : values) {
+                                        weight = this->_graph.getWeight(id, otherId);
+                                        this->_graph.addEdge(id, otherId, weight);
+                                    }
+                                    
+                                    
+                                    
+                                    /*
+                                    int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
+                                    
+                                    double weight = this->_graph.getWeight(id, otherId);
+                                    
+                                    this->_graph.addEdge(id, otherId, weight);
+                                    printf("node: %d to %d weight: %f\n", id, otherId, weight);
+                                    */
+                            
+                                    
+                                    
+                                    
+                                    
+                                    pProperty2 = pProperty2->NextSiblingElement("property");
+                                }
+                            }
                         
-                        double weight = this->_graph.getWeight(id, otherId);
-                        
-                        //double weight = 0.0;
-                        
-                        this->_graph.addEdge(id, otherId, weight);
-                        printf("node: %d to %d weight: %f\n", id, otherId, weight);
+                        }
                         
                         pObject = pObject->NextSiblingElement("object");
                     }
@@ -672,13 +715,19 @@ void Level::handleUnitMovement() {
 void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graphics for testing
     //check if the path is clear
     
-    bool temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY()+4, posX, posY);
+    bool temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, posX+8, posY+8, graphics);
+    //printf("temp: %d\n", temp);
+    
+    //printf("%d, %d\n", posX, posY);
+    
     
     //printf("%d, %d\n", temp.x, temp.y);
     
     std::vector<int> vertexPath;
     
     //graphics.drawLine(0,0,500,500);
+    
+    //printf("%f, %f\n", this->_unit.getStaticX(),this->_unit.getStaticY());
     
     //no collision
     if(temp == 0) {
@@ -697,18 +746,20 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
         double weight = 0.0;
         
         for(const auto& iter : vertices) {
-            temp = checkPathCollision(this->_unit.getStaticX(), this->_unit.getStaticY()+4, iter.second.x, iter.second.y);
+            temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
+            printf("vertex: %d \t collision:%d\n", iter.first, temp);
             
-            tempDestination = checkPathCollision(posX, posY, iter.second.x, iter.second.y);
+            
+            tempDestination = checkPathCollision(posX+8, posY+8, iter.second.x+8, iter.second.y+8,graphics);
             
             //printf("destination: %d, %d, %d, %d\n", posX, posY, iter.second.x, iter.second.y);
             
             if(temp == 0) {
                 weight = std::sqrt(std::pow(this->_unit.getStaticX()-iter.second.x,2)+std::pow(this->_unit.getStaticY()+4-iter.second.y,2));
                 
-                printf("%d, %d\n", iter.first, this->_graph.getVertexCount());
+                //printf("%d, %d\n", iter.first, this->_graph.getVertexCount());
                 
-                this->_graph.addEdge(iter.first, this->_graph.getVertexCount(), weight); //source
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight); //source
 
             }
             
@@ -716,7 +767,7 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
                 //printf("no collision\n");
                 weight = std::sqrt(std::pow(posX-iter.second.x,2)+std::pow(posY-iter.second.y,2));
                 
-                this->_graph.addEdge(iter.first, this->_graph.getVertexCount()+1, weight); //destination
+                this->_graph.addEdge(iter.first, this->_graph.getVertexCount(), weight); //destination
                 
             }
             
@@ -780,7 +831,7 @@ bool Level::checkSlideCollision(int xm, int ym) {
 }
 
 void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
-    this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY());
+    this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
 }
 
 void Level::centerSlideToZero(){
@@ -788,8 +839,7 @@ void Level::centerSlideToZero(){
 }
 
 
-bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy) {
-    
+bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
 
     //double xdiff = endx - (this->_unit.getStaticX());
     //double ydiff = endy - (this->_unit.getStaticY()+4);
@@ -825,8 +875,184 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy) {
     
     //double distanceToEnd = 0;
     
-    return checkPathCollisionHelp(beginx, beginy, angle, distanceToEnd);
+    //bool collision = checkPathCollisionHelp(beginx, beginy, angle, distanceToEnd);
+    
+    //(y - y1) = m (x - x1)
+    // y = mx + y1 - m * x1
+    
+    double m = ydiff / xdiff;
+    double b = beginy - m * beginx;
+    
+    //b = b + 8 / std::sin(angle*3.14159/180);
+    
+    //bool collision = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);   //checking collision with center
+    
+    b = b + 8 / std::sin(angle*3.14159/180);
+    bool collisionTop = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);
+    //graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collisionTop);
+    
+    
+    b = b - 16 / std::sin(angle*3.14159/180);
+    bool collisionBottom = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);
+    //graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collisionBottom);
+    
+    
+    
+    
+    
+    
+    /*
+    //graphics.storeLineDebug(beginx, beginy, endx, endy, collision);
+    
+    //y = m x + b
+    //graphics.storeLineDebug(0, b, 1280, 1280*m + b, 0);
+    
+    b = b + 8 / std::sin(angle*3.14159/180);
+    graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collision);
+    
+    b = b - 16 / std::sin(angle*3.14159/180);
+    graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collision);
+    */
+    
+    
+    
+    return (collisionTop || collisionBottom);
 }
+
+bool Level::checkPathCollisionHelp2(double beginx, double beginy, double m, double b, double distanceToEnd, double angle) {
+    
+    /*
+    float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
+    
+    
+    float b = beginy - m*beginx;
+    */
+    
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    float yhit = 0.0;
+    float xhit = 0.0;
+    
+    for(Rectangle &i : this->_collisionRects) {
+        
+        
+        
+        //check bottom
+        collisionx = (i.getStartY()+i.getHeight() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() <= (beginy - i.getHeight()) && std::abs(angle) <= 90)) {
+            //printf("I'm satisfied\n");
+            //printf("\n");
+            
+            //printf("collisionx: %f\n", collisionx);
+            
+            
+            //printf("\n");
+            
+            if((collisionx >= i.getStartX()) && (collisionx <= (i.getStartX()+i.getWidth()))) {       //need ">=" to account for corners
+                
+                //yes collision
+                //printf("bottom\n");
+                
+                yhit = i.getStartY()+i.getHeight();
+                
+                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                
+                
+                //return 1;
+                
+                //return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
+                
+            }
+        }
+        
+        
+        
+        //check top
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        
+        if((i.getStartY() >= beginy && std::abs(angle) >= 90)) {
+            if(collisionx >= i.getStartX() && collisionx <= i.getStartX()+i.getWidth()) {
+                
+                //printf("top\n");
+                //return 1;
+                
+                //return Vector2(collisionx,this->_collisionRects.at(0).getY());
+                
+                yhit = i.getStartY();
+                
+                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+            }
+        }
+        
+        
+        
+        
+        //check left
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartX() >= beginx) && angle <= 0) {
+            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
+                
+                //printf("left\n");
+                
+                //return 1;
+                
+                xhit = i.getStartX();
+                
+                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                //return Vector2(this->_collisionRects.at(0).getX(),collisiony);
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = (i.getStartX()+i.getWidth()) * m + b;
+        if((i.getStartX() <= beginx - i.getWidth()) && angle >= 0) {
+            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
+                
+                //printf("right\n");
+                
+                //return 1;
+                
+                xhit = i.getStartX()+i.getWidth();
+                
+                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
+                    return 1;
+                }
+                
+                //return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
+                
+            }
+        }
+        
+        
+        
+    }
+    
+    
+    
+    //no collision
+    return 0;
+    //return Vector2(0, 0);
+    
+    
+    
+}
+
+
+
 
 
 bool Level::checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd) {

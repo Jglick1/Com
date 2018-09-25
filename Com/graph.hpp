@@ -13,6 +13,7 @@
 #include <map>
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 class Graph {
     
@@ -32,6 +33,8 @@ public:
     void findNextNode(std::vector<int> & vertexPath,std::map<int, double> & h, int currentVertex);
     std::vector<Vector2> convertToMovementOrders(std::vector<int> vertices);
 
+    void addCoverNode(int vertex, std::vector<Cover> coverNodes);
+    
     
 private:
     //double** _adjacencyMatrix;
@@ -39,6 +42,8 @@ private:
     
     int _vertexCount;
     std::map<int, Vector2> _vertices; //id to location (to get vertex location)
+    
+    std::map<int, std::vector<Cover> > _vertexToCover;
 
 };
 

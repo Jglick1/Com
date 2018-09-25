@@ -216,7 +216,7 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     
 }
 
-void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float levelx, float levely) {
+void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float levelx, float levely, Graphics &graphics) {
     
     int width = std::round(this->_width);
     int height = std::round(this->_height);
@@ -225,14 +225,16 @@ void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float level
     //xm += this->_x;
     //ym -= this->_y;
     
+    angle = graphics.getCameraAngle();
+    
     //printf("%f, %f\n", this->_x, this->_y);
     
     if(this->_centerHold) {
         //this->_staticx = xm - width/2 - levelx;
         //this->_staticy = ym - height/2 - levely;
         
-        double bx = 640;
-        double by = 400;
+        double bx = graphics.getPlayerCenterX();
+        double by = graphics.getPlayerCenterY();
         
         //xm = std::cos(angle*3.14159/180)*(xm-bx) - std::sin(angle*3.14159/180)*(ym-by) + bx;
         //ym = std::sin(angle*3.14159/180)*(xm-bx) + std::cos(angle*3.14159/180)*(ym-by) + by;

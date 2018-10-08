@@ -34,7 +34,7 @@ public:
     std::vector<Vector2> convertToMovementOrders(std::vector<int> vertices);
 
     void addCoverNode(int vertex, std::vector<Cover> coverNodes);
-    
+    //std::map<int, Vector2> getCoverNodes(int vertex);
     
 private:
     //double** _adjacencyMatrix;

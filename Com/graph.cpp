@@ -408,4 +408,13 @@ void Graph::addCoverNode(int vertex, std::vector<Cover> coverNodes) {
 }
 
 
+/*
+std::map<int, Vector2> Graph::getCoverNodes(int vertex) {
 
+    
+    
+    
+    
+    
+}
+*/

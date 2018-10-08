@@ -42,8 +42,21 @@ namespace sides {
     }
 }
 
-enum GameState {
-    SLIDE_MOVE, PAUSE, NORMAL, COMMAND
+
+enum ActionState {
+    SLIDE_MOVE, PAUSE, NORMAL, COMMAND, ORGANIZATION
+};
+
+enum Rank {
+    PVT, PFC, CPL, SGT, SSGT, TSGT, MSGT, FSGT
+};
+
+enum Role {
+    RIFLEMAN, SCOUT_RIFLEMAN, AUTOMATIC_RIFLEMAN, SQUAD_LEADER, ASSISSTANT_SQUAD_LEADER
+};
+
+enum Formation {
+    FIRETEAM, SQUAD, PLATOON
 };
 
 enum Direction {

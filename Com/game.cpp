@@ -43,7 +43,7 @@ Game::Game() {
         return;
     }
     
-    this->_gameState = NORMAL;
+    this->_actionState = NORMAL;
     
     this->gameLoop();
     
@@ -86,7 +86,7 @@ void Game::gameLoop() {
     
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test4", graphics);
     
-    
+    this->_organizationChart = OrganizationChart(graphics);
     
     
     //this->_hud = HUD(graphics, this->_player);
@@ -128,6 +128,10 @@ void Game::gameLoop() {
         
         input.beginNewFrame();
         
+        old_xm = xm;
+        old_ym = ym;
+        SDL_GetMouseState(&xm, &ym);        //update mouse positions
+        
         
         wasThereAnEvent = 0;
         while (SDL_PollEvent(&event)) {
@@ -147,25 +151,36 @@ void Game::gameLoop() {
             //    this->_deltaX = event.motion.xrel;
             //    this->_deltaY += event.motion.y;
             //}
-            else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     rightMouseDown = 1;
-                    if(this->_gameState == NORMAL) {
-                        this->_gameState = COMMAND;
+                    if(this->_actionState == NORMAL) {
+                        this->_actionState = COMMAND;
                     }
                     //printf("mouse down\n");
                     
                     
                 }
                 else if(event.button.button == SDL_BUTTON_LEFT) {
-                    this->_gameState = NORMAL;
-                    printf("left mouse down");
+                    if(this->_actionState == ORGANIZATION) {
+                        this->_organizationChart.handleMouseCollision(graphics, xm, ym);
+                    }
+                    else {
+                        this->_actionState = NORMAL;
+                        printf("left mouse down");
+                    }
+                    
                 }
             }
-            else if (event.type == SDL_MOUSEBUTTONUP) {
+            if (event.type == SDL_MOUSEBUTTONUP) {
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     rightMouseDown = 0;
                     //printf("mouse up\n");
+                }
+                if (event.button.button == SDL_BUTTON_LEFT) {   //left mouse up
+                    if(this->_actionState == ORGANIZATION) {
+                        this->_organizationChart.isNotSelected();
+                    }
                 }
             }
             
@@ -200,11 +215,11 @@ void Game::gameLoop() {
         
         //printf("%d\n", rightMouseClick);
         
-
+/*
         old_xm = xm;
         old_ym = ym;
         SDL_GetMouseState(&xm, &ym);
-        
+        */
 
 /*
         if ((game_state == NORMAL) && std::abs((xm - old_xm)) < 100) {
@@ -233,19 +248,27 @@ void Game::gameLoop() {
             graphics.eraseDebugLines();
         }
         
+        if(input.wasKeyPressed(SDL_SCANCODE_O)) {
+            if(this->_actionState == ORGANIZATION) {
+                this->_actionState = NORMAL;
+            }
+            else {
+                this->_actionState = ORGANIZATION;
+            }
+        }
         
         
         
-        if((this->_gameState == COMMAND) && rightMouseClick) {
+        if((this->_actionState == COMMAND) && rightMouseClick) {
             if(this->_level.checkSlideCollision(xm, ym)) {
-                this->_gameState = SLIDE_MOVE;
+                this->_actionState = SLIDE_MOVE;
                 //printf("collision!\n");
             }
         }
         
-        if(this->_gameState == SLIDE_MOVE) {
+        if(this->_actionState == SLIDE_MOVE) {
             if(rightMouseDown == 0) {   //sliders is released
-                this->_gameState = COMMAND;
+                this->_actionState = COMMAND;
                 this->_level.centerSlideToZero();
                 this->_level.moveUnitToSlidePosition(graphics);
             }
@@ -253,6 +276,7 @@ void Game::gameLoop() {
                 this->_level.handleSlideMovement(xm, ym, graphics);
             }
         }
+
         
         //printGameState(this->_gameState);
         
@@ -541,20 +565,30 @@ void Game::draw(Graphics &graphics) {
     graphics.clear();
 
     
-    this->_level.draw(graphics);
-    this->_player.draw(graphics);
+    if(this->_actionState != ORGANIZATION) {
+        this->_level.draw(graphics);
+        this->_player.draw(graphics);
+        
+        //SDL_Rect destinationRectangle = { 0, 0, 200, 200};
+        //graphics.blitSurface(this->textSheet, NULL, &destinationRectangle);
+        
+        //graphics.renderText();
+        
+        this->_hud.draw(graphics);
+        
+        //this->_cursor.draw(graphics);
+        
+        graphics.drawDebug();       //draw all debug lines
+        //graphics.eraseDebugLines();      //erase all stored debug lines
+    }
+    else {
+        
+        this->_organizationChart.draw(graphics);
+        
+        
+    }
+
     
-    //SDL_Rect destinationRectangle = { 0, 0, 200, 200};
-    //graphics.blitSurface(this->textSheet, NULL, &destinationRectangle);
-    
-    //graphics.renderText();
-    
-    this->_hud.draw(graphics);
-    
-    //this->_cursor.draw(graphics);
-    
-    graphics.drawDebug();       //draw all debug lines
-    //graphics.eraseDebugLines();      //erase all stored debug lines
     
     graphics.flip();
     
@@ -584,7 +618,7 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     //printf("%d\n",this->_gameState == NORMAL);
     
     
-    if ((this->_gameState == NORMAL) && std::abs((xm - old_xm)) < 100) {
+    if ((this->_actionState == NORMAL) && std::abs((xm - old_xm)) < 100) {
 
 
         
@@ -634,6 +668,8 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
 
     this->_cursor.update(elapsedTime, ym, old_ym);
     
+    this->_organizationChart.update(xm, ym);
+    
     
                                                                 //handle collisions shoudl come after update for some reason
     std::vector<Rectangle> others;
@@ -682,8 +718,8 @@ void Game::printDirection(Direction inPower) {
     }
 }
 
-void Game::printGameState(GameState gameState) {
-    switch(gameState) {
+void Game::printActionState(ActionState actionState) {
+    switch(actionState) {
         case NORMAL:
             printf("NORMAL\n");
             break;

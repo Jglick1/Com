@@ -84,7 +84,7 @@ public:
     Vector2 checkShotCollision(double beginx, double beginy, double angle);
 
     void moveUnitToSlidePosition(Graphics &graphics);
-    
+    void moveUnitToNearestCover(Graphics &graphics);
     
     
 private:

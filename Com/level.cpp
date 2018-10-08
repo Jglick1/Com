@@ -258,7 +258,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                     while (pObject) {
                         
                         
-                        int id = pObject->IntAttribute("name");
+                        int id = pObject->IntAttribute("name");         //id
                         XMLElement * pProperty1 = pObject->FirstChildElement("properties");
                         if(pProperty1 != NULL) {
                         
@@ -737,6 +737,9 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
         return;                                 //CHANGE THIS
     }
     else {
+        
+        //this maybe should all be in the graph class? Maybe not
+        
         
         std::map<int, Vector2> vertices = this->_graph.getVertexTable();
         
@@ -1395,6 +1398,62 @@ void Level::moveUnitToSlidePosition(Graphics &graphics) {
     moveUnitToPosition(std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8), graphics);
     
     //printf("%f, %f\n", std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8));
+    
+    
+}
+
+void Level::moveUnitToNearestCover(Graphics &graphics) {
+    //find nearest visible vertex
+    std::map<int, Vector2> vertices = this->_graph.getVertexTable();
+    
+    bool temp;
+    
+    std::vector<int> visibleVertices;
+    
+    int minVertex = -1;
+    double minDistance = 100000.0;
+    
+    double distance = 0.0;
+    
+    //find nearest visible vertex
+    for(const auto& iter : vertices) {
+        temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
+        
+        if(temp == 0) {
+            
+            distance = std::sqrt(std::pow(this->_unit.getStaticX()-iter.second.x,2) + std::pow(this->_unit.getStaticY()-iter.second.y,2));
+            if(distance < minDistance) {
+                minVertex = iter.first;
+                minDistance = distance;
+            }
+
+        }
+    }
+    
+    //now find the nearest cover connected to that vertex
+    /*
+    minDistance = 1000000.0;
+    int minCoverVertex = -1;
+    
+    if(minVertex != -1) {
+        
+        std::map<int, Vector2> coverNodes = this->_graph.getCoverNodes(minVertex);
+        
+        
+        for(const auto& iter : coverNodes) {
+            
+            
+            
+            
+            
+            
+            
+        }
+        
+        
+    }
+    
+    */
     
     
 }

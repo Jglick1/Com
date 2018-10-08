@@ -16,16 +16,19 @@
 #include "input.hpp"
 #include "hud.hpp"
 #include "cursor.hpp"
+#include "gamestate.hpp"
+#include "organizationChart.hpp"
 //#include "inventory.hpp"
 
 //class Level;
+
 
 class Game {
 public:
     Game();
     ~Game();
     void printDirection(Direction inPower);
-    void printGameState(GameState state);
+    void printActionState(ActionState direction);
     
     
 private:
@@ -56,7 +59,9 @@ private:
     
     Cursor _cursor;
     
-    GameState _gameState;
+    ActionState _actionState;
+    
+    OrganizationChart _organizationChart;
     
     
 };

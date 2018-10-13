@@ -21,7 +21,7 @@ class Graphics;
 class FormationCard {
 public:
     FormationCard();
-    FormationCard(Formation formation, Graphics &graphics);
+    FormationCard(Formation formation, std::vector<int> post, std::map< std::vector<int>, int> mapToNumChildren, Graphics &graphics);
     ~FormationCard();
     void update(int mx, int my, int offsetX, int offsetY);
     void draw(Graphics &graphics);
@@ -35,7 +35,15 @@ public:
     Rectangle getRectangle();
     
     void addSubUnit(UnitCard &subUnit);
-    void addSubFormation(FormationCard &subCounter);
+    void addSubFormation(FormationCard &subFormation);
+    
+    void addSubUnit(UnitCard &subUnit, std::vector<int> &position);
+    
+    FormationCard getSubFormation(int pos);
+    int getSubUnitNumber();
+    int getSubFormationNumber();
+    
+    std::vector<int> getPost();
     
 private:
     
@@ -50,8 +58,11 @@ private:
     //children
     std::vector<FormationCard> _subFormations;
     std::vector<UnitCard> _subUnits;
+    UnitCard _commander;
     
     int _numberOfSubUnits, _numberOfSubFormations;
+    
+    std::vector<int> _post;
     
     
 };

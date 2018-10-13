@@ -84,7 +84,7 @@ void Game::gameLoop() {
     
     //printf("test1\n");
     
-    this->_level = Level("/Users/jonahglick/Documents/Com/com_test4", graphics);
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test5", graphics);
     
     this->_organizationChart = OrganizationChart(graphics);
     
@@ -179,7 +179,10 @@ void Game::gameLoop() {
                 }
                 if (event.button.button == SDL_BUTTON_LEFT) {   //left mouse up
                     if(this->_actionState == ORGANIZATION) {
-                        this->_organizationChart.isNotSelected();
+                        if(this->_organizationChart.isSelected()) {
+                            this->_organizationChart.handleMouseLiftCollision(graphics, xm, ym);
+                        }
+                        this->_organizationChart.setToNotSelected();
                     }
                 }
             }
@@ -257,6 +260,10 @@ void Game::gameLoop() {
             }
         }
         
+        if(input.wasKeyPressed(SDL_SCANCODE_C)) {
+            //graphics.playShot();
+            this->_level.moveUnitToNearestCover(graphics);
+        }
         
         
         if((this->_actionState == COMMAND) && rightMouseClick) {
@@ -275,6 +282,9 @@ void Game::gameLoop() {
             else {
                 this->_level.handleSlideMovement(xm, ym, graphics);
             }
+        }
+        else if(this->_actionState == ORGANIZATION) {
+            this->_organizationChart.handleMouseHover(xm, ym, graphics);
         }
 
         

@@ -39,15 +39,32 @@ public:
     //the tree structure should be here
     
     void handleMouseCollision(Graphics &graphics, int mx, int my);
-    void isNotSelected();
+    void handleMouseLiftCollision(Graphics &graphics, int mx, int my);
+    
+    bool isSelected();
+    void setToNotSelected();
+    
+    int getNumberOfChildren(std::vector<int> path);
+    
+    void handleMouseHover(int xm, int ym, Graphics &graphics);
+    
+    bool _drawHover = 1;
+    Vector2 _hoverShadowPosition;
     
 private:
     
-    std::vector<UnitCard> _cards;
+    std::vector<UnitCard> _Unitcards;
+    std::vector<FormationCard> _formationCards;
+    
+    //std::vector<UnitCard *> _collisionCards;
     
     Sprite _background;
     
     PlusSign _plusSign;
+    
+    Sprite _hoverShadow;
+    
+    Sprite _selectShadow;
     
     int _selectedUnitCardIndex;
     bool _isSelected;
@@ -56,6 +73,11 @@ private:
     
     int _mouseOffsetX, _mouseOffsetY;
     
+    std::map<int, std::vector<int> > _unitToPost;
+    
+    //map from collision rec (of formation card) to vector<int> of how to get there {0, 2, 3} like
+    
+    std::map< std::vector<int>, int> _mapToNumChildren;
     
 };
 

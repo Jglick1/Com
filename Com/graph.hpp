@@ -36,6 +36,17 @@ public:
     void addCoverNode(int vertex, std::vector<Cover> coverNodes);
     //std::map<int, Vector2> getCoverNodes(int vertex);
     
+    std::map<int, Vector2> getCoverNodeTable(); // coverNode to Coordinates
+    
+    void addToCoverTable(int coverNode, int x, int y);
+    void initializeCoverTable(std::map<int, Vector2> temp);
+    void connectCoverNodeToVertex(int vertex, std::vector<int> coverNodes);
+    std::vector<int> getCoverNodes(int vertex);
+    
+    void setCoverToOccupied(int coverNode);
+    
+    bool isCoverOccupied(int coverNode);
+    
 private:
     //double** _adjacencyMatrix;
     std::vector< std::vector<double> > _adjacencyMatrix;
@@ -43,8 +54,16 @@ private:
     int _vertexCount;
     std::map<int, Vector2> _vertices; //id to location (to get vertex location)
     
-    std::map<int, std::vector<Cover> > _vertexToCover;
+    
+    
+    
+    
+    std::map<int, Vector2> _coverNodes; //cover nodes coordinates
 
+    std::map<int, std::vector<int> > _vertexToCoverNode;
+    
+    std::map<int, bool> _coverNodeOccupiedTable; //covernode
+    
 };
 
 

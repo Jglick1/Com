@@ -16,7 +16,7 @@ PlusSign::~PlusSign() {}
 PlusSign::PlusSign(Graphics &graphics) :
 _width(64),
 _height(64),
-_x(700.0),
+_x(750.0),
 _y(100.0)
 
 {
@@ -25,7 +25,7 @@ _y(100.0)
     this->_plus = Sprite(graphics, "/Users/jonahglick/Documents/Com/plus_sign.png", 0, 0, 64, 64, 0, 0);
 
     
-    this->_rectangle = Rectangle(700, 100, 64, 64);
+    this->_rectangle = Rectangle(750, 100, 64, 64);
     
 }
 

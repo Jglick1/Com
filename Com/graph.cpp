@@ -403,9 +403,11 @@ std::vector<Vector2> Graph::convertToMovementOrders(std::vector<int> vertices) {
     
 }
 
+/*
 void Graph::addCoverNode(int vertex, std::vector<Cover> coverNodes) {
-    this->_vertexToCover.insert(std::make_pair(vertex, coverNodes));
+    this->_coverNodes.insert(std::make_pair(vertex, coverNodes));
 }
+*/
 
 
 /*
@@ -418,3 +420,54 @@ std::map<int, Vector2> Graph::getCoverNodes(int vertex) {
     
 }
 */
+
+void Graph::addToCoverTable(int coverNode, int x, int y) {
+    this->_coverNodes.insert(std::make_pair(coverNode, Vector2(x, y)));
+    this->_coverNodeOccupiedTable.insert(std::make_pair(coverNode, 0));
+    //printf("%d, %d\n", x, y);
+}
+
+void Graph::initializeCoverTable(std::map<int, Vector2> temp) {
+    this->_coverNodes = temp;
+    
+    for(const auto& iter : temp) {
+        this->_coverNodeOccupiedTable.insert(std::make_pair(iter.first, 0));
+    }
+    
+}
+
+void Graph::connectCoverNodeToVertex(int vertex, std::vector<int> coverNodes) {
+    
+    this->_vertexToCoverNode.insert(std::make_pair(vertex, coverNodes));
+    
+}
+
+std::vector<int> Graph::getCoverNodes(int vertex) {
+    
+    return this->_vertexToCoverNode[vertex];
+    
+}
+
+std::map<int, Vector2> Graph::getCoverNodeTable() {
+    
+    //printf("cover nodes size before: %ld\n", this->_coverNodes.size());
+    
+    return this->_coverNodes;
+    
+}
+
+
+
+void Graph::setCoverToOccupied(int coverNode) {
+    
+    this->_coverNodeOccupiedTable[coverNode] = 1;
+    
+}
+
+bool Graph::isCoverOccupied(int coverNode) {
+    
+    return this->_coverNodeOccupiedTable[coverNode];
+    
+}
+
+

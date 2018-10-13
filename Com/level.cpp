@@ -32,7 +32,7 @@ Level::Level() {
 }
 
 Level::Level(std::string mapName, Graphics &graphics) :
-    Map(graphics, "/Users/jonahglick/Documents/Com/com_test2.png", 0, 0, 1280, 800, 0, 0),
+    Map(graphics, "/Users/jonahglick/Documents/Com/com_test5.png", 0, 0, 1280, 800, 0, 0),
 	_mapName(mapName),
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
@@ -90,6 +90,9 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 	//this->_backgroundTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("C:\\Users\\Jglick\\Documents\\Io\\Test.png"));
 	//this->_size = Vector2(1280, 960);
 	
+    std::map<int, Vector2> tempForCoverTable; //in case corners are called before cover
+    bool coverHasBeenCalled = 0;
+    bool cornerHasBeenCalled = 0;
     
 	XMLDocument doc;
 	std::stringstream ss;
@@ -219,6 +222,8 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
             
             else if (ss.str() == "corners") {
                 
+                cornerHasBeenCalled = 1;
+                
                 int vertexCount = 0;
                 
                 //count the total number of vertices
@@ -231,6 +236,10 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 }
                 
                 this->_graph = Graph(vertexCount+2); //+2 for source and destination nodes
+                
+                if(coverHasBeenCalled) {
+                    this->_graph.initializeCoverTable(tempForCoverTable);
+                }
                 
                 printf("vertex count: %d\n", vertexCount);
                 
@@ -266,44 +275,69 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                             if(pProperty2 != NULL) {
                                 while(pProperty2) {
                                     
+                                    std::stringstream ssTemp;
+                                    ssTemp << pProperty2->Attribute("name");
+                                    
+                                    if(ssTemp.str() == "connectedVertices") {
                             
-                                    
-                                    std::stringstream ssCorner;
-                                    
-                                    std::vector<int> values;
-                                    int n;
-                                    ssCorner << pProperty2->Attribute("value");     //string of the form "1 6 12 15"
-                                        //assumed to be in "connectedVertices" name
-                                    //seperate into ints
-                                    
-                                    printf("read in from %d: ", id);
-                                    while(ssCorner >> n) {
-                                        values.push_back(n);
-                                        printf("%d ", n);
-                                    }
-                                    printf("\n");
-                                    
-                                    
-                                    
-                                    double weight = 0.0;
-                                    for(int otherId : values) {
-                                        weight = this->_graph.getWeight(id, otherId);
+                                        
+                                        std::stringstream ssCorner;
+                                        
+                                        std::vector<int> values;
+                                        int n;
+                                        ssCorner << pProperty2->Attribute("value");     //string of the form "1 6 12 15"
+                                            //assumed to be in "connectedVertices" name
+                                        //seperate into ints
+                                        
+                                        printf("read in from %d: ", id);
+                                        while(ssCorner >> n) {
+                                            values.push_back(n);
+                                            printf("%d ", n);
+                                        }
+                                        printf("\n");
+                                        
+                                        
+                                        
+                                        double weight = 0.0;
+                                        for(int otherId : values) {
+                                            weight = this->_graph.getWeight(id, otherId);
+                                            this->_graph.addEdge(id, otherId, weight);
+                                        }
+                                        
+                                        
+                                        
+                                        /*
+                                        int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
+                                        
+                                        double weight = this->_graph.getWeight(id, otherId);
+                                        
                                         this->_graph.addEdge(id, otherId, weight);
+                                        printf("node: %d to %d weight: %f\n", id, otherId, weight);
+                                        */
+                                
+                                        
                                     }
                                     
-                                    
-                                    
-                                    /*
-                                    int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
-                                    
-                                    double weight = this->_graph.getWeight(id, otherId);
-                                    
-                                    this->_graph.addEdge(id, otherId, weight);
-                                    printf("node: %d to %d weight: %f\n", id, otherId, weight);
-                                    */
-                            
-                                    
-                                    
+                                    else if (ssTemp.str() == "connectedCoverNodes") {
+                                        
+                                        std::stringstream ssCover;
+                                        
+                                        std::vector<int> values;
+                                        int n;
+                                        ssCover << pProperty2->Attribute("value");
+                                        
+                                        printf("read cover from %d: ", id);
+                                        
+                                        while(ssCover >> n) {
+                                            values.push_back(n);
+                                            printf("%d ", n);
+                                        }
+                                        printf("\n");
+                                        
+                                        this->_graph.connectCoverNodeToVertex(id, values);
+                                        
+                                        
+                                    }
                                     
                                     
                                     pProperty2 = pProperty2->NextSiblingElement("property");
@@ -317,7 +351,40 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 }
                 
                 
+            
             }
+            
+            else if (ss.str() == "cover") {                                         //needs to come after graph has been created. graph is created in "corners" so "corner" must come first
+                
+                coverHasBeenCalled = 1;
+                
+                //add all cover nodes to cover node table
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        printf("add to cover table\n");
+                        
+                        int id = pObject->IntAttribute("name");
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        
+                        if(cornerHasBeenCalled) { //then graph has already been initlized
+                            this->_graph.addToCoverTable(id, x, y);
+                        }
+                        else {
+                            tempForCoverTable.insert(std::make_pair(id, Vector2(x, y)));
+                        }
+                        
+                        
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                
+            }
+            
+            
             
 			
 			pObjectGroup = pObjectGroup->NextSiblingElement("objectgroup");
@@ -1403,6 +1470,9 @@ void Level::moveUnitToSlidePosition(Graphics &graphics) {
 }
 
 void Level::moveUnitToNearestCover(Graphics &graphics) {
+    
+    printf("c key pressed\n");
+    
     //find nearest visible vertex
     std::map<int, Vector2> vertices = this->_graph.getVertexTable();
     
@@ -1429,31 +1499,52 @@ void Level::moveUnitToNearestCover(Graphics &graphics) {
 
         }
     }
+    printf("closest Vertex: %d\n", minVertex);
+    
     
     //now find the nearest cover connected to that vertex
-    /*
+    
     minDistance = 1000000.0;
     int minCoverVertex = -1;
     
     if(minVertex != -1) {
         
-        std::map<int, Vector2> coverNodes = this->_graph.getCoverNodes(minVertex);
+        std::vector<int> coverNodes = this->_graph.getCoverNodes(minVertex);
+        std::map<int, Vector2> coverNodeTable = this->_graph.getCoverNodeTable();
+        
+        //printf("cover node test: %d, %d\n", coverNodeTable[1].x, coverNodeTable[1].y);
+        
+        //printf("coverNodeTable size: %ld\n", coverNodeTable.size());
         
         
-        for(const auto& iter : coverNodes) {
+        
+        for(int iter : coverNodes) {
             
+            //printf("%d, ", iter);
             
+            distance = std::sqrt(std::pow(this->_unit.getStaticX() - coverNodeTable[iter].x,2) + std::pow(this->_unit.getStaticY() - coverNodeTable[iter].y,2));
+            printf("%f\n", distance);
             
-            
-            
-            
-            
+            if(distance < minDistance) {
+                minCoverVertex = iter;
+                minDistance = distance;
+            }
         }
+        //printf("\n");
         
+        printf("minCoverVertex: %d\n", minCoverVertex);             //MAKE SURE TO FREE WHEN THE UNIT MOVES AGAIN
+        if(!this->_graph.isCoverOccupied(minCoverVertex)) { //if no other unit is occupying that vertex
+            this->_graph.setCoverToOccupied(minCoverVertex);
+            moveUnitToPosition(coverNodeTable[minCoverVertex].x, coverNodeTable[minCoverVertex].y, graphics);
+        }
+        else {
+            //find the next nearest cover Vertex
+        }
+
         
     }
     
-    */
+    
     
     
 }

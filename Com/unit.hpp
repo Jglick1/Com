@@ -107,6 +107,7 @@ public:
     
     Rectangle getCollisionRect();
     
+    
 private:
     float _dx, _dy;
     float _angle;

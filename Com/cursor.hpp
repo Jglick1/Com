@@ -19,12 +19,20 @@ class Cursor : public Sprite{
 public:
     Cursor();
     Cursor(Graphics &graphics);
-    void update(int elapsedTime, int ym, int old_ym);
+    void update(int elapsedTime, int ym, int old_ym, int xm, int old_xm, double cameraAngle, Graphics &graphics);
     void draw(Graphics &graphics);
+    
+    double getMapX();
+    double getMapY();
+    
+    double getRotatedX();
+    double getRotatedY();
     
 private:
     
     Sprite _cursor;
+    double _mapX, _mapY;
+    double _rotatedX, _rotatedY;
     
 };
 

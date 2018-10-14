@@ -586,7 +586,7 @@ void Game::draw(Graphics &graphics) {
         
         this->_hud.draw(graphics);
         
-        //this->_cursor.draw(graphics);
+        this->_cursor.draw(graphics);
         
         graphics.drawDebug();       //draw all debug lines
         //graphics.eraseDebugLines();      //erase all stored debug lines
@@ -665,6 +665,26 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
         
         
     }
+    else if(this->_actionState == COMMAND) {
+        
+        //graphics.changeAngle(-0.5*(xm - old_xm));
+        
+        
+        //graphics.changeAngle(-180/3.14159*std::atan(((xm - old_xm) / 100.0)));
+        //graphics.setAngle();
+        
+        
+        
+        double dy = (400 - this->_cursor.getMapX());
+        double dx = (640 - this->_cursor.getMapY());
+        
+        graphics.setAngle(180/3.14159*std::atan(dy / dx));
+        
+        
+        
+        
+        
+    }
     
      
     
@@ -676,7 +696,7 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     this->_player.update(elapsedTime, xm, ym);
 
-    this->_cursor.update(elapsedTime, ym, old_ym);
+    this->_cursor.update(elapsedTime, ym, old_ym, xm, old_xm, graphics.getCameraAngle(), graphics);
     
     this->_organizationChart.update(xm, ym);
     

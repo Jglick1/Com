@@ -76,6 +76,7 @@ _numberOfSubFormations(0)
         this->_height = 32;
     }
     
+    
 }
 
 void FormationCard::addSubUnit(UnitCard &subUnit) {

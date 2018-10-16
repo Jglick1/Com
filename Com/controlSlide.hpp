@@ -45,6 +45,8 @@ public:
     
     void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime);
     
+    double getAngle();
+    
 private:
     //float _x, _y;
     float _dx, _dy;

@@ -20,6 +20,7 @@
 //#include "door.hpp"
 #include "controlSlide.hpp"
 #include "graph.hpp"
+#include "gunshotPath.hpp"
 
 class Graphics;
 struct SDL_Texture;
@@ -86,6 +87,13 @@ public:
     void moveUnitToSlidePosition(Graphics &graphics);
     void moveUnitToNearestCover(Graphics &graphics);
     
+    void playerFireShot(Graphics &graphics);
+    
+    Vector2 checkShotCollisionNew(double beginx, double beginy, double angle);
+    
+    void clearGunshotPaths();
+    
+    void moveUnitAngleToSlideAngle(Graphics &graphics);
     
 private:
     //Map _map;
@@ -124,6 +132,8 @@ private:
     
     Graph _graph;
 
+    std::vector<GunshotPath> _gunShotPaths;
+    
 };
 
 struct Tileset {

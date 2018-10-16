@@ -16,6 +16,7 @@
 		411043A021694A8400DCC740 /* unitCard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4110439E21694A8400DCC740 /* unitCard.cpp */; };
 		411043A3216ABBA600DCC740 /* formationCard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411043A1216ABBA600DCC740 /* formationCard.cpp */; };
 		411043A6216AFC0600DCC740 /* plusSign.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411043A4216AFC0600DCC740 /* plusSign.cpp */; };
+		411043A92175711300DCC740 /* gunshotPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411043A72175711300DCC740 /* gunshotPath.cpp */; };
 		419E04C6211541A300FBF9C3 /* hud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04C4211541A300FBF9C3 /* hud.cpp */; };
 		419E04CC2115685300FBF9C3 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04CA2115685300FBF9C3 /* cursor.cpp */; };
 		41D4195620DB531C00A97956 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195520DB531C00A97956 /* main.cpp */; };
@@ -64,6 +65,8 @@
 		411043A2216ABBA600DCC740 /* formationCard.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = formationCard.hpp; sourceTree = "<group>"; };
 		411043A4216AFC0600DCC740 /* plusSign.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = plusSign.cpp; sourceTree = "<group>"; };
 		411043A5216AFC0600DCC740 /* plusSign.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = plusSign.hpp; sourceTree = "<group>"; };
+		411043A72175711300DCC740 /* gunshotPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gunshotPath.cpp; sourceTree = "<group>"; };
+		411043A82175711300DCC740 /* gunshotPath.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gunshotPath.hpp; sourceTree = "<group>"; };
 		419E04C4211541A300FBF9C3 /* hud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hud.cpp; sourceTree = "<group>"; };
 		419E04C5211541A300FBF9C3 /* hud.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = hud.hpp; sourceTree = "<group>"; };
 		419E04CA2115685300FBF9C3 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
@@ -160,6 +163,7 @@
 				4110439E21694A8400DCC740 /* unitCard.cpp */,
 				411043A1216ABBA600DCC740 /* formationCard.cpp */,
 				411043A4216AFC0600DCC740 /* plusSign.cpp */,
+				411043A72175711300DCC740 /* gunshotPath.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -189,6 +193,7 @@
 				4110439F21694A8400DCC740 /* unitCard.hpp */,
 				411043A2216ABBA600DCC740 /* formationCard.hpp */,
 				411043A5216AFC0600DCC740 /* plusSign.hpp */,
+				411043A82175711300DCC740 /* gunshotPath.hpp */,
 			);
 			name = headers;
 			sourceTree = "<group>";
@@ -270,6 +275,7 @@
 				41D4197C20DDF60F00A97956 /* level.cpp in Sources */,
 				41064C9A20FB2C9A004E1EF4 /* controlSlide.cpp in Sources */,
 				419E04C6211541A300FBF9C3 /* hud.cpp in Sources */,
+				411043A92175711300DCC740 /* gunshotPath.cpp in Sources */,
 				41D4197F20DEF8F200A97956 /* unit.cpp in Sources */,
 				41D4197820DDF5B600A97956 /* tile.cpp in Sources */,
 				419E04CC2115685300FBF9C3 /* cursor.cpp in Sources */,

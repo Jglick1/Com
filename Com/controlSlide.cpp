@@ -438,3 +438,7 @@ void ControlSlide::handleTileCollisions(std::vector<Rectangle> &others, float el
      */
 
 }
+
+double ControlSlide::getAngle() {
+    return this->_angle;
+}

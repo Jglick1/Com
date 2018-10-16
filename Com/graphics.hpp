@@ -87,6 +87,12 @@ public:
     void storeLineDebug(int x1, int y1, int x2, int y2, int color);
     void eraseDebugLines();
     
+    void updateFrameTimeIndicator(int elapsedTime);
+    
+    void storeMapLineDebug(int x1, int y1, int x2, int y2, int color);
+    
+    void drawGunshotLine(int x1, int y1, int x2, int y2, int opacity);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -110,6 +116,12 @@ private:
     int _playerCenterY;
     
     std::vector< std::vector<int> > _debugLines;
+    
+    std::vector< std::vector<int> > _mapDebugLines;
+    
+    std::vector<int> _frameTimes;       //size is 100
+    int _frameTimeIndex;
+    
     
     
 };

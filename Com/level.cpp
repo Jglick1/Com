@@ -412,6 +412,30 @@ void Level::update(int elapsedTime, Graphics &graphics) {
     this->_slide.update(elapsedTime, graphics);
     
     
+    
+    
+    //update gunshots
+    
+    std::vector<GunshotPath>::iterator iter = this->_gunShotPaths.begin();//                      THIS IS THE PROBLEM
+    while(iter != this->_gunShotPaths.end()) {
+        //if(iter->update(elapsedTime) == 1) {
+            //iter = this->_gunShotPaths.erase(iter);
+        //}
+        bool dead = iter->update(elapsedTime);
+        if(dead == 1) {
+            this->_gunShotPaths.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+    
+    
+    /*
+    for(GunshotPath &iter : this->_gunShotPaths) {
+        iter.update(elapsedTime);
+    }
+    */
 }
 
 
@@ -500,6 +524,11 @@ void Level::draw(Graphics &graphics) {
     
     //slide
     this->_slide.draw(graphics);
+    
+    //draw all the gunshots
+    for(GunshotPath iter : this->_gunShotPaths) {
+        iter.draw(graphics);
+    }
     
     
 }
@@ -1260,7 +1289,103 @@ bool Level::checkPathCollisionHelp(double beginx, double beginy, double angle, d
     
 }
 
+Vector2 Level::checkShotCollisionNew(double beginx, double beginy, double angle) {
+    
+    
+    //float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
+    float m = 1.0 / std::tan(angle*3.14159/180);
+    
+    float b = beginy - m*beginx;
+    
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    
+    std::vector<Vector2> collisionPoints;
+    
+    for(Rectangle i : this->_collisionRects) {
+        //check bottom
+        collisionx = (i.getStartY()+i.getHeight() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                //return Vector2(collisionx, i.getY()+i.getHeight());
+                collisionPoints.push_back(Vector2(collisionx, i.getStartY()+i.getHeight()));
+                
+            }
+        }
+        
+        
+        
+        //check top
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                //printf("top ");
+                
+                //return Vector2(collisionx, i.getY());
+                collisionPoints.push_back(Vector2(collisionx, i.getStartY()));
+                
+            }
+        }
+        
+        
+        
+        //check left
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartX() > beginx) && angle < 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                //return Vector2(i.getX(),collisiony);
+                collisionPoints.push_back(Vector2(i.getStartX(),collisiony));
+                
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = (i.getStartX()+i.getWidth()) * m + b;
+        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                //return Vector2(i.getX()+i.getWidth(), collisiony);
+                collisionPoints.push_back(Vector2(i.getStartX()+i.getWidth(), collisiony));
+                
+            }
+        }
+    }
+    
+    if(collisionPoints.size() > 0) {
+        
+        double min = 1000000;
+        double weight = 0.0;
+        int nearest = -1;
+        
+        for(int i = 0; i<collisionPoints.size(); i++) {
+            //weight = std::sqrt(std::pow(collisionPoints[i].x - 640,2) + std::pow(collisionPoints[i].y - 400,2));
+            weight = std::sqrt(std::pow(collisionPoints[i].x - beginx,2) + std::pow(collisionPoints[i].y - beginy,2));
+            if(weight < min) {
+                min = weight;
+                nearest = i;
+            }
+        }
+        
+        return collisionPoints[nearest];
+        
+    }
 
+    
+    
+    //no collision
+    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
+    
+    
+    
+}
 
 Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
     
@@ -1455,7 +1580,7 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
     
     
     //no collision
-    return Vector2(0, 0);
+    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
     
 
     
@@ -1547,4 +1672,80 @@ void Level::moveUnitToNearestCover(Graphics &graphics) {
     
     
     
+}
+
+void Level::playerFireShot(Graphics &graphics) {
+    
+    double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+    double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+    
+    //Vector2 shotCollision = checkShotCollision(playerX, playerY, -graphics.getCameraAngle());
+    
+    Vector2 shotCollision = checkShotCollisionNew(playerX, playerY, graphics.getCameraAngle());
+    
+    printf("shotX: %d\t shotY: %d\n", shotCollision.x, shotCollision.y);
+    
+    //graphics.storeMapLineDebug(graphics.getPlayerCenterX(), graphics.getPlayerCenterY(), 0,0,0);
+    
+    //calculate distance to unit
+    //find m
+    
+    double mShot = 1.0 / std::tan(graphics.getCameraAngle()*3.14159/180);
+    //needs to go through player position
+    
+    //printf("mShot: %f\n", mShot);
+    
+    //y = mx + b
+    //playerY = m * playerX + b
+    //b = - m * playerX + playerY
+    
+    double bShot = mShot * (-playerX) + playerY;
+    
+    //now calculate y = mx + b for the perpindicular line
+    
+    double mPerpindicular = 1.0 / mShot;
+    
+    //y = mx + b
+    //yUnit = m xUnit + b
+    //b = - m xUnit + yUnit
+    
+    double bPerpindicular = -mPerpindicular * this->_unit.getStaticX() + this->_unit.getStaticY();
+    
+    //print player shot
+    if(shotCollision.x == 0 && shotCollision.y == 0) {   //if the shot did not collide with anything
+        //graphics.storeMapLineDebug(0, bShot, 1280, mShot * 1280 + bShot, 0);
+        
+        
+        //make sure shot only goes 400 pixels
+        
+        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), std::round(playerX) - 400 * std::sin(graphics.getCameraAngle()*3.14159/180), std::round(playerY) - 400 * std::cos(graphics.getCameraAngle()*3.14159/180), 1000));
+            //lifetime is 3 seconds
+        
+        
+        
+    }
+    else {          //if it did collide with a surface
+        printf("shot collides\n");
+        //graphics.storeMapLineDebug(playerX, playerY, shotCollision.x, shotCollision.y, 0);
+        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotCollision.x, shotCollision.y, 1000)); //lifetime is 3 seconds
+        //put collisions through rotation matrix
+        
+        
+        //double rotatedX = std::cos(graphics.getCameraAngle()*3.14159/180)*(shotCollision.x - 640) - std::sin(graphics.getCameraAngle()*3.14159/180)*(shotCollision.y - 400) + 640;
+        //double rotatedY = std::sin(graphics.getCameraAngle()*3.14159/180)*(shotCollision.x - 640) + std::cos(graphics.getCameraAngle()*3.14159/180)*(shotCollision.y - 400) + 400;
+    }
+    
+    
+    
+    
+    
+    
+}
+
+void Level::clearGunshotPaths() {
+    this->_gunShotPaths.clear();
+}
+
+void Level::moveUnitAngleToSlideAngle(Graphics &graphics) {
+    this->_unit.addToAngleOrders(this->_slide.getAngle());
 }

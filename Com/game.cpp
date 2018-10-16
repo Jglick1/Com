@@ -123,6 +123,9 @@ void Game::gameLoop() {
     
     bool rightMouseClick = 0;
     
+    int FRAME_CALCULATE_TIME_BEGIN = 0;
+    int FRAME_CALCULATE_TIME_END = 0;
+    
     while(true) {
 
         
@@ -152,6 +155,7 @@ void Game::gameLoop() {
             //    this->_deltaY += event.motion.y;
             //}
             if (event.type == SDL_MOUSEBUTTONDOWN) {
+                printf("mouse button down\n");
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     rightMouseDown = 1;
                     if(this->_actionState == NORMAL) {
@@ -161,12 +165,13 @@ void Game::gameLoop() {
                     
                     
                 }
-                else if(event.button.button == SDL_BUTTON_LEFT) {
+                if(event.button.button == SDL_BUTTON_LEFT) {
                     if(this->_actionState == ORGANIZATION) {
                         this->_organizationChart.handleMouseCollision(graphics, xm, ym);
                     }
                     else {
                         this->_actionState = NORMAL;
+                        this->_level.playerFireShot(graphics);
                         printf("left mouse down");
                     }
                     
@@ -249,6 +254,7 @@ void Game::gameLoop() {
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
             //graphics.playShot();
             graphics.eraseDebugLines();
+            this->_level.clearGunshotPaths();
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_O)) {
@@ -266,6 +272,15 @@ void Game::gameLoop() {
         }
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
         if((this->_actionState == COMMAND) && rightMouseClick) {
             if(this->_level.checkSlideCollision(xm, ym)) {
                 this->_actionState = SLIDE_MOVE;
@@ -278,6 +293,7 @@ void Game::gameLoop() {
                 this->_actionState = COMMAND;
                 this->_level.centerSlideToZero();
                 this->_level.moveUnitToSlidePosition(graphics);
+                this->_level.moveUnitAngleToSlideAngle(graphics);
             }
             else {
                 this->_level.handleSlideMovement(xm, ym, graphics);
@@ -287,6 +303,12 @@ void Game::gameLoop() {
             this->_organizationChart.handleMouseHover(xm, ym, graphics);
         }
 
+        
+        
+        
+        
+        
+        
         
         //printGameState(this->_gameState);
         
@@ -318,7 +340,7 @@ void Game::gameLoop() {
         
         
         
-            this->handleMovement(inPower, input, graphics);
+        this->handleMovement(inPower, input, graphics);
         
         
         
@@ -327,30 +349,51 @@ void Game::gameLoop() {
         //this->_unit.moveForward();
         
         
-        const int CURRENT_TIME_MS = SDL_GetTicks();
+        const int CURRENT_TIME_MS = SDL_GetTicks();                         //getting total elapsedTime
         int ELAPSED_TIME_MS = CURRENT_TIME_MS - LAST_UPDATE_TIME;
         
         //this->_graphics = graphics;
         
+        LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        
         this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym, graphics);
         
 
-        LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        this->draw(graphics);
         
-        if (ELAPSED_TIME_MS < MAX_FRAME_TIME) {
-            SDL_Delay(MAX_FRAME_TIME - ELAPSED_TIME_MS);
+        //LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        
+        FRAME_CALCULATE_TIME_END = SDL_GetTicks();
+        
+        //if (ELAPSED_TIME_MS < MAX_FRAME_TIME) {
+        //    SDL_Delay(MAX_FRAME_TIME - ELAPSED_TIME_MS);
+        //}
+        
+        int TOTAL_CALC_TIME = FRAME_CALCULATE_TIME_END - FRAME_CALCULATE_TIME_BEGIN;            //getting time to spare in frame
+        
+        if ((TOTAL_CALC_TIME) < MAX_FRAME_TIME) {
+            SDL_Delay(MAX_FRAME_TIME - (TOTAL_CALC_TIME));
         }
         
-        //printf("Test\n");
+        FRAME_CALCULATE_TIME_BEGIN = SDL_GetTicks();
         
-        this->draw(graphics);
-        //this->_unit.stopMoving();
         
-        //printf("test\n");
+        //LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        
+        
+        //this->draw(graphics);
+
         
         //handle movement
         //update
         //draw
+        
+
+        
+        
+        
+        graphics.updateFrameTimeIndicator(TOTAL_CALC_TIME);
+        //printf("%d\n",TOTAL_CALC_TIME);
         
     }
     
@@ -674,12 +717,21 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
         //graphics.setAngle();
         
         
+        /*
+        double dy = (400 - this->_cursor.getMapY());
+        double dx = (640 - this->_cursor.getMapX());
         
-        double dy = (400 - this->_cursor.getMapX());
-        double dx = (640 - this->_cursor.getMapY());
+        printf("dx: %f,\t dy: %f\n", dx, dy);
         
-        graphics.setAngle(180/3.14159*std::atan(dy / dx));
+        //printf("mapX: %f \t mapY: %f\n", this->_cursor.getMapX(), this->_cursor.getMapY());
         
+        if(dy >= 0) {
+            graphics.setAngle(180/3.14159*std::atan(dx / dy));
+        }
+        else {
+            graphics.setAngle(180/3.14159*std::atan(dx / dy) + 180);
+        }
+        */
         
         
         

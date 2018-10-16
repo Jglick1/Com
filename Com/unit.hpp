@@ -107,6 +107,8 @@ public:
     
     Rectangle getCollisionRect();
     
+    void addToAngleOrders(double angle);
+    void moveToAngle(double angle);
     
 private:
     float _dx, _dy;
@@ -126,6 +128,7 @@ private:
     Direction _destinationDirection;
     
     std::vector<Vector2> _unitMovementOrders;
+    std::vector<double> _unitAngleOrders;
     
     Rectangle _collisionRect;
     

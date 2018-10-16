@@ -26,7 +26,8 @@ Graphics::Graphics() :
     _cameraDx(0.0),
     _cameraDy(0.0),
     _playerCenterX(640.0),
-    _playerCenterY(400.0)
+    _playerCenterY(400.0),
+    _frameTimeIndex(0)
     {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
     SDL_SetWindowTitle(this->_window, "Com");
@@ -45,7 +46,17 @@ Graphics::Graphics() :
     
     //SDL_WarpMouseInWindow(this->_window, 10, 10);
     //SDL_SetWindowFullscreen(this->_window, SDL_WINDOW_FULLSCREEN);
+        
+        for(int i = 0; i < 100; i++) {
+            this->_frameTimes.push_back(0);
+        }
     
+        
+        
+        
+        
+        
+        SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);   //for the transparent gunshots
 }
 
 Graphics::~Graphics() {
@@ -246,6 +257,7 @@ void Graphics::setCameraY(double y) {
 }
 
 void Graphics::drawDebug() {
+    //draw debug lines
     for(std::vector<int> line : this->_debugLines) {
         if(!(line[4] == 0)) {
             SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
@@ -256,7 +268,36 @@ void Graphics::drawDebug() {
         SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //back to black
         
     }
-
+    
+    
+    //draw map debug lines
+    for(std::vector<int> line : this->_mapDebugLines) {
+        if(!(line[4] == 0)) {
+            SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
+        }
+        
+        SDL_RenderDrawLine(this->_renderer, line[0] + this->_cameraX, line[1] + this->_cameraY, line[2] + this->_cameraX, line[3] + this->_cameraY); // x1, y1, x2, y2
+        
+        SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //back to black
+        
+    }
+    
+    
+    
+    
+    
+    //drawFrameTimes
+    
+    SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
+    for(int i = 0; i < 100; i++) {      //max frame time at 30 FPS. 1000 / 30
+        drawLine(i, 100, i, this->_frameTimes.at(i)/33.33*100);
+    }
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
+    
+    
+    
+    
+    
 }
 
 
@@ -269,5 +310,31 @@ void Graphics::storeLineDebug(int x1, int y1, int x2, int y2, int color) {
 void Graphics::eraseDebugLines() {
     
     this->_debugLines.clear();
+    this->_mapDebugLines.clear();
+    
+}
+
+void Graphics::updateFrameTimeIndicator(int elapsedTime) {
+    
+    this->_frameTimes[this->_frameTimeIndex] = elapsedTime;
+    
+    
+    this->_frameTimeIndex = (this->_frameTimeIndex+1) % 100;
+    //printf("%d\n",this->_frameTimeIndex);
+}
+
+void Graphics::storeMapLineDebug(int x1, int y1, int x2, int y2, int color) {
+    std::vector<int> line = {x1, y1, x2, y2, color};
+    
+    this->_mapDebugLines.push_back(line);
+}
+
+void Graphics::drawGunshotLine(int x1, int y1, int x2, int y2, int opacity) {
+    //SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, opacity);
+    
+    SDL_RenderDrawLine(this->_renderer, x1, y1, x2, y2);
+    
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
     
 }

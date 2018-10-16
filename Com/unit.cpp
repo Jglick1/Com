@@ -187,6 +187,22 @@ void Unit::moveToNextPosition() {
     if(this->_unitMovementOrders.size() > 0) {
         moveToPosition(this->_unitMovementOrders[0].x, this->_unitMovementOrders[0].y);
     }
+    else if (this->_unitAngleOrders.size() > 0){
+        moveToAngle(this->_unitAngleOrders.at(0));
+        this->_unitAngleOrders.erase(this->_unitAngleOrders.begin());//erase last order
+    }
+}
+
+void Unit::moveToAngle(double angle) {
+    
+    this->_destinationAngle = angle;
+    
+    if(this->_angle >= this->_destinationAngle) {
+        this->_state = CHANGE_ANGLE_DOWN;
+    }
+    else {
+        this->_state = CHANGE_ANGLE_UP;         //TODO. decided whether to go up or down
+    }
 }
 
 void Unit::moveToPosition(int posX, int posY) {
@@ -590,7 +606,9 @@ void Unit::handleMovement() {
             }
             else {
                 this->_angle = this->_destinationAngle;
-                this->_state = MOVE_FORWARD;
+                if(this->_unitMovementOrders.size() > 0) {
+                    this->_state = MOVE_FORWARD;
+                }
             }
             break;
         case CHANGE_ANGLE_DOWN:
@@ -599,7 +617,9 @@ void Unit::handleMovement() {
             }
             else {
                 this->_angle = this->_destinationAngle;
-                this->_state = MOVE_FORWARD;
+                if(this->_unitMovementOrders.size() > 0) {
+                    this->_state = MOVE_FORWARD;
+                }
             }
             break;
         case MOVE_FORWARD:
@@ -742,6 +762,10 @@ void Unit::addToMovementOrders(Vector2 pos) {
 
     this->_unitMovementOrders.push_back(pos);
     
+}
+
+void Unit::addToAngleOrders(double angle) {
+    this->_unitAngleOrders.push_back(angle);
 }
 
 void Unit::printMovementOrders() {

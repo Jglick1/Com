@@ -16,7 +16,8 @@ _beginX(beginX),
 _beginY(beginY),
 _endX(endX),
 _endY(endY),
-_lifeTime(lifeTime)
+_lifeTime(lifeTime),
+_age(0)
 {
     
 }

@@ -33,6 +33,7 @@ Level::Level() {
 
 Level::Level(std::string mapName, Graphics &graphics) :
     Map(graphics, "/Users/jonahglick/Documents/Com/com_test5.png", 0, 0, 1280, 800, 0, 0),
+    //Map(graphics, "/Users/jonahglick/Documents/Com/village-deshast-large.png", 0, 0, 1714, 2400, 0, 0),
 	_mapName(mapName),
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
@@ -811,7 +812,7 @@ void Level::handleUnitMovement() {
 void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graphics for testing
     //check if the path is clear
     
-    bool temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, posX+8, posY+8, graphics);
+    bool temp = checkPathCollisionNew(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, posX+8, posY+8, graphics);
     //printf("temp: %d\n", temp);
     
     //printf("%d, %d\n", posX, posY);
@@ -845,11 +846,11 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
         double weight = 0.0;
         
         for(const auto& iter : vertices) {
-            temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
+            temp = checkPathCollisionNew(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
             printf("vertex: %d \t collision:%d\n", iter.first, temp);
             
             
-            tempDestination = checkPathCollision(posX+8, posY+8, iter.second.x+8, iter.second.y+8,graphics);
+            tempDestination = checkPathCollisionNew(posX+8, posY+8, iter.second.x+8, iter.second.y+8,graphics);
             
             //printf("destination: %d, %d, %d, %d\n", posX, posY, iter.second.x, iter.second.y);
             
@@ -936,6 +937,64 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
 void Level::centerSlideToZero(){
     this->_slide.centerSlideToZero();
 }
+
+bool Level::checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
+    //we're going from center of vertices;
+    double xdiff = endx - (beginx);
+    double ydiff = endy - (beginy);
+    
+    double angle = 0.0;
+    
+    if(ydiff < 0) {
+        angle = (-std::atan(xdiff/ydiff)*180/3.14159);
+    }
+    else {
+        angle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
+    }
+    
+    angle = -angle;
+    
+    if(angle > 180) {
+        angle -= 360;
+    }
+    else if(angle < -180) {
+        angle += 360;
+    }
+    
+    double distanceToEnd = std::sqrt(std::pow(beginx - endx,2) + std::pow(beginy - endy,2));
+    
+
+    double topPosX = beginx - 8 * std::cos(angle*3.14159/180);      //radius of unit is 8
+    double topPosY = beginy + 8 * std::sin(angle*3.14159/180);
+    
+    double bottomPosX = beginx + 8 * std::cos(angle*3.14159/180);
+    double bottomPosY = beginy - 8 * std::sin(angle*3.14159/180);
+    
+    
+    Vector2 collisionTop = checkShotCollisionNew(topPosX, topPosY, angle);
+    if(!(collisionTop.x == 0 && collisionTop.y == 0)) { //if there was a collision
+        double distanceToCollision = std::sqrt(std::pow(collisionTop.x - topPosX,2) + std::pow(collisionTop.y - topPosY,2));
+        if(distanceToCollision < distanceToEnd) { // then there is no clear path
+            return 1;
+        }
+    }
+    
+    Vector2 collisionBottom = checkShotCollisionNew(bottomPosX, bottomPosY, angle);
+    if(!(collisionBottom.x == 0 && collisionBottom.y == 0)) { //if there was a collision
+        double distanceToCollision = std::sqrt(std::pow(collisionBottom.x - bottomPosX,2) + std::pow(collisionBottom.y - bottomPosY,2));
+        if(distanceToCollision < distanceToEnd) { // then there is no clear path
+            return 1;
+        }
+    }
+    
+
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, topPosX, topPosY, endx, endy, 6000));
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, bottomPosX, bottomPosY, endx, endy, 6000));
+
+    
+    return 0; //no collision
+}
+
 
 
 bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
@@ -1683,7 +1742,7 @@ void Level::playerFireShot(Graphics &graphics) {
     
     Vector2 shotCollision = checkShotCollisionNew(playerX, playerY, graphics.getCameraAngle());
     
-    printf("shotX: %d\t shotY: %d\n", shotCollision.x, shotCollision.y);
+    //printf("shotX: %d\t shotY: %d\n", shotCollision.x, shotCollision.y);
     
     //graphics.storeMapLineDebug(graphics.getPlayerCenterX(), graphics.getPlayerCenterY(), 0,0,0);
     
@@ -1703,42 +1762,56 @@ void Level::playerFireShot(Graphics &graphics) {
     
     //now calculate y = mx + b for the perpindicular line
     
-    double mPerpindicular = 1.0 / mShot;
+    double mPerpindicular = - 1.0 / mShot;
     
     //y = mx + b
     //yUnit = m xUnit + b
     //b = - m xUnit + yUnit
     
-    double bPerpindicular = -mPerpindicular * this->_unit.getStaticX() + this->_unit.getStaticY();
+    double bPerpindicular = -mPerpindicular * (this->_unit.getStaticX()+8) + (this->_unit.getStaticY() + 12);
     
     //print player shot
     if(shotCollision.x == 0 && shotCollision.y == 0) {   //if the shot did not collide with anything
         //graphics.storeMapLineDebug(0, bShot, 1280, mShot * 1280 + bShot, 0);
         
-        
         //make sure shot only goes 400 pixels
         
         this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), std::round(playerX) - 400 * std::sin(graphics.getCameraAngle()*3.14159/180), std::round(playerY) - 400 * std::cos(graphics.getCameraAngle()*3.14159/180), 1000));
-            //lifetime is 3 seconds
-        
-        
-        
+            //lifetime is 1 second
     }
     else {          //if it did collide with a surface
-        printf("shot collides\n");
-        //graphics.storeMapLineDebug(playerX, playerY, shotCollision.x, shotCollision.y, 0);
-        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotCollision.x, shotCollision.y, 1000)); //lifetime is 3 seconds
-        //put collisions through rotation matrix
-        
-        
-        //double rotatedX = std::cos(graphics.getCameraAngle()*3.14159/180)*(shotCollision.x - 640) - std::sin(graphics.getCameraAngle()*3.14159/180)*(shotCollision.y - 400) + 640;
-        //double rotatedY = std::sin(graphics.getCameraAngle()*3.14159/180)*(shotCollision.x - 640) + std::cos(graphics.getCameraAngle()*3.14159/180)*(shotCollision.y - 400) + 400;
+
+        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotCollision.x, shotCollision.y, 1000)); //lifetime is 1 second
+
     }
     
+    //print perpindicular shot
     
     
     
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, 0, bPerpindicular, 1280, mPerpindicular * 1280 + bPerpindicular, 1000));
     
+    
+    //graphics.storeLineDebug(0, bPerpindicular, 1280, mPerpindicular * 1280 + bPerpindicular,0);
+    //printf("b: %f \t m: %f\n",bPerpindicular,mPerpindicular);
+    
+    //find (x, y) where lines collide
+    // y = mPerpindicular * x + bPerpindicular
+    // y = mShot * x + bShot
+    
+    //x = (-Bperp + Bshot) / (Mperp - Mshot)
+    //y = (Bshot*Mperp - Bperp*Mshot)/(Mperp - Mshot)
+    
+    double closestPointX = (-bPerpindicular + bShot) / (mPerpindicular - mShot);
+    double closestPointY = (bShot*mPerpindicular - bPerpindicular*mShot)/(mPerpindicular - mShot);
+    
+    double shotCollisionDistance = std::sqrt(std::pow(shotCollision.x - playerX,2) + std::pow(shotCollision.y - playerY,2));
+    double closestColllisionDistance = std::sqrt(std::pow(closestPointX - playerX,2) + std::pow(closestPointY - playerY,2));
+    
+    if((shotCollision.x == 0 && shotCollision.y == 0) || (shotCollisionDistance > closestColllisionDistance)) { //if no collision, or shot collision is farther from player than closest point
+        this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
+    }
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
     
 }
 

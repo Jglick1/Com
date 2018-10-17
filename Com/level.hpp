@@ -95,6 +95,8 @@ public:
     
     void moveUnitAngleToSlideAngle(Graphics &graphics);
     
+    bool checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Graphics &graphics);
+    
 private:
     //Map _map;
 	std::string _mapName;

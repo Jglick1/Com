@@ -22,7 +22,7 @@ namespace player_constants {
 Graphics::Graphics() :
     _cameraX(0.0),
     _cameraY(0.0),
-    _cameraAngle(0.0),
+    _cameraAngle(0.01),
     _cameraDx(0.0),
     _cameraDy(0.0),
     _playerCenterX(640.0),

@@ -248,7 +248,8 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
-            this->_level.moveUnitToPosition(0, 0, graphics);
+            //this->_level.moveUnitToPosition(0, 0, graphics);
+            graphics.drawShape();
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {

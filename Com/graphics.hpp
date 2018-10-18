@@ -15,6 +15,7 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
+#include <SDL2_gfx/SDL2_gfxPrimitives.h>
 //#include "globals.hpp"
 #include <vector>
 
@@ -92,6 +93,8 @@ public:
     void storeMapLineDebug(int x1, int y1, int x2, int y2, int color);
     
     void drawGunshotLine(int x1, int y1, int x2, int y2, int opacity);
+    
+    void drawShape();
     
 private:
     SDL_Window* _window;

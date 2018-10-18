@@ -257,6 +257,11 @@ void Graphics::setCameraY(double y) {
 }
 
 void Graphics::drawDebug() {
+    
+    
+    drawShape();
+    
+    
     //draw debug lines
     for(std::vector<int> line : this->_debugLines) {
         if(!(line[4] == 0)) {
@@ -296,7 +301,7 @@ void Graphics::drawDebug() {
     
     
     
-    
+    //drawShape();
     
 }
 
@@ -332,9 +337,38 @@ void Graphics::storeMapLineDebug(int x1, int y1, int x2, int y2, int color) {
 void Graphics::drawGunshotLine(int x1, int y1, int x2, int y2, int opacity) {
     //SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, opacity);
+    printf("opacity: %d\n", opacity);
     
     SDL_RenderDrawLine(this->_renderer, x1, y1, x2, y2);
     
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
     
+}
+
+void Graphics::drawShape() {
+    
+    const Sint16 vx[3] = {100, 200, 300};
+    const Sint16 vy[3] = {100, 200, 100};
+    
+    //const Sint16 vx[1] = {100};
+    //const Sint16 vy[1] = {100};
+    
+    //const Sint16 * pVx = vx;
+    //const Sint16 * pVy = vy;
+    
+    //Uint32 color = 0xff00ff00;    //green               //0xAABBGGRR
+    //Uint32 color = 0xffffff;
+    
+    Uint32 color = 0xfe00ff00; //for some reason an ff opacity messes up the opacity of the gunshots
+    
+    filledPolygonColor(this->_renderer, vx, vy, 3, color);
+    
+    //filledPolygonColor(this->_renderer, pVx, pVy, 3, 0xff0000ff);
+    
+    
+    
+    //SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //need to put draw color back to black
+    
+    //bool test = filledPolygonColor(this->_renderer, pVx, pVy, 4, color);
+    //printf("test: %d\n", test);
 }

@@ -64,6 +64,11 @@ private:
     
     std::map<int, bool> _coverNodeOccupiedTable; //covernode
     
+    
+    
+    
+    std::map<int, std::vector<Vector2> > _buildingToIndoorCoverNodes;
+    
 };
 
 

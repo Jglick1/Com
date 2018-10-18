@@ -136,6 +136,11 @@ private:
 
     std::vector<GunshotPath> _gunShotPaths;
     
+    std::vector<Rectangle> _buildings;
+    
+    
+    
+    
 };
 
 struct Tileset {

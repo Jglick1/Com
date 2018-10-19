@@ -248,8 +248,8 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
-            //this->_level.moveUnitToPosition(0, 0, graphics);
-            graphics.drawShape();
+            this->_level.moveUnitToPosition(0, 0, graphics);
+            //graphics.drawShape();
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
@@ -289,12 +289,12 @@ void Game::gameLoop() {
             }
         }
         
-        if(this->_actionState == SLIDE_MOVE) {
+        if(this->_actionState == SLIDE_MOVE) {                      //slider is released
             if(rightMouseDown == 0) {   //sliders is released
                 this->_actionState = COMMAND;
-                this->_level.centerSlideToZero();
-                this->_level.moveUnitToSlidePosition(graphics);
-                this->_level.moveUnitAngleToSlideAngle(graphics);
+                
+                this->_level.handleSlideRelease(graphics);
+                
             }
             else {
                 this->_level.handleSlideMovement(xm, ym, graphics);
@@ -754,7 +754,7 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     this->_organizationChart.update(xm, ym);
     
     
-                                                                //handle collisions shoudl come after update for some reason
+                                                                //handle collisions should come after update for some reason
     std::vector<Rectangle> others;
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);

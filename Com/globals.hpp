@@ -67,6 +67,10 @@ enum State {
     CHANGE_ANGLE_UP, CHANGE_ANGLE_DOWN, MOVE_FORWARD, STILL
 };
 
+enum FoWNodePosition {
+    BL, BR, TL, TR, IN      //in is for inner nodes
+};
+
 struct Vector2 {
     int x, y;
     Vector2() : x(0), y(0) {}
@@ -76,15 +80,44 @@ struct Vector2 {
     }
 };
 
-struct Cover {
+struct CoverNode {
     int x, y;
     bool occupied;
     int id;
-    Direction shootDirection;
+    double angle;
+    //Direction shootDirection;
     
+    CoverNode() : x(0), y(0), angle(0.0) {}
+    CoverNode(int x, int y, double angle) : x(x), y(y), angle(angle) {}
     
-    Cover() : x(0), y(0), shootDirection(NONE) {}
-    Cover(int x, int y, Direction direction) : x(x), y(y), shootDirection(direction) {}
+    //CoverNode() : x(0), y(0), shootDirection(NONE) {}
+    //CoverNode(int x, int y, Direction direction) : x(x), y(y), shootDirection(direction) {}
+    
+};
+
+struct CornerNode {
+    int x, y;
+    int id;
+    Direction directionOfCorner;
+    
+    CornerNode() : x(0), y(0), directionOfCorner(NONE) {}
+    CornerNode(int x, int y, Direction direction) : x(x), y(y), directionOfCorner(direction) {}
+    
+};
+
+struct FoWNode {
+    int x, y;
+    FoWNodePosition positionOnRectangle;
+    FoWNode() : x(0), y(0), positionOnRectangle(IN) {}
+    FoWNode(int x, int y, FoWNodePosition positionOnRectangle) : x(x), y(y), positionOnRectangle(positionOnRectangle) {}
+};
+
+struct PolygonCorner {
+    int x, y;
+    double angle;
+    bool isExtension;
+    
+    PolygonCorner(int x, int y, double angle, bool isExtension) : x(x), y(y), angle(angle), isExtension(isExtension) {}
     
 };
 

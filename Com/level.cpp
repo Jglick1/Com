@@ -249,11 +249,13 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 if (pObject != NULL) {
                     while (pObject) {
                         
-                        int id = pObject->IntAttribute("name");
+                        int id = pObject->IntAttribute("name");     //read in direction here
                         int x = pObject->IntAttribute("x");
                         int y = pObject->IntAttribute("y");
                         this->_graph.addToVertexTable(id, x, y);
                         
+                        
+                        this->_cornerNodes.push_back(CornerNode(x + 8, y + 8, NONE)); //center of the corners
                         
                         //int idNext = pObject->IntAttribute("edge")
                         
@@ -364,7 +366,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 if (pObject != NULL) {
                     while (pObject) {
                         
-                        printf("add to cover table\n");
+                        //printf("add to cover table\n");
                         
                         int id = pObject->IntAttribute("name");
                         int x = pObject->IntAttribute("x");
@@ -376,6 +378,69 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                         else {
                             tempForCoverTable.insert(std::make_pair(id, Vector2(x, y)));
                         }
+                        
+                        
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                
+            }
+            else if (ss.str() == "building") {                                         //needs to come after graph has been created. graph is created in "corners" so "corner" must come first
+                
+                //add all building rects to cover building table
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+
+                        
+                        int id = pObject->IntAttribute("name");
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        int width = pObject->IntAttribute("width");
+                        int height = pObject->IntAttribute("height");
+                        
+                        
+                        Rectangle building(x, y, width, height);
+                        
+                        this->_buildings.push_back(building);
+                        
+                        
+                        
+                        if(cornerHasBeenCalled) { //then graph has already been initlized
+                            this->_graph.addToCoverTable(id, x, y);
+                        }
+                        else {
+                            tempForCoverTable.insert(std::make_pair(id, Vector2(x, y)));
+                        }
+                        
+                        
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                
+            }
+            
+            else if (ss.str() == "FoWCorners") {
+                
+                //add all FoWCorners to FoWCorners vector
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        int position = pObject->IntAttribute("name");       //maybe don't need id
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        
+                        //0 - TL
+                        //1 - TR
+                        //2 - BR
+                        //3 - BL
+                        //4 - IN
+                        
+                        FoWNodePosition nodePosition = intToNodePosition(position); //maybe change this to string to node position
+                        
+                        this->_FoWNode.push_back(FoWNode(x, y, nodePosition));
                         
                         
                         pObject = pObject->NextSiblingElement("object");
@@ -532,6 +597,9 @@ void Level::draw(Graphics &graphics) {
     }
     
     
+    //draw polygon corners
+    drawFogOfWar(graphics);
+    
 }
 
 
@@ -562,6 +630,36 @@ std::vector<Door> Level::checkDoorCollisions(const Rectangle &other) {
 
 const Vector2 Level::getPlayerSpawnPoint() const {
 	return this->_spawnPoint;
+}
+
+void Level::handleSlideRelease(Graphics &graphics) {
+    centerSlideToZero();
+    
+    //check to see if the slide is in a building
+    //if(this->_level.) { //if slide is in a building
+    bool isInBuilding = 0;
+    
+    for(Rectangle i : this->_buildings) {
+        Vector2 center = this->_slide.getCenter();
+        if((center.x > i.getStartX()) && (center.x < i.getStartX() + i.getWidth())) {
+            if((center.y > i.getStartY()) && (center.y < i.getStartY() + i.getHeight())) {
+                
+                printf("in building\n");
+                //isInBuilding = 1;
+            }
+        }
+    }
+    
+    
+    if(0) { //if is in building. Find preferredNode;
+        
+    }
+    else {
+        moveUnitToSlidePosition(graphics);
+        moveUnitAngleToSlideAngle(graphics);
+    }
+    
+
 }
 
 
@@ -707,7 +805,6 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
                     //this->_dy = 0.0f;
                     
 
-                    
                     graphics.setCameraY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 392);
 
                     
@@ -1419,7 +1516,7 @@ Vector2 Level::checkShotCollisionNew(double beginx, double beginy, double angle)
     }
     
     if(collisionPoints.size() > 0) {
-        
+
         double min = 1000000;
         double weight = 0.0;
         int nearest = -1;
@@ -1822,3 +1919,365 @@ void Level::clearGunshotPaths() {
 void Level::moveUnitAngleToSlideAngle(Graphics &graphics) {
     this->_unit.addToAngleOrders(this->_slide.getAngle());
 }
+
+void Level::drawFogOfWar(Graphics &graphics) {
+    //erase last frame's polygon corners       // only if unit moves, TODO
+    this->_polygonCorners.clear();
+    
+    
+    //first check camera corners
+    double cameraX = -graphics.getCameraX();
+    double cameraY = -graphics.getCameraY();
+    std::vector<Vector2> corners = {Vector2(cameraX+1,cameraY+1), Vector2(cameraX + 1280, cameraY), Vector2(cameraX + 1280, cameraY + 800), Vector2(cameraX, cameraY + 800)};   //change the +1 of the top left corner
+    
+    
+    for(Vector2 iter : corners) {
+        double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        
+        //find angle to point           /I shoudl for sure make this its own function. I use it a lot
+        double xdiff = iter.x - (playerX);
+        double ydiff = iter.y - (playerY);
+        
+        graphics.drawLine(playerX + graphics.getCameraX(), playerY + graphics.getCameraY(), iter.x + graphics.getCameraX(), iter.y + graphics.getCameraY());
+        
+        double angle = 0.0;
+        
+        if(ydiff < 0) {
+            angle = (-std::atan(xdiff/ydiff)*180/3.14159);
+        }
+        else {
+            angle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
+        }
+        
+        angle = -angle;
+        
+        if(angle > 180) {
+            angle -= 360;
+        }
+        else if(angle < -180) {
+            angle += 360;
+        }
+        
+        //don't return a corner
+        //Vector2 view = checkShotCollisionNew(playerX, playerY, angle);                 //may be way faster to do this with mx + b. Since atan takes a lot of cycles
+        
+        double distanceToNode = std::sqrt(std::pow(xdiff,2) + pow(ydiff,2));
+        
+        Vector2 view = checkShotCollisionFoW(playerX, playerY, angle, iter.x, iter.y);
+        if(!(view.x == 0 && view.y == 0)) { // if there was a collision
+            double distanceToCollision = std::sqrt(std::pow(playerX - view.x,2) + pow(playerY - view.y,2));
+            
+            if(distanceToNode > distanceToCollision) {
+                //then corner is visible
+                //add corner to polygon corner
+                this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+                
+                
+                
+            }
+            
+        }
+        
+    }
+    
+    //Get corners of polygon
+    for(FoWNode iter : this->_FoWNode) {
+        //check if corner is visible
+        
+        double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        
+        //find angle to point           /I shoudl for sure make this its own function. I use it a lot
+        double xdiff = iter.x - (playerX);
+        double ydiff = iter.y - (playerY);
+        
+        graphics.drawLine(playerX + graphics.getCameraX(), playerY + graphics.getCameraY(), iter.x + graphics.getCameraX(), iter.y + graphics.getCameraY());
+        
+        double angle = 0.0;
+        
+        if(ydiff < 0) {
+            angle = (-std::atan(xdiff/ydiff)*180/3.14159);
+        }
+        else {
+            angle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
+        }
+        
+        angle = -angle;
+        
+        if(angle > 180) {
+            angle -= 360;
+        }
+        else if(angle < -180) {
+            angle += 360;
+        }
+        
+        //don't return a corner
+        //Vector2 view = checkShotCollisionNew(playerX, playerY, angle);                 //may be way faster to do this with mx + b. Since atan takes a lot of cycles
+        
+        Vector2 view = checkShotCollisionFoW(playerX, playerY, angle, iter.x, iter.y);
+        
+        double distanceToNode = std::sqrt(std::pow(xdiff,2) + pow(ydiff,2));
+
+        
+        if(!(view.x == 0 && view.y == 0)) { // if there was a collision
+            double distanceToCollision = std::sqrt(std::pow(playerX - view.x,2) + pow(playerY - view.y,2));
+            
+            if(distanceToNode < distanceToCollision) {
+                //then corner is visible
+                //add corner to polygon corner
+                this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+
+                bool lookOver = shouldNextCollisionBeIncluded(playerX, playerY, iter);
+                
+                if(lookOver) {
+                    this->_polygonCorners.push_back(view);
+                }
+                
+            }
+
+        }
+        else { //no collision. Corner is visible
+            //add corner to polygon corner
+            this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+            
+            //add edge of screen to polygon corner                                          //TODO
+            bool lookOver = shouldNextCollisionBeIncluded(playerX, playerY, iter);
+            
+            
+            
+            
+            
+            
+        }
+
+    }
+    
+    //sort polygon nodes
+    
+    
+    
+    
+    
+    
+    
+    //draw polygon
+    drawPolygonCorners(graphics);
+    
+    
+    
+    
+    
+    
+}
+
+bool Level::arePointsVeryClose(Vector2 node1, Vector2 node2) {
+    double distance = std::sqrt(std::pow(node1.x - node2.x,2) + std::pow(node1.y - node2.y,2));
+    if(distance < 4.0) {
+        return 1;
+    }
+    return 0;
+}
+
+void Level::drawPolygonCorners(Graphics &graphics) {
+    //printf("polygonCorners size: %d\n", this->_polygonCorners.size());
+    for(Vector2 iter : this->_polygonCorners) {
+        graphics.drawCircle(iter.x + graphics.getCameraX(), iter.y + graphics.getCameraY());
+    }
+}
+
+Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle, double endx, double endy) {
+    
+    
+    //need to also include boundaries of the camera
+    
+    
+    
+    
+    float m = 1.0 / std::tan(angle*3.14159/180);
+    
+    float b = beginy - m*beginx;
+    
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    
+    std::vector<Vector2> collisionPoints;
+    
+    Vector2 cornerVector(endx, endy);
+    
+    for(Rectangle i : this->_collisionRects) {
+        //check bottom
+        collisionx = (i.getStartY()+i.getHeight() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                /*
+                double xColl = collisionx;
+                double yColl = i.getStartY()+i.getHeight();
+                
+                Vector2 collisionVector(xColl, yColl);
+                
+                bool samePoint = arePointsVeryClose(cornerVector, collisionVector);
+                
+                if(!samePoint) {        //if the collision is not the corner we are testing
+                    collisionPoints.push_back(collisionVector);
+                }
+                */
+                
+                
+                Vector2 collisionVector(collisionx, i.getStartY()+i.getHeight());
+                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
+                    collisionPoints.push_back(collisionVector);
+                }
+                
+
+                
+            }
+        }
+        
+        
+        
+        //check top
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                Vector2 collisionVector(collisionx, i.getStartY());
+                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
+                    collisionPoints.push_back(collisionVector);
+                }
+                //collisionPoints.push_back(Vector2(collisionx, i.getStartY()));
+                
+            }
+        }
+        
+        
+        
+        //check left
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartX() > beginx) && angle < 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                //collisionPoints.push_back(Vector2(i.getStartX(),collisiony));
+                
+                Vector2 collisionVector(i.getStartX(), collisiony);
+                
+                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
+                    collisionPoints.push_back(collisionVector);
+                }
+                
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = (i.getStartX()+i.getWidth()) * m + b;
+        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                //collisionPoints.push_back(Vector2(i.getStartX()+i.getWidth(), collisiony));
+                
+                
+                Vector2 collisionVector(i.getStartX()+i.getWidth(), collisiony);
+                
+                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
+                    collisionPoints.push_back(collisionVector);
+                }
+                
+                
+            }
+        }
+    }
+    
+    if(collisionPoints.size() > 0) {
+        
+        double min = 1000000;
+        double weight = 0.0;
+        int nearest = -1;
+        
+        for(int i = 0; i<collisionPoints.size(); i++) {
+            //weight = std::sqrt(std::pow(collisionPoints[i].x - 640,2) + std::pow(collisionPoints[i].y - 400,2));
+            weight = std::sqrt(std::pow(collisionPoints[i].x - beginx,2) + std::pow(collisionPoints[i].y - beginy,2));
+            if(weight < min) {
+                min = weight;
+                nearest = i;
+            }
+        }
+        
+        return collisionPoints[nearest];
+        
+    }
+    
+    
+    
+    //no collision
+    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
+    
+    
+    
+}
+
+FoWNodePosition Level::intToNodePosition(int position) {
+    switch(position) {
+        case 0:
+            return TL;
+            break;
+        case 1:
+            return TR;
+            break;
+        case 2:
+            return BR;
+            break;
+        case 3:
+            return BL;
+            break;
+        case 4:
+            return IN;
+            break;
+        default:
+            return IN;
+            break;
+    }
+}
+
+bool Level::shouldNextCollisionBeIncluded(double playerX, double playerY, FoWNode iter) {
+    
+    switch(iter.positionOnRectangle) {
+        case(TL):
+            if(((playerX < iter.x) && (playerY > iter.y)) || ((playerX > iter.x) && (playerY < iter.y))) {
+                return 1;
+            }
+            return 0;
+            break;
+        case(TR):
+            if(((playerX > iter.x) && (playerY > iter.y)) || ((playerX < iter.x) && (playerY < iter.y))) {
+                return 1;
+            }
+            return 0;
+            break;
+        case(BR):
+            if(((playerX < iter.x) && (playerY > iter.y)) || ((playerX > iter.x) && (playerY < iter.y))) {  //same as TL
+                return 1;
+            }
+            return 0;
+            break;
+        case(BL):
+            if(((playerX > iter.x) && (playerY > iter.y)) || ((playerX < iter.x) && (playerY < iter.y))) {  //same as TR
+                return 1;
+            }
+            return 0;
+            break;
+        case(IN):
+            return 0;
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
+

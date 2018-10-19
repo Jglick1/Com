@@ -96,6 +96,8 @@ public:
     
     void drawShape();
     
+    void drawCircle(int x, int y);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

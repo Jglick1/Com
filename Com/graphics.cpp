@@ -337,7 +337,7 @@ void Graphics::storeMapLineDebug(int x1, int y1, int x2, int y2, int color) {
 void Graphics::drawGunshotLine(int x1, int y1, int x2, int y2, int opacity) {
     //SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, opacity);
-    printf("opacity: %d\n", opacity);
+    //printf("opacity: %d\n", opacity);
     
     SDL_RenderDrawLine(this->_renderer, x1, y1, x2, y2);
     
@@ -367,8 +367,14 @@ void Graphics::drawShape() {
     
     
     
-    //SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //need to put draw color back to black
+    const Sint16 vx1[4] = {600, 800, 800, 600};
+    const Sint16 vy1[4] = {600, 600, 800, 800};
     
-    //bool test = filledPolygonColor(this->_renderer, pVx, pVy, 4, color);
-    //printf("test: %d\n", test);
+    color = 0xfe00ff00;
+    
+    filledPolygonColor(this->_renderer, vx1, vy1, 4, color);
+}
+
+void Graphics::drawCircle(int x, int y) {
+    circleColor(this->_renderer, x, y, 10, 0xfe0000ff); //red
 }

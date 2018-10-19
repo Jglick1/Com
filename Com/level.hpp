@@ -97,6 +97,20 @@ public:
     
     bool checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Graphics &graphics);
     
+    void handleSlideRelease(Graphics &graphics);
+    
+    void drawFogOfWar(Graphics &graphics);
+    
+    void drawPolygonCorners(Graphics &graphics);
+    
+    bool arePointsVeryClose(Vector2 node1, Vector2 node2);
+    
+    Vector2 checkShotCollisionFoW(double beginx, double beginy, double angle, double endx, double endy);
+    
+    FoWNodePosition intToNodePosition(int position);
+    
+    bool shouldNextCollisionBeIncluded(double playerX, double playerY, FoWNode iter);
+    
 private:
     //Map _map;
 	std::string _mapName;
@@ -138,8 +152,16 @@ private:
     
     std::vector<Rectangle> _buildings;
     
+    std::vector<CornerNode> _cornerNodes;
+    
+    std::vector<Vector2> _polygonCorners;
+    //need to know the angle for each one
+    //need to know if they are extensions of a FoWNode
+        //start the sorting at those points
     
     
+    
+    std::vector<FoWNode> _FoWNode;
     
 };
 

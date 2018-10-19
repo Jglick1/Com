@@ -33,7 +33,7 @@ public:
     void findNextNode(std::vector<int> & vertexPath,std::map<int, double> & h, int currentVertex);
     std::vector<Vector2> convertToMovementOrders(std::vector<int> vertices);
 
-    void addCoverNode(int vertex, std::vector<Cover> coverNodes);
+    void addCoverNode(int vertex, std::vector<CoverNode> coverNodes);
     //std::map<int, Vector2> getCoverNodes(int vertex);
     
     std::map<int, Vector2> getCoverNodeTable(); // coverNode to Coordinates

@@ -47,6 +47,8 @@ public:
     
     double getAngle();
     
+    Vector2 getCenter();
+    
 private:
     //float _x, _y;
     float _dx, _dy;

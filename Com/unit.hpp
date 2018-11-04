@@ -17,13 +17,19 @@
 
 class Graphics;
 
-class Unit : public Sprite {
+class Unit {
     
 public:
     Unit();
-    Unit(Graphics &graphics, Vector2 spawnPoint);
+    ~Unit();
+    Unit(Graphics &graphics, Vector2 spawnPoint, bool allie);
     void draw(Graphics &graphics);
     void update(float elapsedTime, float playerAngle, Graphics &graphics);
+    
+    Sprite _unitSprite;
+    
+    
+    
     
     void moveForward();
     void moveBackward();
@@ -111,6 +117,7 @@ public:
     void moveToAngle(double angle);
     
 private:
+    float _x, _y;
     float _dx, _dy;
     float _angle;
     float _staticdx, _staticdy;
@@ -118,6 +125,8 @@ private:
     //int _mx, _my; //mouse x and mouse y
     //Sprite _fov;
     float _playerAngle;
+    
+    int id;
     
     State _state;
     

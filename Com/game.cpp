@@ -155,11 +155,12 @@ void Game::gameLoop() {
             //    this->_deltaY += event.motion.y;
             //}
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                printf("mouse button down\n");
+                //printf("mouse button down\n");
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     rightMouseDown = 1;
                     if(this->_actionState == NORMAL) {
                         this->_actionState = COMMAND;
+                        graphics.storeCameraCoordinates();
                     }
                     //printf("mouse down\n");
                     
@@ -169,10 +170,13 @@ void Game::gameLoop() {
                     if(this->_actionState == ORGANIZATION) {
                         this->_organizationChart.handleMouseCollision(graphics, xm, ym);
                     }
-                    else {
+                    else if(this->_actionState == COMMAND) {
                         this->_actionState = NORMAL;
+                        //graphics.revertToRegularCameraCoordinates();                      nwe command state
+                    }
+                    else {
                         this->_level.playerFireShot(graphics);
-                        printf("left mouse down");
+                        //printf("left mouse down");
                     }
                     
                 }
@@ -244,7 +248,8 @@ void Game::gameLoop() {
         if(input.wasKeyPressed(SDL_SCANCODE_X)) {
             //this->_level.moveUnitToPosition(480, 336);
             //this->_level.moveUnitToPosition(610, 290);
-            this->_level.moveUnitToPosition(790, 400, graphics);
+            //this->_level.moveUnitToPosition(790, 400, graphics);
+            this->_level.changeDrawFoVNode();
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
@@ -303,7 +308,9 @@ void Game::gameLoop() {
         else if(this->_actionState == ORGANIZATION) {
             this->_organizationChart.handleMouseHover(xm, ym, graphics);
         }
-
+        else if (this->_actionState == COMMAND) {
+            //graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state
+        }
         
         
         

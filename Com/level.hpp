@@ -21,6 +21,7 @@
 #include "controlSlide.hpp"
 #include "graph.hpp"
 #include "gunshotPath.hpp"
+#include "fireteam.hpp"
 
 class Graphics;
 struct SDL_Texture;
@@ -111,6 +112,10 @@ public:
     
     bool shouldNextCollisionBeIncluded(double playerX, double playerY, FoWNode iter);
     
+    bool checkShotCollisionFoWCorner(double beginx, double beginy, double angle, double endx, double endy);
+    
+    void changeDrawFoVNode();
+    
 private:
     //Map _map;
 	std::string _mapName;
@@ -154,7 +159,7 @@ private:
     
     std::vector<CornerNode> _cornerNodes;
     
-    std::vector<Vector2> _polygonCorners;
+    std::vector<PolygonCorner> _polygonCorners;
     //need to know the angle for each one
     //need to know if they are extensions of a FoWNode
         //start the sorting at those points
@@ -162,6 +167,11 @@ private:
     
     
     std::vector<FoWNode> _FoWNode;
+    
+    bool _drawFovNode;
+    
+    Fireteam _fireteam;
+    
     
 };
 

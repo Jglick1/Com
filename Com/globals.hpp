@@ -108,16 +108,30 @@ struct CornerNode {
 struct FoWNode {
     int x, y;
     FoWNodePosition positionOnRectangle;
+    bool isInnerCorner;
     FoWNode() : x(0), y(0), positionOnRectangle(IN) {}
-    FoWNode(int x, int y, FoWNodePosition positionOnRectangle) : x(x), y(y), positionOnRectangle(positionOnRectangle) {}
+    FoWNode(int x, int y, FoWNodePosition positionOnRectangle, bool isInnerCorner) : x(x), y(y), positionOnRectangle(positionOnRectangle), isInnerCorner(isInnerCorner) {}
 };
 
 struct PolygonCorner {
     int x, y;
     double angle;
     bool isExtension;
+    bool isInnerCorner;
     
-    PolygonCorner(int x, int y, double angle, bool isExtension) : x(x), y(y), angle(angle), isExtension(isExtension) {}
+    PolygonCorner(int x, int y, double angle, bool isExtension, bool isInnerCorner) : x(x), y(y), angle(angle), isExtension(isExtension), isInnerCorner(isInnerCorner) {}
+    
+    bool operator < (const PolygonCorner& plgnCnr) const {
+        if(angle == plgnCnr.angle) {
+            return (isExtension > plgnCnr.isExtension); //extensions come first
+        }
+        else {
+            return (angle < plgnCnr.angle);
+        }
+        
+        
+    }
+    
     
 };
 

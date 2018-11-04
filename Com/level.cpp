@@ -45,17 +45,28 @@ Level::Level(std::string mapName, Graphics &graphics) :
     _positiony(0),
     _transx(0),
     _transy(0),
-    _ang(0)
+    _ang(0),
+    _drawFovNode(0)
 {
     //printf("level contructor\n");
     
 	this->loadMap(mapName, graphics);
     
-    this->_unit = Unit(graphics, Vector2(0,0));
+    this->_unit = Unit(graphics, Vector2(0,0), 1);
     
-
+    //std::vector< std::unique_ptr<int> > test;
     
     
+    this->_fireteam = Fireteam();
+    
+    //this->_fireteam.addUnit(new Unit(graphics, Vector2(100,100), 1));
+    
+    
+    //Unit * unitPointer = new Unit(graphics, Vector2(100,100), 1);
+    //std::unique_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
+    //this->_fireteam.addUnit( std::move(tmp) );                          //need to std::move the unique pointer
+    std::shared_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
+    this->_fireteam.addUnit( std::move(tmp) );
     
     //this->_unit.moveToPosition(600, 800);
 
@@ -440,7 +451,39 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                         
                         FoWNodePosition nodePosition = intToNodePosition(position); //maybe change this to string to node position
                         
-                        this->_FoWNode.push_back(FoWNode(x, y, nodePosition));
+                        
+                        bool isInnerCorner = 0;
+                        
+                        
+                        XMLElement * pProperty1 = pObject->FirstChildElement("properties");
+                        if(pProperty1 != NULL) {
+                            
+                            XMLElement * pProperty2 = pProperty1->FirstChildElement("property");
+                            if(pProperty2 != NULL) {
+                                
+                                while(pProperty2) {
+                                    
+                                    std::stringstream ssTemp;
+                                    ssTemp << pProperty2->Attribute("name");
+                                    
+                                    if(ssTemp.str() == "innerCorner") {
+                                        
+                                        isInnerCorner = pProperty2->IntAttribute("value");
+                                         
+
+                                    }
+                                    pProperty2 = pProperty2->NextSiblingElement("property");
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                        
+                        
+                        
+  
+                        this->_FoWNode.push_back(FoWNode(x, y, nodePosition, isInnerCorner));
                         
                         
                         pObject = pObject->NextSiblingElement("object");
@@ -568,6 +611,8 @@ void Level::draw(Graphics &graphics) {
     //unit
     this->_unit.draw(graphics);
     
+    this->_fireteam.draw(graphics);
+    
     //float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
     //float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
     
@@ -598,8 +643,10 @@ void Level::draw(Graphics &graphics) {
     
     
     //draw polygon corners
-    drawFogOfWar(graphics);
     
+    if(this->_drawFovNode) {
+        drawFogOfWar(graphics);
+    }
 }
 
 
@@ -1930,10 +1977,14 @@ void Level::drawFogOfWar(Graphics &graphics) {
     double cameraY = -graphics.getCameraY();
     std::vector<Vector2> corners = {Vector2(cameraX+1,cameraY+1), Vector2(cameraX + 1280, cameraY), Vector2(cameraX + 1280, cameraY + 800), Vector2(cameraX, cameraY + 800)};   //change the +1 of the top left corner
     
+    std::vector<PolygonCorner> polygonEdges;
+    
+    double playerX = 0.0;
+    double playerY = 0.0;
     
     for(Vector2 iter : corners) {
-        double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
-        double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
         
         //find angle to point           /I shoudl for sure make this its own function. I use it a lot
         double xdiff = iter.x - (playerX);
@@ -1959,6 +2010,14 @@ void Level::drawFogOfWar(Graphics &graphics) {
             angle += 360;
         }
         
+        bool view = checkShotCollisionFoWCorner(playerX, playerY, angle, iter.x, iter.y);
+        
+        if(view) {
+            //this->_polygonCorners.push_back(PolygonCorner(iter.x, iter.y, angle - 180, 0));
+            polygonEdges.push_back(PolygonCorner(iter.x, iter.y, angle, 0, 0));
+        }
+        
+        /*
         //don't return a corner
         //Vector2 view = checkShotCollisionNew(playerX, playerY, angle);                 //may be way faster to do this with mx + b. Since atan takes a lot of cycles
         
@@ -1971,19 +2030,23 @@ void Level::drawFogOfWar(Graphics &graphics) {
             if(distanceToNode > distanceToCollision) {
                 //then corner is visible
                 //add corner to polygon corner
-                this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+                this->_polygonCorners.push_back(PolygonCorner(iter.x, iter.y, angle, 0));
                 
                 
                 
             }
             
         }
+         */
         
     }
     
+    //int count = 0;
     //Get corners of polygon
     for(FoWNode iter : this->_FoWNode) {
         //check if corner is visible
+        
+        //iter = this->_FoWNode.at(6);
         
         double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
         double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
@@ -2017,7 +2080,7 @@ void Level::drawFogOfWar(Graphics &graphics) {
         
         Vector2 view = checkShotCollisionFoW(playerX, playerY, angle, iter.x, iter.y);
         
-        double distanceToNode = std::sqrt(std::pow(xdiff,2) + pow(ydiff,2));
+        double distanceToNode = std::sqrt(std::pow(xdiff,2) + std::pow(ydiff,2));
 
         
         if(!(view.x == 0 && view.y == 0)) { // if there was a collision
@@ -2026,36 +2089,202 @@ void Level::drawFogOfWar(Graphics &graphics) {
             if(distanceToNode < distanceToCollision) {
                 //then corner is visible
                 //add corner to polygon corner
-                this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+                this->_polygonCorners.push_back(PolygonCorner(iter.x, iter.y, angle, 0, iter.isInnerCorner));
 
                 bool lookOver = shouldNextCollisionBeIncluded(playerX, playerY, iter);
                 
                 if(lookOver) {
-                    this->_polygonCorners.push_back(view);
+                    this->_polygonCorners.push_back(PolygonCorner(view.x, view.y, angle, 1, iter.isInnerCorner));
                 }
                 
             }
 
         }
+        /*              //there will always be a collision, if only with the camera bounds
         else { //no collision. Corner is visible
             //add corner to polygon corner
-            this->_polygonCorners.push_back(Vector2(iter.x, iter.y));
+            this->_polygonCorners.push_back(PolygonCorner(iter.x, iter.y, angle, 0));
             
             //add edge of screen to polygon corner                                          //TODO
             bool lookOver = shouldNextCollisionBeIncluded(playerX, playerY, iter);
+            //printf("no collision\n");
             
-            
-            
+            count++;
             
             
             
         }
-
+         */
     }
     
     //sort polygon nodes
     
+    //std::vector<PolygonCorner> sortedPolygonCorners;
     
+    
+    std::sort(this->_polygonCorners.begin(), this->_polygonCorners.end());
+    
+    //bool shouldSwap = 0;
+    
+    //for(int i = 0; i < this->_polygonCorners.size(); i++) {
+    //    printf("%f \t %d \n",this->_polygonCorners.at(i).angle, this->_polygonCorners.at(i).isExtension);
+    //}
+    //printf("\n\n");
+    
+    /*
+    for(int i = 0; i < this->_polygonCorners.size(); i++) {
+        if(this->_polygonCorners.at(i).isExtension) {
+            //printf("%f \t",this->_polygonCorners.at(i).angle);
+            if(shouldSwap) {
+                std::iter_swap(this->_polygonCorners.begin() + i, this->_polygonCorners.begin() + i + 1);
+            }
+            shouldSwap = !shouldSwap;
+        }
+        //printf("%f \t %d \n",this->_polygonCorners.at(i).angle, this->_polygonCorners.at(i).isExtension);
+    }
+    //printf("\n\n");
+    */
+    
+    
+    
+    
+    
+    /*
+    int i = 0;
+    
+    
+    double distanceToPrevExtension = 0.0;
+    double distanceToCurrentNode = 0.0;
+    
+    
+    while(i < this->_polygonCorners.size()) {
+        
+        if(this->_polygonCorners.at(i).isExtension) {
+            
+            distanceToCurrentNode = std::sqrt(std::pow( playerX - this->_polygonCorners.at(i+1).x    ,2) + std::pow(    playerY - this->_polygonCorners.at(i+1).y             ,2));
+            
+            if(distanceToCurrentNode > distanceToPrevExtension) {
+                //don't swap
+            }
+            else {
+                //swap
+                std::iter_swap(this->_polygonCorners.begin() + i, this->_polygonCorners.begin() + i + 1);
+                
+            }
+            
+            distanceToPrevExtension = std::sqrt(std::pow( playerX - this->_polygonCorners.at(i).x        ,2) + std::pow(   playerY -  this->_polygonCorners.at(i).y      ,2));
+            
+            i++;
+        }
+        //if distance to next 0 in (0,1) pair is farther from next 1 in (0,1) pair, then go 0 -> 1, 0 -> 1
+
+        
+        
+        i++;
+    }
+    */
+    
+    
+    
+    /*
+    int totalDoubles = 0;
+    for(PolygonCorner iter : this->_polygonCorners) {
+        totalDoubles += iter.isExtension;
+    }
+    */
+    
+    
+    //rotate so we start with a 1
+    int firstOneLocation = 0;
+    for(int i = 0; i < this->_polygonCorners.size(); i++) {     //always going to be at least 2 1s so long as there is never a closed building
+        if(this->_polygonCorners.at(i).isExtension) {
+            break;
+        }
+        firstOneLocation++;
+    }
+    
+    //std::rotate(this->_polygonCorners.begin(), this->_polygonCorners.begin() + firstOneLocation, this->_polygonCorners.end());
+   
+    
+    
+    
+    //std::rotate(this->_polygonCorners.begin(), this->_polygonCorners.begin()+this->_polygonCorners.size()-firstOneLocation, this->_polygonCorners.end());
+    
+    
+    
+    
+    
+    
+    //bool shouldSwap = 0;
+    
+    int i = 0;
+    while(i < this->_polygonCorners.size()) {
+        
+        if(this->_polygonCorners.at(i).isExtension) {
+
+            //the next one will share an x or y coordinate with the previous
+            
+            //check to see which of the next two share an x or y with the previous and start with that one
+            
+            if(i > 0) {
+                if((this->_polygonCorners.at(i).x == this->_polygonCorners.at(i-1).x) || (this->_polygonCorners.at(i).y == this->_polygonCorners.at(i-1).y)) {
+                    //then don't swap
+                    i++;
+                }
+                else  {
+                    std::iter_swap(this->_polygonCorners.begin() + i, this->_polygonCorners.begin() + i + 1);
+                    i++;
+                }
+                
+            }
+        
+            
+            
+            
+            /*
+            if(this->_polygonCorners.at(i).isInnerCorner) {
+                std::iter_swap(this->_polygonCorners.begin() + i, this->_polygonCorners.begin() + i + 1);
+                i++;
+            }
+            else {
+                if(shouldSwap) {
+                    std::iter_swap(this->_polygonCorners.begin() + i, this->_polygonCorners.begin() + i + 1);
+                    i++;
+                }
+                shouldSwap = !shouldSwap;
+            }
+            */
+
+        }
+
+        
+        i++;
+    }
+    
+    
+    //depending on size of array
+    
+    
+    
+    
+    
+    
+    
+    for(int i = 0; i < this->_polygonCorners.size(); i++) {
+        printf("%f \t %d \n",this->_polygonCorners.at(i).angle, this->_polygonCorners.at(i).isExtension);
+    }
+    printf("\n\n");
+    
+    
+    std::sort(polygonEdges.rbegin(), polygonEdges.rend());  //reverse sorting
+    
+    
+    /*
+    //then add the invisible corners
+    for(int i = 0; i < polygonEdges.size(); i++) {
+        this->_polygonCorners.push_back(polygonEdges.at(i));
+    }
+    */
     
     
     
@@ -2066,7 +2295,13 @@ void Level::drawFogOfWar(Graphics &graphics) {
     
     
     
+    //put the corners through a rotation matrix
     
+    
+    //then draw them
+    //if(totalDoubles % 2 == 0) {
+        graphics.drawPolygon(this->_polygonCorners);
+   //}
     
     
 }
@@ -2081,10 +2316,82 @@ bool Level::arePointsVeryClose(Vector2 node1, Vector2 node2) {
 
 void Level::drawPolygonCorners(Graphics &graphics) {
     //printf("polygonCorners size: %d\n", this->_polygonCorners.size());
-    for(Vector2 iter : this->_polygonCorners) {
+    for(PolygonCorner iter : this->_polygonCorners) {
         graphics.drawCircle(iter.x + graphics.getCameraX(), iter.y + graphics.getCameraY());
     }
 }
+
+bool Level::checkShotCollisionFoWCorner(double beginx, double beginy, double angle, double endx, double endy) {
+    
+    
+    float collisionx = 0.0;
+    float collisiony = 0.0;
+    
+    float m = 1.0 / std::tan(angle*3.14159/180);
+    float b = beginy - m*beginx;
+    
+    
+    for(Rectangle i : this->_collisionRects) {
+        //check bottom
+        collisionx = (i.getStartY()+i.getHeight() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                
+                return 1;
+                
+                
+                
+            }
+        }
+        
+        
+        
+        //check top
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
+            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
+                
+                return 1;
+                
+            }
+        }
+        
+        
+        
+        //check left
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = i.getStartX() * m + b;
+        if((i.getStartX() > beginx) && angle < 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                return 1;
+                
+                
+            }
+        }
+        
+        //check right
+        collisionx = (i.getStartY() - b)/m;
+        collisiony = (i.getStartX()+i.getWidth()) * m + b;
+        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
+            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
+                
+                return 1;
+                
+                
+            }
+        }
+    }
+    
+    
+    return 0;
+    
+    
+}
+
 
 Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle, double endx, double endy) {
     
@@ -2092,7 +2399,7 @@ Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle,
     //need to also include boundaries of the camera
     
     
-    
+    //printf("%f\n",angle);
     
     float m = 1.0 / std::tan(angle*3.14159/180);
     
@@ -2105,6 +2412,58 @@ Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle,
     
     Vector2 cornerVector(endx, endy);
     
+    //first do camera boudaries
+    
+    //angle will be -180 < angle < 180
+    
+    double tmp = 180.0 / 3.14159 * std::atan(640.0/400.0);
+    
+    
+    //check top
+    //y = mx + b
+    //x =
+    
+    collisionx = ((beginy-400)-b)/m;
+    collisiony = beginy + 400;                          //based on where the player is located on screen. Same as cameraY
+    if(std::abs(angle) < tmp) {
+        collisionPoints.push_back(Vector2(collisionx, beginy - 400));
+        //return Vector2(300, 300);
+    }
+    //printf("top: %f\n", 180.0 / 3.14159 * std::atan(640.0/400.0));
+    
+    double tmp1 = (360.0 - tmp*2.0) / 2.0;
+    
+    //check right                                                                   //only one of these 4 works. probably not the one i expect. dont use 1280 and 400, use the static location values
+    collisionx = beginx + 640;
+    collisiony = m * (beginx + 640) + b;
+    if(-angle > tmp && -angle < tmp1) {
+        collisionPoints.push_back(Vector2(beginx + 640, collisiony));
+        //return Vector2(400, 400);
+        
+    }
+    
+    //check left
+    collisionx = beginx - 640;
+    collisiony = m*(beginx - 640) + b;
+    if(angle > -tmp && angle < (tmp1)) {
+        collisionPoints.push_back(Vector2(beginx - 640, collisiony));
+        //return Vector2(200, 400);
+    }
+    
+    //check bottom
+    collisionx = ((beginy + 400) - b) / m;
+    collisiony = beginy + 400;
+    if(std::abs(angle) > tmp1) {
+        //printf("printing\n");
+        collisionPoints.push_back(Vector2(collisionx, beginy + 400));
+        //return Vector2(300, 500);
+    }
+    
+    
+    
+    //printf("angle: %f\n", angle);
+    
+    
     for(Rectangle i : this->_collisionRects) {
         //check bottom
         collisionx = (i.getStartY()+i.getHeight() - b)/m;
@@ -2112,18 +2471,7 @@ Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle,
         if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
             if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
                 
-                /*
-                double xColl = collisionx;
-                double yColl = i.getStartY()+i.getHeight();
-                
-                Vector2 collisionVector(xColl, yColl);
-                
-                bool samePoint = arePointsVeryClose(cornerVector, collisionVector);
-                
-                if(!samePoint) {        //if the collision is not the corner we are testing
-                    collisionPoints.push_back(collisionVector);
-                }
-                */
+
                 
                 
                 Vector2 collisionVector(collisionx, i.getStartY()+i.getHeight());
@@ -2280,4 +2628,7 @@ bool Level::shouldNextCollisionBeIncluded(double playerX, double playerY, FoWNod
     }
 }
 
+void Level::changeDrawFoVNode() {
+    this->_drawFovNode = !this->_drawFovNode;
+}
 

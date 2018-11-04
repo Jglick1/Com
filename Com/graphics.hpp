@@ -16,7 +16,7 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
 #include <SDL2_gfx/SDL2_gfxPrimitives.h>
-//#include "globals.hpp"
+#include "globals.hpp"
 #include <vector>
 
 struct SDL_Window;
@@ -98,6 +98,19 @@ public:
     
     void drawCircle(int x, int y);
     
+    void drawPolygon(std::vector<PolygonCorner> polygonCorners);
+    
+    void updateCommandCameraOffset(int old_xm, int old_ym, int xm, int ym);
+    
+    void storeCameraCoordinates();
+    void revertToRegularCameraCoordinates();
+    
+    double getPlayerX();
+    double getPlayerY();
+    
+    double getCommandCameraOffsetX();
+    double getCommandCameraOffsetY();
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -120,6 +133,9 @@ private:
     int _playerCenterX;
     int _playerCenterY;
     
+    double _playerX;
+    double _playerY;
+    
     std::vector< std::vector<int> > _debugLines;
     
     std::vector< std::vector<int> > _mapDebugLines;
@@ -127,7 +143,10 @@ private:
     std::vector<int> _frameTimes;       //size is 100
     int _frameTimeIndex;
     
+    Vector2 _cameraPositionStore;
     
+    double _cameraCommandOffsetX;
+    double _cameraCommandOffsetY;
     
 };
 

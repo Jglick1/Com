@@ -20,14 +20,19 @@ namespace player_constants {
 
 
 Graphics::Graphics() :
-    _cameraX(0.0),
-    _cameraY(0.0),
+    _cameraX(0.01),
+    _cameraY(0.01),
     _cameraAngle(0.01),
     _cameraDx(0.0),
     _cameraDy(0.0),
     _playerCenterX(640.0),
     _playerCenterY(400.0),
-    _frameTimeIndex(0)
+    _frameTimeIndex(0),
+    _cameraPositionStore(Vector2(0.0,0.0)),
+    _playerX(640.0),
+    _playerY(400.0),
+    _cameraCommandOffsetX(0.0),
+    _cameraCommandOffsetY(0.0)
     {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
     SDL_SetWindowTitle(this->_window, "Com");
@@ -50,7 +55,7 @@ Graphics::Graphics() :
         for(int i = 0; i < 100; i++) {
             this->_frameTimes.push_back(0);
         }
-    
+        
         
         
         
@@ -186,7 +191,11 @@ void Graphics::update(int elapsedTime) {
     this->_cameraX += this->_cameraDx * elapsedTime;
     this->_cameraY += this->_cameraDy * elapsedTime;
     
-    //printf("%f, %f\n", this->_cameraDx, this->_cameraDy);
+    this->_playerX = this->_cameraX + this->_playerCenterX + this->_cameraCommandOffsetX;
+    this->_playerY = this->_cameraY + this->_playerCenterY + this->_cameraCommandOffsetY;
+    
+    
+    //printf("%f, %f\n", this->_playerX, this->_playerY);
 }
 
 void Graphics::moveCameraForward() {
@@ -293,12 +302,13 @@ void Graphics::drawDebug() {
     
     //drawFrameTimes
     
+    /*
     SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
     for(int i = 0; i < 100; i++) {      //max frame time at 30 FPS. 1000 / 30
         drawLine(i, 100, i, this->_frameTimes.at(i)/33.33*100);
     }
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
-    
+    */
     
     
     //drawShape();
@@ -347,14 +357,12 @@ void Graphics::drawGunshotLine(int x1, int y1, int x2, int y2, int opacity) {
 
 void Graphics::drawShape() {
     
+    
+    /*
     const Sint16 vx[3] = {100, 200, 300};
     const Sint16 vy[3] = {100, 200, 100};
     
-    //const Sint16 vx[1] = {100};
-    //const Sint16 vy[1] = {100};
-    
-    //const Sint16 * pVx = vx;
-    //const Sint16 * pVy = vy;
+
     
     //Uint32 color = 0xff00ff00;    //green               //0xAABBGGRR
     //Uint32 color = 0xffffff;
@@ -362,19 +370,136 @@ void Graphics::drawShape() {
     Uint32 color = 0xfe00ff00; //for some reason an ff opacity messes up the opacity of the gunshots
     
     filledPolygonColor(this->_renderer, vx, vy, 3, color);
+    */
+    
+    
+    
+    
     
     //filledPolygonColor(this->_renderer, pVx, pVy, 3, 0xff0000ff);
     
     
-    
+    /*
     const Sint16 vx1[4] = {600, 800, 800, 600};
     const Sint16 vy1[4] = {600, 600, 800, 800};
     
     color = 0xfe00ff00;
     
     filledPolygonColor(this->_renderer, vx1, vy1, 4, color);
+    */
+    
+    
 }
 
 void Graphics::drawCircle(int x, int y) {
     circleColor(this->_renderer, x, y, 10, 0xfe0000ff); //red
+    //circleColor(this->_renderer, x, y, 10, 0xfeFF0000);
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
+}
+
+void Graphics::drawPolygon(std::vector<PolygonCorner> polygonCorners) {
+    int numCorners = polygonCorners.size();
+    
+    Sint16 vx[numCorners];// = {600, 800, 800, 600};
+    Sint16 vy[numCorners];// = {600, 600, 800, 800};
+    Uint32 color = 0xfe00ff00;
+    
+    for(int i = 0; i < numCorners; i++) {
+        vx[i] = polygonCorners.at(i).x + this->_cameraX;
+        vy[i] = polygonCorners.at(i).y + this->_cameraY;
+        //vx[i] = polygonCorners.at(i).x;
+        //vy[i] = polygonCorners.at(i).y;
+    }
+    
+    filledPolygonColor(this->_renderer, vx, vy, numCorners, color);
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
+}
+
+
+void Graphics::updateCommandCameraOffset(int old_xm, int old_ym, int xm, int ym) {
+    
+    //R(a - b) + b
+    // Cos x    - Sin x
+    // Sin x    Cos x
+    
+    /*
+    double ax = (old_xm - xm);
+    double ay = (old_ym - ym);
+    
+    
+    
+    
+    
+    double bx = 640;
+    double by = 400;
+    
+    double x = std::cos(-this->_cameraAngle  * 3.14159 / 180) * (ax - bx) - std::sin(-this->_cameraAngle * 3.14159 / 180) * (ay - by) + bx;
+    double y = std::sin(-this->_cameraAngle  * 3.14159 / 180) * (ax - bx) + std::cos(-this->_cameraAngle * 3.14159 / 180) * (ay - by) + by;
+    
+    
+    this->_cameraCommandOffsetX += x;
+    this->_cameraCommandOffsetY += y;
+    
+    this->_cameraX += x;
+    this->_cameraY += y;
+    */
+    
+    
+    
+    
+    double x = std::cos(-this->_cameraAngle  * 3.14159 / 180) * (old_xm - xm) - std::sin(-this->_cameraAngle * 3.14159 / 180) * (old_ym - ym);
+    double y = std::sin(-this->_cameraAngle  * 3.14159 / 180) * (old_xm - xm) + std::cos(-this->_cameraAngle * 3.14159 / 180) * (old_ym - ym);
+    
+    
+    
+    
+    this->_cameraCommandOffsetX += x;
+    this->_cameraCommandOffsetY += y;
+    
+    this->_cameraX += x;
+    this->_cameraY += y;
+    
+    
+    
+    
+
+    /*
+    this->_cameraCommandOffsetX += (old_xm - xm);
+    this->_cameraCommandOffsetY += (old_ym - ym);
+    
+    this->_cameraX += (old_xm - xm);
+    this->_cameraY += (old_ym - ym);
+    */
+    
+
+}
+
+void Graphics::storeCameraCoordinates() {
+    this->_cameraPositionStore.x = this->_cameraX;
+    this->_cameraPositionStore.y = this->_cameraY;
+}
+
+void Graphics::revertToRegularCameraCoordinates() {
+    this->_cameraCommandOffsetX = 0.0;
+    this->_cameraCommandOffsetY = 0.0;
+    
+    this->_cameraX = 0.0;
+    this->_cameraY = 0.0;
+    
+}
+
+double Graphics::getPlayerX() {
+    return this->_playerX;
+}
+
+double Graphics::getPlayerY() {
+    return this->_playerY;
+}
+
+double Graphics::getCommandCameraOffsetX() {
+    return this->_cameraCommandOffsetX;
+}
+
+double Graphics::getCommandCameraOffsetY() {
+    return this->_cameraCommandOffsetY;
 }

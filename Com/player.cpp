@@ -188,25 +188,18 @@ void Player::update(float elapsedTime, int mx, int my) {
 }
 
 void Player::draw(Graphics &graphics) {
-    /*
-    float angle = 0.0;
+
     
-    if(this->_my < (this->_y + 48)) {
-        angle = -std::atan((this->_mx - (this->_x + 48))/(this->_my - (this->_y + 48))) * 180 / 3.14159;
-    }
-    else {
-        angle = 180-std::atan((this->_mx - (this->_x + 48))/(this->_my - (this->_y + 48))) * 180 / 3.14159;
-    }
     
-    this->_fov.drawAngle(graphics, this->_x, this->_y-32, angle);
-    */
     
-    Sprite::draw(graphics, this->_x, this->_y);
-    //graphics.drawRect(this->_x, this->_y+4, 16, 16);
+    //Sprite::draw(graphics, this->_x, this->_y);
     
-    //graphics.drawRect(640 - 8, 400 - 8, 16, 16);
+    Sprite::draw(graphics, -graphics.getCameraX() + graphics.getPlayerX() - 8 + 1, -graphics.getCameraY() + graphics.getPlayerY() - 12 + 1);    //for some reason the +1 s are necissary
     
     graphics.drawRect(640 - 8, 400 - 8, 16, 16);
     
 
+    
+    
+    
 }

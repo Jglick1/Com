@@ -18,10 +18,11 @@ namespace player_constants {
 }
 
 Unit::Unit() {}
+Unit::~Unit() {}
 
-Unit::Unit(Graphics &graphics, Vector2 spawnPoint) :
+Unit::Unit(Graphics &graphics, Vector2 spawnPoint, bool allie) :
 //Sprite(graphics, "/Users/jonahglick/Documents/Com/riflemant_30x40.png", 0, 0, 30, 40, 500, 400),
-Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman.png", 0, 0, 16, 20, 0, 0),
+//Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman_enemy.png", 0, 0, 16, 20, 0, 0),
 _dx(0),
 _dy(0),
 _angle(0.0),
@@ -35,6 +36,16 @@ _destinationx(0),
 _destinationy(0),
 _destinationDirection(NONE)
 {
+
+    if(allie) {
+        this->_unitSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman.png", 0, 0, 16, 20, 0, 0);
+    }
+    else {
+        this->_unitSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman_enemy.png", 0, 0, 16, 20, 0, 0);
+    }
+    
+    
+    
     //graphics.loadImage("/Users/jonahglick/Documents/Com/rifelman_final_96x96.png");
     
     this->_x = 0;
@@ -42,6 +53,9 @@ _destinationDirection(NONE)
     
     //this->_staticx = 500;
     //this->_staticy = 400;
+    
+    this->_staticx = spawnPoint.x;
+    this->_staticy = spawnPoint.y;
     
     Rectangle rec(0,4,16,16);
     
@@ -411,7 +425,8 @@ void Unit::draw(Graphics &graphics) {
     
     double playerAngle = graphics.getCameraAngle();
     
-    Sprite::drawAngle(graphics, playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180), playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180)), this->_angle + playerAngle);
+
+    this->_unitSprite.drawAngle(graphics, playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180), playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180)), this->_angle + playerAngle);
     
     
     
@@ -481,7 +496,7 @@ void Unit::update(float elapsedTime, float playerAngle, Graphics &graphics) {
     
     this->_collisionRect.setXY(graphics.getCameraX()+this->_staticx, graphics.getCameraY()+this->_staticy + 4);
     
-    Sprite::update();
+    this->_unitSprite.update();
     
     
 }
@@ -513,7 +528,7 @@ void Unit::setX(float x) {
 void Unit::setY(float y) {
     this->_y = y;
 }
-
+/*
 int Unit::getStartX() {
     return this->_startX;
 }
@@ -521,7 +536,7 @@ int Unit::getStartX() {
 int Unit::getStartY() {
     return this->_startY;
 }
-
+*/
 int Unit::getX() {
     return this->_x;
 }
@@ -753,6 +768,10 @@ void Unit::handleMovement() {
 }
 
 void Unit::addToMovementOrders(std::vector<Vector2> pos) {
+    
+    this->_unitMovementOrders.clear();
+    this->_unitAngleOrders.clear();
+    
     for(Vector2 i : pos) {
         this->_unitMovementOrders.push_back(i);
     }

@@ -194,9 +194,9 @@ void Player::draw(Graphics &graphics) {
     
     //Sprite::draw(graphics, this->_x, this->_y);
     
-    Sprite::draw(graphics, -graphics.getCameraX() + graphics.getPlayerX() - 8 + 1, -graphics.getCameraY() + graphics.getPlayerY() - 12 + 1);    //for some reason the +1 s are necissary
+    //Sprite::draw(graphics, -graphics.getCameraX() + graphics.getPlayerX() - 8 + 1, -graphics.getCameraY() + graphics.getPlayerY() - 12 + 1);    //for some reason the +1 s are necissary
     
-    graphics.drawRect(640 - 8, 400 - 8, 16, 16);
+    //graphics.drawRect(640 - 8, 400 - 8, 16, 16);
     
 
     

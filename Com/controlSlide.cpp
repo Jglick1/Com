@@ -16,12 +16,12 @@ namespace player_constants {
 
 ControlSlide::ControlSlide() {}
 
-ControlSlide::ControlSlide(Graphics &graphics) :
+ControlSlide::ControlSlide(Graphics &graphics, Vector2 spawnPoint) :
 Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider.png", 0, 0, 150, 25, 0, 0),
 //_x(0),
 //_y(0),
-_staticx(500),
-_staticy(500),
+_staticx(spawnPoint.x),
+_staticy(spawnPoint.y),
 _angle(0.0),
 _width(150),
 _height(25),
@@ -36,7 +36,8 @@ _RrotatedY(0.0),
 _LrotatedX(0.0),
 _LrotatedY(0.0),
 _sideHoldR(0),
-_sideHoldL(0)
+_sideHoldL(0),
+_isSelected(0)
 {}
 
 
@@ -164,6 +165,7 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     if(std::sqrt(std::pow(xm - this->_LrotatedX,2) + std::pow(ym - this->_LrotatedY,2)) < (height/2) ) {
         //printf("right collision!\n");
         this->_sideHoldL = 1;
+        this->_isSelected = 1;
         return 1;
     }
     
@@ -172,6 +174,7 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
         //printf("middle collision!\n");
         
         this->_centerHold = 1;
+        this->_isSelected = 1;
         return 1;
     }
 
@@ -180,6 +183,7 @@ bool ControlSlide::checkSlideCollision(int xm, int ym) {
     if(std::sqrt(std::pow(xm - this->_RrotatedX,2) + std::pow(ym - this->_RrotatedY,2)) < (height/2) ) {
         //printf("right collision!\n");
         this->_sideHoldR = 1;
+        this->_isSelected = 1;
         return 1;
     }
     
@@ -336,6 +340,7 @@ void ControlSlide::handleSlideMovement(int xm, int ym, double angle, float level
 
 void ControlSlide::centerSlideToZero() {
     
+    this->_isSelected = 0;
     this->_centerHold = 0;
     this->_sideHoldR = 0;
     this->_sideHoldL = 0;
@@ -446,4 +451,12 @@ double ControlSlide::getAngle() {
 Vector2 ControlSlide::getCenter() {
     return Vector2(this->_staticx + 75, this->_staticy + 12);
     
+}
+
+bool ControlSlide::isSelected() {
+    return this->_isSelected;
+}
+
+bool ControlSlide::isCenterSelected() {
+    return this->_centerHold;
 }

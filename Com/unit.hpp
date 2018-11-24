@@ -24,7 +24,7 @@ public:
     ~Unit();
     Unit(Graphics &graphics, Vector2 spawnPoint, bool allie);
     void draw(Graphics &graphics);
-    void update(float elapsedTime, float playerAngle, Graphics &graphics);
+    void update(int elapsedTime, Graphics &graphics);
     
     Sprite _unitSprite;
     

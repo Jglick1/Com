@@ -116,6 +116,22 @@ public:
     
     void changeDrawFoVNode();
     
+    bool isLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
+    Vector2 whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
+    double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
+    
+    Vector2 checkShotCollisionNewNew(double beginx, double beginy, double endx, double endy, Graphics &graphics);
+    
+    bool approxEqual(double x1, double x2);
+    
+    void handlePlayerCollisions(double elapsedTime, Graphics &graphics);
+    bool lineCircle(double x1, double y1, double x2, double y2, double cx, double cy, double r, double &closestX, double &closestY);
+    bool pointCircle(double px, double py, double cx, double cy, double r);
+    bool linePoint(double x1, double y1, double x2, double y2, double px, double py);
+    double dist(double x1, double y1, double x2, double y2);
+    Direction findWallDirection(double x1, double y1, double x2, double y2);
+    void printDirection(Direction direction);
+    
 private:
     //Map _map;
 	std::string _mapName;
@@ -171,6 +187,9 @@ private:
     bool _drawFovNode;
     
     Fireteam _fireteam;
+    
+    std::vector<Structure> _structures;
+    
     
     
 };

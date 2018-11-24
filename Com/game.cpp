@@ -84,7 +84,7 @@ void Game::gameLoop() {
     
     //printf("test1\n");
     
-    this->_level = Level("/Users/jonahglick/Documents/Com/com_test5", graphics);
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test6", graphics);
     
     this->_organizationChart = OrganizationChart(graphics);
     
@@ -157,6 +157,7 @@ void Game::gameLoop() {
             if (event.type == SDL_MOUSEBUTTONDOWN) {
                 //printf("mouse button down\n");
                 if (event.button.button == SDL_BUTTON_RIGHT) {
+                    
                     rightMouseDown = 1;
                     if(this->_actionState == NORMAL) {
                         this->_actionState = COMMAND;
@@ -641,6 +642,9 @@ void Game::draw(Graphics &graphics) {
         
         graphics.drawDebug();       //draw all debug lines
         //graphics.eraseDebugLines();      //erase all stored debug lines
+        
+        graphics.drawCircle(640, 400, 8);
+        
     }
     else {
         
@@ -761,8 +765,15 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     this->_organizationChart.update(xm, ym);
     
     
+    
+    
+    
+    
+    
+    
+    /*
                                                                 //handle collisions should come after update for some reason
-    std::vector<Rectangle> others;
+    std::vector<Rectangle> others;                                          //COLLISION HANDLING
     if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
         //this->_player.handleTileCollisions(others);
         //printf("tile collision!a");
@@ -770,7 +781,15 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
         
         //this->_unit.handleTileCollisions(others, elapsedTime);
     }
-
+    */
+    
+    this->_level.handlePlayerCollisions(elapsedTime, graphics);
+    
+    
+    
+    
+    
+    
     
     this->_hud.update(elapsedTime, this->_player);
    

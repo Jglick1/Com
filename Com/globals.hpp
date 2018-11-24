@@ -10,6 +10,7 @@
 #define globals_h
 
 #include <cmath>
+#include <vector>
 
 namespace globals {
     
@@ -64,11 +65,15 @@ enum Direction {
 };
 
 enum State {
-    CHANGE_ANGLE_UP, CHANGE_ANGLE_DOWN, MOVE_FORWARD, STILL
+    CHANGE_ANGLE_UP, CHANGE_ANGLE_DOWN, MOVE_FORWARD, STILL, SCAN
 };
 
 enum FoWNodePosition {
     BL, BR, TL, TR, IN      //in is for inner nodes
+};
+
+enum Weapon {
+    MP40, KAR98, M1GARAND
 };
 
 struct Vector2 {
@@ -134,6 +139,30 @@ struct PolygonCorner {
     
     
 };
+
+struct Structure {
+    std::vector<Vector2> corners;
+    double angle;
+    std::vector<Direction> directions;
+    int numOutsideWalls;
+    
+    Structure() : angle(0.0), numOutsideWalls(0) {}
+    Structure(std::vector<Vector2> corners, double angle, std::vector<Direction> directions, int numOutsideWalls) : angle(angle), numOutsideWalls(numOutsideWalls) {
+        this->corners = corners;
+        this->directions = directions;
+        
+        
+        //for (Vector2 &iter : this->_corners) {
+        //    printf("%d, %d\n", iter.x, iter.y);
+        //}
+        
+    }
+};
+
+
+
+
+
 
 /*
 struct Edge;

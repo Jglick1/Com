@@ -16,6 +16,8 @@
 #include "controlSlide.hpp"
 //#include "squad.hpp"
 #include "graphics.hpp"
+#include "graph.hpp"
+
 
 class Fireteam {
 public:
@@ -32,20 +34,25 @@ public:
     
     void addUnit(std::shared_ptr<Unit> unit);     //adding node to tree
     void removeUnit(std::shared_ptr<Unit> unit);
+
+    int checkSlideCollision(int xm, int ym);
+    void handleSlideMovement(int xm, int ym, double angle, float levelx, float levely, Graphics &graphics);
     
+    void centerSlideToZero();
+    bool isSelected();
+    
+    void moveToSlidePosition(Graph & graph, Graphics &graphics);
+    bool isCenterSelected();
+    void moveToSlideAngle();
     
 private:
     int _id;
     int _numUnits;
-    //std::vector<Unit *> _units;
     
     std::vector< std::shared_ptr<Unit> > _units;
     
-    //std::unique_ptr<int> _units1;
-    
-    
+
     //level of danger. cover or something
-    
     ControlSlide _controlSlide;
     
     //Squad * _parentSquad

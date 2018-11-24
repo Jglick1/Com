@@ -86,6 +86,7 @@ public:
     
     void drawDebug();
     void storeLineDebug(int x1, int y1, int x2, int y2, int color);
+    void storeDebugCircle(double centerX, double centerY, double radius);
     void eraseDebugLines();
     
     void updateFrameTimeIndicator(int elapsedTime);
@@ -97,6 +98,8 @@ public:
     void drawShape();
     
     void drawCircle(int x, int y);
+    void drawCircle(int x, int y, int radius);
+    
     
     void drawPolygon(std::vector<PolygonCorner> polygonCorners);
     
@@ -110,6 +113,10 @@ public:
     
     double getCommandCameraOffsetX();
     double getCommandCameraOffsetY();
+    
+    bool isLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
+    Vector2 whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
+    double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
     
 private:
     SDL_Window* _window;
@@ -137,6 +144,8 @@ private:
     double _playerY;
     
     std::vector< std::vector<int> > _debugLines;
+    std::vector< std::vector<double> > _debugCircles;
+    
     
     std::vector< std::vector<int> > _mapDebugLines;
     

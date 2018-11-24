@@ -479,7 +479,7 @@ void Unit::draw(Graphics &graphics) {
 
 }
 
-void Unit::update(float elapsedTime, float playerAngle, Graphics &graphics) {
+void Unit::update(int elapsedTime, Graphics &graphics) {
     //movement
 
     //printf("%f, %f\n", this->_staticdx, this->_staticdy);
@@ -611,6 +611,13 @@ float Unit::getPlayerAngle() {
 
 void Unit::handleMovement() {
     
+    /*
+    for( double i : this->_unitAngleOrders) {
+        printf("%f, ", i);
+    }
+    printf("\n");
+    */
+    
     //printf("staticx: %f, staticy: %f\n", this->_staticx, this->_staticy);
 
     
@@ -624,6 +631,9 @@ void Unit::handleMovement() {
                 if(this->_unitMovementOrders.size() > 0) {
                     this->_state = MOVE_FORWARD;
                 }
+                else {
+                    this->_state = STILL;
+                }
             }
             break;
         case CHANGE_ANGLE_DOWN:
@@ -634,6 +644,9 @@ void Unit::handleMovement() {
                 this->_angle = this->_destinationAngle;
                 if(this->_unitMovementOrders.size() > 0) {
                     this->_state = MOVE_FORWARD;
+                }
+                else {
+                    this->_state = STILL;
                 }
             }
             break;
@@ -775,16 +788,37 @@ void Unit::addToMovementOrders(std::vector<Vector2> pos) {
     for(Vector2 i : pos) {
         this->_unitMovementOrders.push_back(i);
     }
+    
+    //start moving to first position
+    moveToPosition(pos[0].x, pos[0].y);
+    
+    
+    
 }
 
 void Unit::addToMovementOrders(Vector2 pos) {
 
     this->_unitMovementOrders.push_back(pos);
     
+    moveToPosition(pos.x, pos.y);
+    
 }
 
 void Unit::addToAngleOrders(double angle) {
-    this->_unitAngleOrders.push_back(angle);
+    this->_unitAngleOrders.clear();
+    
+    
+    //if your not busy, move to that angle
+    if(this->_state == STILL) {
+        //printf("static angle move\n");
+        moveToAngle(angle);
+    }
+    else {  //otherwise do it after you move to the relevent position
+        this->_unitAngleOrders.push_back(angle);
+    }
+    
+    
+    
 }
 
 void Unit::printMovementOrders() {

@@ -296,7 +296,10 @@ void Graphics::drawDebug() {
         
     }
     
-    
+    for(std::vector<double> circle : this->_debugCircles) {
+        drawCircle(std::round(circle[0]), std::round(circle[1]), std::round(circle[2]));
+        
+    }
     
     
     
@@ -326,6 +329,7 @@ void Graphics::eraseDebugLines() {
     
     this->_debugLines.clear();
     this->_mapDebugLines.clear();
+    this->_debugCircles.clear();
     
 }
 
@@ -396,6 +400,16 @@ void Graphics::drawCircle(int x, int y) {
     //circleColor(this->_renderer, x, y, 10, 0xfeFF0000);
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
 }
+
+
+void Graphics::drawCircle(int x, int y, int radius) {
+    //circleColor(this->_renderer, x, y, radius, 0xfe00ff00);
+    circleColor(this->_renderer, x, y, radius, 0xfe0000ff);
+    //circleColor(this->_renderer, x, y, 10, 0xfeFF0000);
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
+}
+
+
 
 void Graphics::drawPolygon(std::vector<PolygonCorner> polygonCorners) {
     int numCorners = polygonCorners.size();
@@ -502,4 +516,53 @@ double Graphics::getCommandCameraOffsetX() {
 
 double Graphics::getCommandCameraOffsetY() {
     return this->_cameraCommandOffsetY;
+}
+
+void Graphics::storeDebugCircle(double centerX, double centerY, double radius) {
+    std::vector<double> tmp = {centerX, centerY, radius};
+    
+    this->_debugCircles.push_back(tmp);
+    
+    
+}
+
+
+//http://www.jeffreythompson.org/collision-detection/poly-line.php
+bool Graphics::isLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    
+    double uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+    double uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+    
+    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
+    
+    
+}
+
+Vector2 Graphics::whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    
+    
+    double m1 = (y2 - y1) / (x2 - x1);
+    double b1 = - m1 * x1 + y1;
+    double m2 = (y4 - y3) / (x4 - x3);
+    double b2 = - m2 * x3 + y3;
+    
+    double x = (-b1 + b2) / (m1 - m2);
+    double y = m1 * x + b1;
+    
+    return Vector2(x, y);
+    
+}
+
+double Graphics::distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2) {
+    double m = (y2 - y1) / (x2 - x1);
+    
+    
+    //y = (1/m) x + b
+    double bPerp = playerY - (1/m) * playerX;
+    
+
+    
+    
+    return 0.0;
+    
 }

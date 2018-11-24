@@ -32,8 +32,8 @@ Level::Level() {
 }
 
 Level::Level(std::string mapName, Graphics &graphics) :
-    Map(graphics, "/Users/jonahglick/Documents/Com/com_test5.png", 0, 0, 1280, 800, 0, 0),
-    //Map(graphics, "/Users/jonahglick/Documents/Com/village-deshast-large.png", 0, 0, 1714, 2400, 0, 0),
+    Map(graphics, "/Users/jonahglick/Documents/Com/com_test6.png", 0, 0, 1280, 800, 0, 0),
+    //Map(graphics, "/Users/jonahglick/Documents/Com/dehast.png", 0, 0, 1280, 1920, 0, 0),
 	_mapName(mapName),
 	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
@@ -57,7 +57,17 @@ Level::Level(std::string mapName, Graphics &graphics) :
     //std::vector< std::unique_ptr<int> > test;
     
     
-    this->_fireteam = Fireteam();
+    this->_fireteam = Fireteam(graphics, 1);
+    
+    //this->_fireteam = Fireteam();
+    
+    
+    
+    
+    
+    
+    
+    
     
     //this->_fireteam.addUnit(new Unit(graphics, Vector2(100,100), 1));
     
@@ -65,8 +75,17 @@ Level::Level(std::string mapName, Graphics &graphics) :
     //Unit * unitPointer = new Unit(graphics, Vector2(100,100), 1);
     //std::unique_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
     //this->_fireteam.addUnit( std::move(tmp) );                          //need to std::move the unique pointer
-    std::shared_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
+    std::shared_ptr<Unit> tmp(new Unit(graphics, Vector2(100, 100), 1) );
     this->_fireteam.addUnit( std::move(tmp) );
+    
+    
+    std::shared_ptr<Unit> tmp2(new Unit(graphics, Vector2(200, 200), 1) );
+    this->_fireteam.addUnit( std::move(tmp2) );
+    
+    
+    std::shared_ptr<Unit> tmp3(new Unit(graphics, Vector2(300, 300), 1) );
+    this->_fireteam.addUnit( std::move(tmp3) );
+    
     
     //this->_unit.moveToPosition(600, 800);
 
@@ -79,7 +98,7 @@ Level::Level(std::string mapName, Graphics &graphics) :
     //printf("test\n");
     
     
-    this->_slide = ControlSlide(graphics);
+    this->_slide = ControlSlide(graphics,Vector2(500, 500));
     
     //this->_building.push_back(Vector2(1,2));
     
@@ -492,7 +511,71 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 
                 
             }
-            
+            if (ss.str() == "structure") {
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        //float x, y, width, height;
+                        
+                        double startx = pObject->FloatAttribute("x");
+                        double starty = pObject->FloatAttribute("y");
+                        
+                        std::vector<Vector2> tmp;
+                        std::vector<Direction> tmp2;
+                        
+                        //tmp.push_back(Vector2(startx, starty)); //the first position
+                        
+                        
+                        XMLElement * polyLine = pObject->FirstChildElement("polyline");     //only 1 polyline per structure object
+                        if(polyLine != NULL) {
+                         
+                            std::stringstream polyLineSS;
+                            
+                            polyLineSS << polyLine->Attribute("points");
+                            
+                            //printf("string stream:\n");
+                            //std::cout << polyLineSS.str() << std::endl;
+                            
+                            double oldN = -1, oldT = -1;
+                            double n, t;
+                            char tmp1;
+                            while(polyLineSS >> n){
+                                
+                                polyLineSS >> tmp1;    //ignore comma and spaces
+                                polyLineSS >> t;
+                                
+                                if(oldN != -1) {
+                                    tmp2.push_back(findWallDirection(n, t, oldN, oldT));
+                                }
+                                
+                                
+                                tmp.push_back(Vector2(startx + n, starty + t));
+                                oldN = n;
+                                oldT = t;
+                                
+                                //printf("%f\n", n);
+                            }
+                            
+                            
+                            //for (Vector2 &iter : tmp) {
+                            //    printf("%d, %d\n", iter.x, iter.y);
+                            //}
+                            
+                            this->_structures.push_back(Structure(tmp, 0.0, tmp2, 5));
+                            
+                            
+                            
+                            
+                        }
+                        
+                        
+                        
+                    
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+            }
             
             
 			
@@ -517,10 +600,10 @@ void Level::update(int elapsedTime, Graphics &graphics) {
     
 
     
-    this->_unit.update(elapsedTime, this->_angle, graphics);
+    this->_unit.update(elapsedTime, graphics);
     this->_slide.update(elapsedTime, graphics);
     
-    
+    this->_fireteam.update(elapsedTime, graphics);
     
     
     //update gunshots
@@ -567,6 +650,23 @@ void Level::draw(Graphics &graphics) {
     for(int i = 0; i<this->_collisionRects.size(); i++) {
         graphics.drawRect(std::round(this->_collisionRects.at(i).getX()), std::round(this->_collisionRects.at(i).getY()), this->_collisionRects.at(i).getWidth(), this->_collisionRects.at(i).getHeight());
     }
+    
+    //draw collision polygon
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
+            
+            graphics.drawLine(x3, y3, x4, y4);
+            
+            
+        }
+    }
+    
+
+    
     
     //draw unit collision rects
     Rectangle unitRec = this->_unit.getCollisionRect();
@@ -680,8 +780,41 @@ const Vector2 Level::getPlayerSpawnPoint() const {
 }
 
 void Level::handleSlideRelease(Graphics &graphics) {
-    centerSlideToZero();
     
+
+
+    //find the slide in question
+    
+    if(this->_fireteam.isSelected()) {
+        if(this->_fireteam.isCenterSelected()) {
+            this->_fireteam.moveToSlidePosition(this->_graph, graphics);
+        }
+        else {
+            //printf("center not selected\n");
+            this->_fireteam.moveToSlideAngle();
+        }
+            
+            
+        this->_fireteam.centerSlideToZero();
+        
+        
+        
+    }
+    else if(this->_slide.isSelected()) {
+        centerSlideToZero();
+        
+        moveUnitToSlidePosition(graphics);
+        //moveUnitAngleToSlideAngle(graphics);
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    /*
     //check to see if the slide is in a building
     //if(this->_level.) { //if slide is in a building
     bool isInBuilding = 0;
@@ -705,6 +838,11 @@ void Level::handleSlideRelease(Graphics &graphics) {
         moveUnitToSlidePosition(graphics);
         moveUnitAngleToSlideAngle(graphics);
     }
+    */
+    
+    
+    
+    
     
 
 }
@@ -809,6 +947,323 @@ void Level::stopMoving() {
 	this->_dy = 0.0f;
     this->_unit.stopMovingParallax();
     this->_slide.stopMovingParallax();
+}
+
+//http://www.jeffreythompson.org/collision-detection/line-circle.php
+void Level::handlePlayerCollisions(double elapsedTime, Graphics &graphics) {
+    
+    double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+    double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+    
+    double closestX = -1;
+    double closestY = -1;
+    
+    std::vector< std::vector<double> > collisionLines;
+    std::vector<Direction> collisionDirections;
+    
+    for (Structure &structureIter : this->_structures) {
+        
+        /*
+        //printf("%d, %d\n", structureIter.corners.at(0).x, structureIter.corners.at(0).y);
+        double x3 = structureIter.corners.at(0).x;
+        double y3 = structureIter.corners.at(0).y;
+        double x4 = structureIter.corners.at(1).x;
+        double y4 = structureIter.corners.at(1).y;
+        
+        //printf("%d\n", lineCircle(x3, y3, x4, y4, playerX, playerY, 8));
+        */
+        
+        //printf("%f, %f  :   %f, %f\n", x3, y3, playerX, playerY);
+        
+        
+        
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x1 = structureIter.corners.at(i).x;
+            double y1 = structureIter.corners.at(i).y;
+            double x2 = structureIter.corners.at(i+1).x;
+            double y2 = structureIter.corners.at(i+1).y;
+            
+            if(lineCircle(x1, y1, x2, y2, playerX, playerY, 8, closestX, closestY)) { //radius is 8
+                //collisionLines.push_back({x3, y3, x4, y4});
+                //graphics.storeLineDebug(x1, y1, x2, y2, 1);
+                //printf("collision\n");
+                //printDirection(structureIter.directions.at(i));
+                
+                double xdiff = playerX - closestX;
+                double ydiff = playerY - closestY;
+                
+                double dist = std::sqrt(    (xdiff*xdiff) + (ydiff*ydiff)  );
+                
+                collisionLines.push_back({x1, y1, x2, y2, closestX, closestY, dist});
+                collisionDirections.push_back(structureIter.directions.at(i));
+                
+            }
+        }
+    }
+
+    
+    if(collisionLines.size() == 1) {
+        
+        if(collisionDirections.at(0) == UP) {
+            graphics.setCameraX(-collisionLines[0][4] + 640);
+            graphics.setCameraY(-collisionLines[0][5] + 400 + 8);
+            
+            //graphics.setCameraX(-200.0);
+            //graphics.setCameraY(-200.0);
+            
+            //printf("%f, %f\n",collisionLines[0][4], collisionLines[0][5]);
+            
+            //move player to closestX
+            //move player to closestY + 16
+        }
+        else if(collisionDirections.at(0) == DOWN) {
+            graphics.setCameraX(-collisionLines[0][4] + 640);
+            graphics.setCameraY(-collisionLines[0][5] + 400 - 8);
+        }
+        else if(collisionDirections.at(0) == RIGHT) {
+            graphics.setCameraX(-collisionLines[0][4] + 640 - 8);
+            graphics.setCameraY(-collisionLines[0][5] + 400);
+        }
+        else if(collisionDirections.at(0) == LEFT) {
+            graphics.setCameraX(-collisionLines[0][4] + 640 + 8);
+            graphics.setCameraY(-collisionLines[0][5] + 400);
+        }
+        
+        
+        
+    }
+    else if(collisionLines.size() == 2) {
+        
+        //printf("twosies\n");
+        //printf("\n");
+        //for (Direction iter : collisionDirections) {
+        //    printDirection(iter);
+        //}
+        
+        int first = -1;
+        int second = -1;
+        //find which one to handle first
+        
+        //if one closest point is on the line, start with that one
+        
+        if(linePoint(collisionLines[0][0], collisionLines[0][1], collisionLines[0][2], collisionLines[0][3], collisionLines[0][4], collisionLines[0][5])) {
+            //then do this one
+            first = 0;
+            second = 1;
+        }
+        else if (linePoint(collisionLines[1][0], collisionLines[1][1], collisionLines[1][2], collisionLines[1][3], collisionLines[1][4], collisionLines[1][5])) {
+            first = 1;
+            second = 0;
+        }
+        else {
+            //if they are both off, choose one based on distance
+            if(collisionLines[0][6] >= collisionLines[1][6]) {
+                first = 0;
+                second = 1;
+            }
+            else {
+                first = 1;
+                second = 0;
+            }
+        }
+        
+        
+        
+        
+        //playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        //playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        //printf("ZEROTH \t playerX: %f, playerY: %f\n", playerX, playerY);
+        
+        //handle first one
+        if(collisionDirections.at(first) == UP) {
+            graphics.setCameraX(-collisionLines[first][4] + 640);
+            graphics.setCameraY(-collisionLines[first][5] + 400 + 8);
+        }
+        else if(collisionDirections.at(first) == DOWN) {
+            graphics.setCameraX(-collisionLines[first][4] + 640);
+            graphics.setCameraY(-collisionLines[first][5] + 400 - 8);
+        }
+        else if(collisionDirections.at(first) == RIGHT) {
+            graphics.setCameraX(-collisionLines[first][4] + 640 - 8);
+            graphics.setCameraY(-collisionLines[first][5] + 400);
+        }
+        else if(collisionDirections.at(first) == LEFT) {
+            graphics.setCameraX(-collisionLines[first][4] + 640 + 8);
+            graphics.setCameraY(-collisionLines[first][5] + 400);
+        }
+        
+        
+        
+        //then, if still colliding, handle second
+        playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        //printf("FIRST \t playerX: %f, playerY: %f\n", playerX, playerY);
+        
+        closestX = -1;
+        closestY = -1;
+        
+        //printf("%d\n", second);
+        //graphics.storeLineDebug(collisionLines[first][0], collisionLines[first][1], collisionLines[first][2], collisionLines[first][3], 1);
+        //graphics.storeLineDebug(collisionLines[second][0], collisionLines[second][1], collisionLines[second][2], collisionLines[second][3], 1);
+        //printf("%f, %f, %f, %f\n",collisionLines[second][0], collisionLines[second][1], collisionLines[second][2], collisionLines[second][3]);
+        if(lineCircle(collisionLines[second][0], collisionLines[second][1], collisionLines[second][2], collisionLines[second][3], playerX, playerY, 8, closestX, closestY)) {
+            
+            //graphics.storeLineDebug(collisionLines[1][0], collisionLines[1][1], collisionLines[1][2], collisionLines[1][3], 1);
+            
+            //printf("%f, %f, %f, %f\n", collisionLines[1][0], collisionLines[1][1], collisionLines[1][2], collisionLines[1][3] );
+            
+            //printf("second\n");
+            
+            if(collisionDirections.at(second) == UP) {
+                graphics.setCameraX(-closestX + 640);
+                graphics.setCameraY(-closestY + 400 + 8);
+            }
+            else if(collisionDirections.at(second) == DOWN) {
+                graphics.setCameraX(-closestX + 640);
+                graphics.setCameraY(-closestY + 400 - 8);
+            }
+            else if(collisionDirections.at(second) == RIGHT) {
+                graphics.setCameraX(-closestX + 640 - 8);
+                graphics.setCameraY(-closestY + 400);
+            }
+            else if(collisionDirections.at(second) == LEFT) {
+                graphics.setCameraX(-closestX + 640 + 8);
+                graphics.setCameraY(-closestY + 400);
+            }
+            
+            
+            
+        }
+        
+        //playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
+        //playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
+        //printf("SECOND \t playerX: %f, playerY: %f\n", playerX, playerY);
+        
+        
+        
+        
+    }
+    
+    
+    
+    //printf("%f, %f\n", graphics.getPlayerX(), graphics.getPlayerY());
+    
+    
+    
+    
+}
+
+
+// LINE/CIRCLE
+bool Level::lineCircle(double x1, double y1, double x2, double y2, double cx, double cy, double r, double &closestx, double &closesty) {
+    
+    
+    // is either end INSIDE the circle?
+    // if so, return true immediately
+    bool inside1 = pointCircle(x1,y1, cx,cy,r);
+    bool inside2 = pointCircle(x2,y2, cx,cy,r);
+    //if (inside1 || inside2) return true;
+    
+    
+    
+    // get length of the line
+    double distX = x1 - x2;
+    double distY = y1 - y2;
+    double len = std::sqrt( (distX*distX) + (distY*distY) );
+    
+    // get dot product of the line and circle
+    double dot = ( ((cx-x1)*(x2-x1)) + ((cy-y1)*(y2-y1)) ) / std::pow(len,2);
+    
+    // find the closest point on the line
+    double closestX = x1 + (dot * (x2-x1));
+    double closestY = y1 + (dot * (y2-y1));
+    
+    closestx = closestX;
+    closesty = closestY;
+    
+    
+    
+    if (inside1 || inside2) return true;
+    
+    
+    
+    
+    
+    
+    // is this point actually on the line segment?
+    // if so keep going, but if not, return false
+    bool onSegment = linePoint(x1,y1,x2,y2, closestX,closestY);
+    if (!onSegment) return false;
+    
+    
+    /*
+    // optionally, draw a circle at the closest
+    // point on the line
+    fill(255,0,0);
+    noStroke();
+    ellipse(closestX, closestY, 20, 20);
+    */
+    
+    
+    // get distance to closest point
+    distX = closestX - cx;
+    distY = closestY - cy;
+    float distance = std::sqrt( (distX*distX) + (distY*distY) );
+    
+    if (distance <= r) {
+        return true;
+    }
+    return false;
+    
+    
+    
+}
+
+// POINT/CIRCLE
+bool Level::pointCircle(double px, double py, double cx, double cy, double r) {
+    
+    // get distance between the point and circle's center
+    // using the Pythagorean Theorem
+    double distX = px - cx;
+    double distY = py - cy;
+    double distance = std::sqrt( (distX*distX) + (distY*distY) );
+    
+    // if the distance is less than the circle's
+    // radius the point is inside!
+    return (distance <= r);
+}
+
+double Level::dist(double x1, double y1, double x2, double y2) {
+    
+    double distX = x1 - x2;
+    double distY = y1 - y2;
+    
+    return std::sqrt( (distX*distX) + (distY*distY) );
+    
+}
+
+// LINE/POINT
+bool Level::linePoint(double x1, double y1, double x2, double y2, double px, double py) {
+    
+    // get distance from the point to the two ends of the line
+    double d1 = dist(px,py, x1,y1);
+    double d2 = dist(px,py, x2,y2);
+    
+    // get the length of the line
+    double lineLen = dist(x1,y1, x2,y2);
+    
+    // since floats are so minutely accurate, add
+    // a little buffer zone that will give collision
+    double buffer = 0.1;    // higher # = less accurate
+    
+    // if the two distances are equal to the line's
+    // length, the point is on the line!
+    // note we use the buffer here to give a range,
+    // rather than one #
+    if (d1+d2 >= lineLen-buffer && d1+d2 <= lineLen+buffer) {
+        return true;
+    }
+    return false;
 }
 
 
@@ -1070,12 +1525,30 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
 
 bool Level::checkSlideCollision(int xm, int ym) {
     
-    return this->_slide.checkSlideCollision(xm, ym);
+    bool collisions = 0;
+    
+    collisions += this->_slide.checkSlideCollision(xm, ym);
+    
+    
+    
+    
+    //for each fireteam
+    collisions += this->_fireteam.checkSlideCollision(xm, ym);
+    
+    return collisions;       //can only have 1 collision so this is 0 or 1
+    
     
 }
 
 void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
     this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    
+    this->_fireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    
+    
+    
 }
 
 void Level::centerSlideToZero(){
@@ -1491,6 +1964,70 @@ bool Level::checkPathCollisionHelp(double beginx, double beginy, double angle, d
     
     
 }
+Vector2 Level::checkShotCollisionNewNew(double beginx, double beginy, double endx, double endy, Graphics &graphics) {
+    
+    std::vector<Vector2> collisionPoints;
+    std::vector< std::vector<double> > collisionLines;
+    
+    
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
+            
+            if(isLineLineCollision(beginx, beginy, endx, endy, x3, y3, x4, y4)) {
+                collisionLines.push_back({x3, y3, x4, y4});
+                //graphics.storeMapLineDebug(x3, y3, x4, y4, 1);
+            }
+        }
+    }
+    
+    //printf("size: %lu\n", collisionLines.size());
+    
+    for (int i = 0; i < collisionLines.size(); i++) {
+
+        Vector2 loc = whereLineLineCollision(beginx, beginy, endx, endy, collisionLines.at(i).at(0), collisionLines.at(i).at(1), collisionLines.at(i).at(2), collisionLines.at(i).at(3));
+        
+        collisionPoints.push_back(loc);
+        //graphics.storeDebugCircle(loc.x, loc.y, 10);
+        
+    }
+
+    
+    
+    
+    if(collisionPoints.size() > 0) {
+        
+        double min = 1000000;
+        double weight = 0.0;
+        int nearest = -1;
+        
+        for(int i = 0; i<collisionPoints.size(); i++) {
+            weight = std::sqrt(std::pow(collisionPoints[i].x - beginx,2) + std::pow(collisionPoints[i].y - beginy,2));
+            if(weight < min) {
+                min = weight;
+                nearest = i;
+            }
+        }
+        
+        return collisionPoints[nearest];
+        
+    }
+    
+    
+    
+    //no collision
+    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
+    
+    
+
+    
+    
+    
+}
+
 
 Vector2 Level::checkShotCollisionNew(double beginx, double beginy, double angle) {
     
@@ -1561,7 +2098,8 @@ Vector2 Level::checkShotCollisionNew(double beginx, double beginy, double angle)
             }
         }
     }
-    
+
+
     if(collisionPoints.size() > 0) {
 
         double min = 1000000;
@@ -1660,6 +2198,9 @@ Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
             }
         }
     }
+    
+    
+    
     
     if(collisionPoints.size() > 0) {
         
@@ -1882,21 +2423,20 @@ void Level::playerFireShot(Graphics &graphics) {
     double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
     double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
     
-    //Vector2 shotCollision = checkShotCollision(playerX, playerY, -graphics.getCameraAngle());
-    
     Vector2 shotCollision = checkShotCollisionNew(playerX, playerY, graphics.getCameraAngle());
     
-    //printf("shotX: %d\t shotY: %d\n", shotCollision.x, shotCollision.y);
     
-    //graphics.storeMapLineDebug(graphics.getPlayerCenterX(), graphics.getPlayerCenterY(), 0,0,0);
+    double shotDistance = 400;
+    double shotEndX = std::round(playerX) - shotDistance * std::sin(graphics.getCameraAngle()*3.14159/180);
+    double shotEndY = std::round(playerY) - shotDistance * std::cos(graphics.getCameraAngle()*3.14159/180);
+    
+    Vector2 newShotCollision = checkShotCollisionNewNew(playerX, playerY, shotEndX, shotEndY, graphics);
     
     //calculate distance to unit
     //find m
     
     double mShot = 1.0 / std::tan(graphics.getCameraAngle()*3.14159/180);
     //needs to go through player position
-    
-    //printf("mShot: %f\n", mShot);
     
     //y = mx + b
     //playerY = m * playerX + b
@@ -1915,17 +2455,21 @@ void Level::playerFireShot(Graphics &graphics) {
     double bPerpindicular = -mPerpindicular * (this->_unit.getStaticX()+8) + (this->_unit.getStaticY() + 12);
     
     //print player shot
-    if(shotCollision.x == 0 && shotCollision.y == 0) {   //if the shot did not collide with anything
+    if(newShotCollision.x == 0 && newShotCollision.y == 0) {   //if the shot did not collide with anything
         //graphics.storeMapLineDebug(0, bShot, 1280, mShot * 1280 + bShot, 0);
         
         //make sure shot only goes 400 pixels
         
-        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), std::round(playerX) - 400 * std::sin(graphics.getCameraAngle()*3.14159/180), std::round(playerY) - 400 * std::cos(graphics.getCameraAngle()*3.14159/180), 1000));
+        //this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), std::round(playerX) - 400 * std::sin(graphics.getCameraAngle()*3.14159/180), std::round(playerY) - 400 * std::cos(graphics.getCameraAngle()*3.14159/180), 1000));
             //lifetime is 1 second
+        
+        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotEndX, shotEndY, 1000));
+        
+        
     }
     else {          //if it did collide with a surface
 
-        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotCollision.x, shotCollision.y, 1000)); //lifetime is 1 second
+        this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), newShotCollision.x, newShotCollision.y, 1000)); //lifetime is 1 second
 
     }
     
@@ -1956,6 +2500,12 @@ void Level::playerFireShot(Graphics &graphics) {
         this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
     }
     //this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
+    
+    
+    
+    
+    
+    
     
 }
 
@@ -2632,3 +3182,124 @@ void Level::changeDrawFoVNode() {
     this->_drawFovNode = !this->_drawFovNode;
 }
 
+//http://www.jeffreythompson.org/collision-detection/poly-line.php
+bool Level::isLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    
+    double uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+    double uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+    
+    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
+    
+    
+}
+
+//http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+Vector2 Level::whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+
+    
+    // If d is zero, there is no intersection
+    double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    /*
+    if(d == 0) {
+        return Vector2(-1, -1);     //no collision. Check!!
+    }
+    */
+    
+    //get x and y
+    double pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
+    double x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
+    double y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
+    
+    /*
+    // Check if the x and y coordinates are within both lines
+    if ( x < std::min(x1, x2) || x > std::max(x1, x2) ||
+        x < std::min(x3, x4) || x > std::max(x3, x4) ) return Vector2(-1,-1);
+    if ( y < std::min(y1, y2) || y > std::max(y1, y2) ||
+        y < std::min(y3, y4) || y > std::max(y3, y4) ) return Vector2(-1,-1);
+    */
+    //printf("%f, %f\n", x, y);
+    
+    return Vector2(int(x), int(y));
+    
+    
+    
+}
+
+double Level::distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2) {
+    double m = (y2 - y1) / (x2 - x1);
+    
+    
+    //y = (1/m) x + b
+    double bPerp = playerY - (1/m) * playerX;
+    
+    
+    
+    
+    return 0.0;
+    
+}
+
+bool Level::approxEqual(double x1, double x2) {
+    
+    return (x1 - x2 < 0.1);
+    
+}
+
+Direction Level::findWallDirection(double x1, double y1, double x2, double y2) {
+    
+    double xdiff = x2 - x1;
+    double ydiff = y2 - y1;
+    
+    if(std::abs(ydiff) > std::abs(xdiff)) {
+        if(ydiff > 0) {
+            return RIGHT;
+        }
+        else {
+            return LEFT;
+        }
+    }
+    else {
+        if(xdiff > 0) {
+            return UP;
+        }
+        else {
+            return DOWN;
+        }
+    }
+    
+    return NONE;
+    
+    
+}
+
+void Level::printDirection(Direction direction) {
+    switch(direction) {
+        case UP:
+            printf("UP\n");
+            break;
+        case DOWN:
+            printf("DOWN\n");
+            break;
+        case RIGHT:
+            printf("RIGHT\n");
+            break;
+        case LEFT:
+            printf("LEFT\n");
+            break;
+        case UPRIGHT:
+            printf("UPRIGHT\n");
+            break;
+        case UPLEFT:
+            printf("UPLEFT\n");
+            break;
+        case DOWNRIGHT:
+            printf("DOWNRIGHT\n");
+            break;
+        case DOWNLEFT:
+            printf("DOWNLEFT\n");
+            break;
+        case NONE:
+            printf("NONE\n");
+            break;
+    }
+}

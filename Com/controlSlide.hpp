@@ -17,7 +17,7 @@ class Graphics;
 class ControlSlide : public Sprite {
 public:
     ControlSlide();
-    ControlSlide(Graphics &graphics);
+    ControlSlide(Graphics &graphics, Vector2 spawnPoint);
 
     void draw(Graphics &graphics);
     void update(float elapsedTime, Graphics &graphics);
@@ -48,6 +48,8 @@ public:
     double getAngle();
     
     Vector2 getCenter();
+    bool isSelected();
+    bool isCenterSelected();
     
 private:
     //float _x, _y;
@@ -68,6 +70,9 @@ private:
     
     float _movingx;
     float _movingy;
+    
+    bool _isSelected;
+    
     
 };
 

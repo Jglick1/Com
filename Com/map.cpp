@@ -60,7 +60,7 @@ void Map::update() {
 
 }
 
-void Map::drawTrans(Graphics &graphics, int transx, int transy, float ang, int x, int y, bool camera_move) {
+void Map::drawTrans(Graphics &graphics, int transx, int transy, float ang, int x, int y) {
     
     SDL_Rect destinationRectangle = {transx, transy, this->_sourceRect.w * globals::LEVEL_SCALE, this->_sourceRect.h * globals::LEVEL_SCALE };
 

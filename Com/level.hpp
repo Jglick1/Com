@@ -36,42 +36,37 @@ public:
 	void update(int elapsedtime, Graphics &graphics);
 	void draw(Graphics &graphics);
 	
+    
+    
 	std::vector<Rectangle> checkTileCollisions(const Rectangle &other);
-	//std::vector<Door> checkDoorCollisions(const Rectangle &other);
 	
 	const Vector2 getPlayerSpawnPoint() const;
 	
-	void moveForward();
-	void moveBackward();
-	void moveRight();
-	void moveLeft();
-	void stopMoving();
+
 	
     void handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime, Graphics &graphics);
     
     void changeAngle(float angle);
-	
-    void cameraMove();
-    void cameraStill();
+
+    
+    
+    
     
     float getAngle();
     
     void changeY(int newY, int newCollisionY);
     void changeX(int newX, int newCollisionX);
     
-    float getDX();
-    float getDY();
+
     
     void setUnitAngle();
     
     void handleUnitMovement();
     
     void moveUnitToPosition(int posX, int posY, Graphics &graphics);
+
     
-    void moveUpRight();
-    void moveUpLeft();
-    void moveDownRight();
-    void moveDownLeft();
+    
     
     bool checkSlideCollision(int xm, int ym);
     void handleSlideMovement(int xm, int ym, Graphics &graphics);
@@ -79,24 +74,34 @@ public:
     
     void centerSlideToZero();
     
-    bool checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd);
-    bool checkPathCollisionHelp2(double beginx, double beginy, double m, double b, double distanceToEnd, double angle);
-    bool checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics);
+    //bool checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd);
+    //bool checkPathCollisionHelp2(double beginx, double beginy, double m, double b, double distanceToEnd, double angle);
+    //bool checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics);
     
-    Vector2 checkShotCollision(double beginx, double beginy, double angle);
+    //Vector2 checkShotCollision(double beginx, double beginy, double angle);
 
     void moveUnitToSlidePosition(Graphics &graphics);
     void moveUnitToNearestCover(Graphics &graphics);
     
     void playerFireShot(Graphics &graphics);
     
-    Vector2 checkShotCollisionNew(double beginx, double beginy, double angle);
+    //Vector2 checkShotCollisionNew(double beginx, double beginy, double angle);
     
     void clearGunshotPaths();
     
     void moveUnitAngleToSlideAngle(Graphics &graphics);
     
-    bool checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Graphics &graphics);
+    
+    
+    
+    
+    
+    bool checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics);
+    
+    
+    
+    
+    
     
     void handleSlideRelease(Graphics &graphics);
     
@@ -120,7 +125,15 @@ public:
     Vector2 whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
     double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
     
+    
+    
+    
+    
     Vector2 checkShotCollisionNewNew(double beginx, double beginy, double endx, double endy, Graphics &graphics);
+    
+    
+    
+    
     
     bool approxEqual(double x1, double x2);
     
@@ -131,6 +144,14 @@ public:
     double dist(double x1, double y1, double x2, double y2);
     Direction findWallDirection(double x1, double y1, double x2, double y2);
     void printDirection(Direction direction);
+    
+    
+    
+    
+    
+    
+    
+    
     
 private:
     //Map _map;
@@ -144,22 +165,13 @@ private:
 	std::vector <Tileset> _tileSets;
 	std::vector <Rectangle> _collisionRects;
 	
-	//std::vector <Door> _doorList;
+
 	
 	void loadMap(std::string mapName, Graphics &graphics);
 	
-	float _dx, _dy;
-    float _angle; // really player angle
-    //Vector2 _position;
-    
-    float _positionx;
-    float _positiony;
-    
-    int _transx;
-    int _transy;
-    int _ang;
-    
-    bool _cameraMove;
+
+    float _angle;
+
     
     Unit _unit;
     
@@ -173,18 +185,22 @@ private:
     
     std::vector<Rectangle> _buildings;
     
-    std::vector<CornerNode> _cornerNodes;
     
+    
+    
+    
+    std::vector<CornerNode> _cornerNodes;
     std::vector<PolygonCorner> _polygonCorners;
     //need to know the angle for each one
     //need to know if they are extensions of a FoWNode
         //start the sorting at those points
-    
-    
-    
     std::vector<FoWNode> _FoWNode;
-    
     bool _drawFovNode;
+    
+    
+    
+    
+    
     
     Fireteam _fireteam;
     
@@ -193,6 +209,8 @@ private:
     
     
 };
+
+
 
 struct Tileset {
 	SDL_Texture * Texture;
@@ -207,5 +225,7 @@ struct Tileset {
 		this->FirstGid = firstGid;
 	}
 };
+ 
+
 
 #endif /* level_hpp */

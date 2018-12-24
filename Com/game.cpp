@@ -21,10 +21,8 @@ namespace {
 }
 
 
-
-//Game::Game() : _graphics(Graphics()), _level("/Users/jonahglick/Documents/Com/com_test2", this->_graphics){
 Game::Game() {
-    //printf("SDL_Init\n");
+
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
     
@@ -53,18 +51,21 @@ Game::~Game() {
     
 }
 
+
+//handle input
+//handle movement
+//render
+
+
 void Game::gameLoop() {
-    //printf("beginning game loop\n");
     
     Graphics graphics;
-    
     
     SDL_Event event;
     Input input;
     
     graphics.loadSound();
     
-    //graphics.resolutionTest();
     
     /*
     textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
@@ -73,55 +74,28 @@ void Game::gameLoop() {
     }
      */
 
-
-    
-    //this->_player = Player(graphics, this->_level.getPlayerSpawnPoint());
     
     this->_player = Player(graphics, Vector2(3,3));
-    //this->_unit = Unit(graphics, Vector2(0,0));
-    
-    //this->_unit.moveToPosition(1280, 0);
-    
-    //printf("test1\n");
-    
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test6", graphics);
-    
     this->_organizationChart = OrganizationChart(graphics);
-    
-    
-    //this->_hud = HUD(graphics, this->_player);
-    //this->_inventory = Inventory(graphics, this->_player);
-    
-    //printf("test2\n");
-    
     this->_hud = HUD(graphics, this->_player);
-    
-    this->_cursor = Cursor(graphics);
     
     int LAST_UPDATE_TIME = SDL_GetTicks();
     
     Direction inPower = NONE;
-    
-    this->_deltaX = 0.0;
-    this->_deltaY = 0.0;
 
     int old_xm = 0;
     int old_ym = 0;
-    
     int xm = 0;
     int ym = 0;
     
-    bool wasThereAnEvent = 0;
     
-    //GameState game_state = NORMAL;
     
     bool rightMouseDown = 0;
-    //bool rightMouseHeld = 0;
-    bool centerHold = 0;
-    
     bool double_time = 0;
-    
     bool rightMouseClick = 0;
+    
+    
     
     int FRAME_CALCULATE_TIME_BEGIN = 0;
     int FRAME_CALCULATE_TIME_END = 0;
@@ -131,14 +105,14 @@ void Game::gameLoop() {
         
         input.beginNewFrame();
         
+        //HANDLE INPUT
+        
         old_xm = xm;
         old_ym = ym;
-        SDL_GetMouseState(&xm, &ym);        //update mouse positions
+        SDL_GetMouseState(&xm, &ym); //update mouse position
         
         
-        wasThereAnEvent = 0;
         while (SDL_PollEvent(&event)) {
-            wasThereAnEvent = 1;
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.repeat == 0) {
                     input.keyDownEvent(event);
@@ -150,12 +124,8 @@ void Game::gameLoop() {
             else if (event.type == SDL_QUIT) {
                 return;
             }
-            //else if (event.type == SDL_MOUSEMOTION) {
-            //    this->_deltaX = event.motion.xrel;
-            //    this->_deltaY += event.motion.y;
-            //}
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                //printf("mouse button down\n");
+
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     
                     rightMouseDown = 1;
@@ -163,7 +133,7 @@ void Game::gameLoop() {
                         this->_actionState = COMMAND;
                         graphics.storeCameraCoordinates();
                     }
-                    //printf("mouse down\n");
+
                     
                     
                 }
@@ -197,15 +167,6 @@ void Game::gameLoop() {
                 }
             }
             
-            
-            
-            //else if (event.type == SDL_MOUSEBUTTONDOWN) {
-            //    if(event.button.button == SDL_BUTTON_LEFT) {
-            //        //std:: cout << "x: " << this->_player.getMX() << "y: " << this->_player.getMY() << std::endl;
-            //       return;
-            //    }
-            //}
-            
         }
         
         
@@ -226,22 +187,18 @@ void Game::gameLoop() {
         }
         
         
-        //printf("%d\n", rightMouseClick);
         
-/*
-        old_xm = xm;
-        old_ym = ym;
-        SDL_GetMouseState(&xm, &ym);
-        */
 
-/*
-        if ((game_state == NORMAL) && std::abs((xm - old_xm)) < 100) {
-            this->_level.changeAngle(-0.5*(xm - old_xm));
-            //this->_level.changeAngle(-0.3*(((xm - old_xm) > 0) - ((xm - old_xm) < 0)) *std::sqrt(std::pow((xm - old_xm),2) + std::pow((ym - old_ym),2)));
-        }
-
-        */
+        
+        
+        // UPDATE
+        
+        
+        
+        
     
+        
+        
         if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE)) {
             return;
         }
@@ -277,17 +234,7 @@ void Game::gameLoop() {
             //graphics.playShot();
             this->_level.moveUnitToNearestCover(graphics);
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         if((this->_actionState == COMMAND) && rightMouseClick) {
             if(this->_level.checkSlideCollision(xm, ym)) {
                 this->_actionState = SLIDE_MOVE;
@@ -313,70 +260,42 @@ void Game::gameLoop() {
             //graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state
         }
         
-        
-        
-        
-        
-        
-        
-        //printGameState(this->_gameState);
-        
-        
-        
-        
-        
-        /*
-        else {
-            this->_level.centerSlideToZero();
-            //this->handleMovement(inPower, input);
-        }
-        */
-        
-        //this->_level.handleSlideMovement(xm, ym);
-        
-        
-        
-        //handle input
-        //handle movement
-        //render
-        
-        //this->_unit.setPlayerAngle(this->_level.getAngle());
-        
-        //this->_level.setUnitAngle();
-        
-        
-        //if(wasThereAnEvent) {
-        
-        
-        
+
         this->handleMovement(inPower, input, graphics);
         
-        
-        
-        //}
-        
-        //this->_unit.moveForward();
+
         
         
         const int CURRENT_TIME_MS = SDL_GetTicks();                         //getting total elapsedTime
         int ELAPSED_TIME_MS = CURRENT_TIME_MS - LAST_UPDATE_TIME;
         
-        //this->_graphics = graphics;
         
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
         
         this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym, graphics);
         
+        
+        
+        
+        
+        
+        
 
+        //RENDER
+        
+        
+        
+        
+        
+        
+        
         this->draw(graphics);
         
-        //LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        
         
         FRAME_CALCULATE_TIME_END = SDL_GetTicks();
         
-        //if (ELAPSED_TIME_MS < MAX_FRAME_TIME) {
-        //    SDL_Delay(MAX_FRAME_TIME - ELAPSED_TIME_MS);
-        //}
+
         
         int TOTAL_CALC_TIME = FRAME_CALCULATE_TIME_END - FRAME_CALCULATE_TIME_BEGIN;            //getting time to spare in frame
         
@@ -385,24 +304,11 @@ void Game::gameLoop() {
         }
         
         FRAME_CALCULATE_TIME_BEGIN = SDL_GetTicks();
-        
-        
-        //LAST_UPDATE_TIME = CURRENT_TIME_MS;
-        
-        
-        //this->draw(graphics);
-
-        
-        //handle movement
-        //update
-        //draw
-        
 
         
         
         
         graphics.updateFrameTimeIndicator(TOTAL_CALC_TIME);
-        //printf("%d\n",TOTAL_CALC_TIME);
         
     }
     
@@ -410,11 +316,7 @@ void Game::gameLoop() {
 
 void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) {
     
-    //this->_level.handleUnitMovement();
-    
-    //this->printDirection(inPower);
-    
-    
+
     switch (inPower) {
         case UP:
             if (input.wasKeyReleased(SDL_SCANCODE_W)) {
@@ -430,7 +332,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveBackward();
                 graphics.moveCameraForward();
             }
             
@@ -450,7 +351,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveForward();
                 graphics.moveCameraBackward();
             }
             
@@ -470,7 +370,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveLeft();
                 graphics.moveCameraRight();
             }
             break;
@@ -489,7 +388,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveRight();
                 graphics.moveCameraLeft();
             }
             
@@ -510,7 +408,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveDownLeft();
                 graphics.moveCameraUpRight();
             }
             break;
@@ -530,7 +427,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveDownRight();
                 graphics.moveCameraUpLeft();
             }
             break;
@@ -550,7 +446,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveUpLeft();
                 graphics.moveCameraDownRight();
             }
             break;
@@ -570,7 +465,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.moveUpRight();
                 graphics.moveCameraDownLeft();
             }
             break;
@@ -612,7 +506,6 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
                 this->handleMovement(inPower, input, graphics);
             }
             else {
-                //this->_level.stopMoving();
                 graphics.stopCameraMoving();
             }
             break;
@@ -631,9 +524,6 @@ void Game::draw(Graphics &graphics) {
         this->_level.draw(graphics);
         this->_player.draw(graphics);
         
-        //SDL_Rect destinationRectangle = { 0, 0, 200, 200};
-        //graphics.blitSurface(this->textSheet, NULL, &destinationRectangle);
-        
         //graphics.renderText();
         
         this->_hud.draw(graphics);
@@ -650,7 +540,6 @@ void Game::draw(Graphics &graphics) {
         
         this->_organizationChart.draw(graphics);
         
-        
     }
 
     
@@ -661,96 +550,14 @@ void Game::draw(Graphics &graphics) {
 }
 
 void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym, Graphics &graphics) {
-    
-    /*
-    std::vector<Rectangle> others;
-    if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
-        //this->_player.handleTileCollisions(others);
-        this->_level.handleTileCollisions(others);
-        this->_unit.handleTileCollisions();
-    }
-     */
 
-
-    //this->_unit.moveForward();
-    
-    
-    //int mx;
-    //int my;
-    
-    //SDL_GetMouseState(&mx, &my);
-    
-    //printf("%d\n",this->_gameState == NORMAL);
-    
     
     if ((this->_actionState == NORMAL) && std::abs((xm - old_xm)) < 100) {
-
-
         
         graphics.changeAngle(-0.5*(xm - old_xm));
         
-        
-        /*
-        double xdiff = (xm) - graphics.getPlayerCenterX();
-        double ydiff = (ym) - graphics.getPlayerCenterY();
-        
-        double newAngle = 0.0;
-        
-        if(ydiff < 0) {
-            newAngle = (-std::atan(xdiff/ydiff)*180/3.14159);
-        }
-        else {
-            newAngle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
-        }
-        
-        newAngle = -newAngle;
-        
-        if(newAngle > 180) {
-            newAngle -= 360;
-        }
-        else if(newAngle < -180) {
-            newAngle += 360;
-        }
-        
-        graphics.setAngle(newAngle);
-        */
-        
-        
-        
-        
-        
     }
-    else if(this->_actionState == COMMAND) {
-        
-        //graphics.changeAngle(-0.5*(xm - old_xm));
-        
-        
-        //graphics.changeAngle(-180/3.14159*std::atan(((xm - old_xm) / 100.0)));
-        //graphics.setAngle();
-        
-        
-        /*
-        double dy = (400 - this->_cursor.getMapY());
-        double dx = (640 - this->_cursor.getMapX());
-        
-        printf("dx: %f,\t dy: %f\n", dx, dy);
-        
-        //printf("mapX: %f \t mapY: %f\n", this->_cursor.getMapX(), this->_cursor.getMapY());
-        
-        if(dy >= 0) {
-            graphics.setAngle(180/3.14159*std::atan(dx / dy));
-        }
-        else {
-            graphics.setAngle(180/3.14159*std::atan(dx / dy) + 180);
-        }
-        */
-        
-        
-        
-        
-    }
-    
-     
+
     
     this->_level.setUnitAngle();
     
@@ -766,29 +573,7 @@ void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old
     
     
     
-    
-    
-    
-    
-    
-    /*
-                                                                //handle collisions should come after update for some reason
-    std::vector<Rectangle> others;                                          //COLLISION HANDLING
-    if((others = this->_level.checkTileCollisions(this->_player.getPlayerBoundingBox())).size() > 0) {
-        //this->_player.handleTileCollisions(others);
-        //printf("tile collision!a");
-        this->_level.handleTileCollisions(others, elapsedTime, graphics);
-        
-        //this->_unit.handleTileCollisions(others, elapsedTime);
-    }
-    */
-    
     this->_level.handlePlayerCollisions(elapsedTime, graphics);
-    
-    
-    
-    
-    
     
     
     this->_hud.update(elapsedTime, this->_player);

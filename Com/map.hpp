@@ -25,7 +25,7 @@ public:
     void draw(Graphics &graphics, int x, int y);
     void drawAngle(Graphics &graphics, int x, int y, float angle);
     
-    void drawTrans(Graphics &graphics, int transx, int transy, float ang, int x, int y, bool camera_move);
+    void drawTrans(Graphics &graphics, int transx, int transy, float ang, int x, int y);
     
     //const inline float getX() const { return this->_x; }
     //const inline float getY() const { return this->_y; }

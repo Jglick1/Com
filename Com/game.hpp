@@ -18,9 +18,6 @@
 #include "cursor.hpp"
 #include "gamestate.hpp"
 #include "organizationChart.hpp"
-//#include "inventory.hpp"
-
-//class Level;
 
 
 class Game {
@@ -46,18 +43,8 @@ private:
     
     Level _level;
     
-    //HUD _hud;
     
-    //Inventory _inventory;
     
-    //Graphics _graphics;
-    
-    float _deltaX;
-    float _deltaY;
-    
-    //Unit _unit;
-    
-                    //erase eventually
     SDL_Texture* textSheet;
     
     HUD _hud;

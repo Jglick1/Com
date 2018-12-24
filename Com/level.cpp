@@ -35,43 +35,19 @@ Level::Level(std::string mapName, Graphics &graphics) :
     Map(graphics, "/Users/jonahglick/Documents/Com/com_test6.png", 0, 0, 1280, 800, 0, 0),
     //Map(graphics, "/Users/jonahglick/Documents/Com/dehast.png", 0, 0, 1280, 1920, 0, 0),
 	_mapName(mapName),
-	//_spawnPoint(spawnPoint),
 	_size(Vector2(0,0)),
-	_dx(0.0),
-	_dy(0.0),
-    _angle(0.0),
-    //_position(Vector2(0,0)),
-    _positionx(0),
-    _positiony(0),
-    _transx(0),
-    _transy(0),
-    _ang(0),
     _drawFovNode(0)
 {
-    //printf("level contructor\n");
     
 	this->loadMap(mapName, graphics);
     
     this->_unit = Unit(graphics, Vector2(0,0), 1);
     
-    //std::vector< std::unique_ptr<int> > test;
-    
-    
+
     this->_fireteam = Fireteam(graphics, 1);
     
-    //this->_fireteam = Fireteam();
     
-    
-    
-    
-    
-    
-    
-    
-    
-    //this->_fireteam.addUnit(new Unit(graphics, Vector2(100,100), 1));
-    
-    
+
     //Unit * unitPointer = new Unit(graphics, Vector2(100,100), 1);
     //std::unique_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
     //this->_fireteam.addUnit( std::move(tmp) );                          //need to std::move the unique pointer
@@ -100,22 +76,14 @@ Level::Level(std::string mapName, Graphics &graphics) :
     
     this->_slide = ControlSlide(graphics,Vector2(500, 500));
     
-    //this->_building.push_back(Vector2(1,2));
-    
-    //printf("test\n");
     
 
 }
 
-Level::~Level() {//printf("level destructor\n");
+Level::~Level() {
 }
 
-/*
-void Level::loadMap(std::string mapName, Graphics &graphics) {
-	this->_backgroundTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("/Users/jonahglick/Documents/Io/test.png"));
-	this->_size = Vector2(1280, 960);
-}
-*/
+
 
 void Level::loadMap(std::string mapName, Graphics &graphics) {
 	//this->_backgroundTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("C:\\Users\\Jglick\\Documents\\Io\\Test.png"));
@@ -131,72 +99,9 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 	doc.LoadFile(ss.str().c_str());
 	
 	XMLElement * mapNode = doc.FirstChildElement("map");
-	
-	int width, height;
-	mapNode->QueryIntAttribute("width", &width);
-	//std::cout << "width: " << width << std::endl;
-	mapNode->QueryIntAttribute("height", &height);
-	//std::cout << "height: " << height << std::endl;
-	this->_size = Vector2(width, height);
-	
-	int tileWidth, tileHeight;
 
-	mapNode->QueryIntAttribute("tilewidth", &tileWidth);
-	//std::cout << "tileWidth: " << tileWidth << std::endl;
-	mapNode->QueryIntAttribute("tileheight", &tileHeight);
-	//std::cout << "tileHeight: " << tileHeight << std::endl;
-	
-	this->_tileSize = Vector2(tileWidth, tileHeight);
-	
-	XMLElement * pTileset = mapNode->FirstChildElement("tileset");
-	
-	//loading the tileset
-	if (pTileset != NULL) {
-		while (pTileset) {
-			int firstgid;
-			//const char * source = pTileset->FirstChildElement("image")->Attribute("source");
-			const char * tsxSource = pTileset->Attribute("source");
-			
-			XMLDocument doc1;
-			std::stringstream ss1;
-			ss1 << tsxSource;
-			doc1.LoadFile(ss1.str().c_str());
-            
-            //std::cout << ss1.str() << std::endl;
-			
-			
-			//std::cout << "	tileset stuff:" + ss1.str() << std::endl;
-			
-			XMLElement * mapNode1 = doc1.FirstChildElement("tileset");
-            
-            
-			
-			const char * source = mapNode1->FirstChildElement("image")->Attribute("source");
-			
-			//std::cout << "	tileset stuff source:";
-			//std::cout << source << std::endl;
-			
-			//char * path;
-			std::stringstream ss2;
-			ss2 << source;
-			pTileset->QueryIntAttribute("firstgid", &firstgid);
-			
-			//std::cout << "first gid: ";
-			//std::cout << firstgid << std::endl;
-			
-			SDL_Texture * tex = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(ss2.str()));
-			this->_tileSets.push_back(Tileset(tex, firstgid));
-			
-			//std::cout << "tileSets size: ";
-			//std::cout << _tileSets.size() << std::endl;
-			
-			pTileset = pTileset->NextSiblingElement("tileset"); //come back to this (32:30, ep. 9)
-
-		}
-	}
-	
-
-	//collisions
+    
+    
 	
 	XMLElement * pObjectGroup = mapNode->FirstChildElement("objectgroup");
 	if (pObjectGroup != NULL) {
@@ -243,14 +148,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 				}
 			}
             
-            //this->_graph = Graph(4);
-            
-            //Graph test = Graph(4);
-            
-            //Graph test(1);
-            
-            
-            
+
             else if (ss.str() == "corners") {
                 
                 cornerHasBeenCalled = 1;
@@ -583,9 +481,6 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 		}
 	}
     
-    //printf("end load map\n");
-    
-    //this->_graph.printAdjacencyMatrix();
     
     
 }
@@ -594,7 +489,6 @@ void Level::update(int elapsedTime, Graphics &graphics) {
 
 
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
-        //this->_collisionRects.at(i).update(elapsedTime, this->_dx, this->_dy);
         this->_collisionRects.at(i).update(elapsedTime, graphics.getCameraDx(), graphics.getCameraDy());
     }
     
@@ -644,7 +538,7 @@ void Level::draw(Graphics &graphics) {
     
     //Map::drawTrans(graphics, posx, posy, this->_angle, posx, posy, this->_cameraMove);
     
-    Map::drawTrans(graphics, posx, posy, graphics.getCameraAngle(), posx, posy, this->_cameraMove);
+    Map::drawTrans(graphics, posx, posy, graphics.getCameraAngle(), posx, posy);
     
     //draw collision rects
     for(int i = 0; i<this->_collisionRects.size(); i++) {
@@ -684,29 +578,16 @@ void Level::draw(Graphics &graphics) {
     //graphics.drawLine(10,10,800,800);
     
     
+    
+    /*
     Vector2 coll = checkShotCollision(640, 400, graphics.getCameraAngle());
     
     if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
         graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
     }
-    
-    
-    /*
-    std::map<int, Vector2> vertices = this->_graph.getVertexTable();
-    Vector2 temp;
-    for(const auto& iter : vertices) {
-        temp = checkPathCollision(this->_unit.getStaticX()+this->_unit.getX(), this->_unit.getStaticY()+this->_unit.getY(), iter.second.x, iter.second.y);
-    
-        //if(!(temp.x == 0)&&(temp.y == 0)) {
-
-            graphics.drawRect(temp.x-5, temp.y-5, 10, 10);
-            
-        //}
-    }
     */
-    
-    
-    
+
+
     
     //unit
     this->_unit.draw(graphics);
@@ -724,14 +605,14 @@ void Level::draw(Graphics &graphics) {
     //in both cases we change the - sin for x into a + sin
     graphics.drawLine(xEquivalent, yEquivalent, xEquivalent - 100*std::sin(angleEquivalent*3.14159/180), yEquivalent - 100*std::cos(angleEquivalent*3.14159/180) );
 
-    
+    /*
     coll = checkShotCollision(xEquivalent, yEquivalent, angleEquivalent);
     
     
     if(!((coll.x == 0) && (coll.y == 0))) {                         //CHNAGE THIS TO NOT BE 0!
         graphics.drawRect(coll.x - 5, coll.y - 5, 10, 10);
     }
-
+*/
     
     //slide
     this->_slide.draw(graphics);
@@ -761,18 +642,6 @@ std::vector<Rectangle> Level::checkTileCollisions(const Rectangle &other) { //ot
 	return others;                                                          //returning level collision rects
 }
 
- 
-/*
-std::vector<Door> Level::checkDoorCollisions(const Rectangle &other) {
-	std::vector<Door> others;
-	for(int i = 0; i<this->_doorList.size(); i++) {
-		if(this->_doorList.at(i).collidesWith(other)) {
-			others.push_back(this->_doorList.at(i));
-		}
-	}
-	return others;
-}
-*/
 
 
 const Vector2 Level::getPlayerSpawnPoint() const {
@@ -809,145 +678,11 @@ void Level::handleSlideRelease(Graphics &graphics) {
         
     }
     
-    
-    
-    
-    
-    
-    /*
-    //check to see if the slide is in a building
-    //if(this->_level.) { //if slide is in a building
-    bool isInBuilding = 0;
-    
-    for(Rectangle i : this->_buildings) {
-        Vector2 center = this->_slide.getCenter();
-        if((center.x > i.getStartX()) && (center.x < i.getStartX() + i.getWidth())) {
-            if((center.y > i.getStartY()) && (center.y < i.getStartY() + i.getHeight())) {
-                
-                printf("in building\n");
-                //isInBuilding = 1;
-            }
-        }
-    }
-    
-    
-    if(0) { //if is in building. Find preferredNode;
-        
-    }
-    else {
-        moveUnitToSlidePosition(graphics);
-        moveUnitAngleToSlideAngle(graphics);
-    }
-    */
-    
-    
-    
-    
-    
+
 
 }
 
 
-/*
-void Level::moveForward() {
-    this->_dx = 0.0;
-    this->_dy = -player_constants::WALK_SPEED;
-}
-
-void Level::moveBackward() {
-    this->_dx = 0.0;
-    this->_dy = player_constants::WALK_SPEED;
-}
-
-
-void Level::moveRight() {
-    this->_dx = player_constants::WALK_SPEED;
-    this->_dy = 0.0;
-}
-
-void Level::moveLeft() {
-    this->_dx = -player_constants::WALK_SPEED;
-    this->_dy = 0.0;
-}
-*/
-
-
-
-/*
-void Level::moveForward() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_unit.moveForwardParallax();
-    this->_slide.moveForwardParallax();
-}
-
-void Level::moveBackward() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_unit.moveBackwardParallax();
-    this->_slide.moveBackwardParallax();
-}
-
-
-void Level::moveRight() {
-    this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_unit.moveRightParallax();
-    this->_slide.moveRightParallax();
-}
-
-void Level::moveLeft() {
-    this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_unit.moveLeftParallax();
-    this->_slide.moveLeftParallax();
-}
-
-//  dxForward/1.41421 + dxRight/1.41421
-//  dyForward/1.41421 + dyRight/1.41421
-void Level::moveUpRight() {                 //should have said forwardRight and backwardRight instead
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
-    this->_unit.moveUpRightParallax();
-    this->_slide.moveUpRightParallax();
-}
-void Level::moveUpLeft() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
-    this->_unit.moveUpLeftParallax();
-    this->_slide.moveUpLeftParallax();
-}
-void Level::moveDownRight() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
-    this->_unit.moveDownRightParallax();
-    this->_slide.moveDownRightParallax();
-}
-void Level::moveDownLeft() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421;
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180)/1.41421;
-    this->_unit.moveDownLeftParallax();
-    this->_slide.moveDownLeftParallax();
-}
-*/
-
-
-void Level::cameraMove() {
-    this->_cameraMove = 1;
-}
-
-void Level::cameraStill() {
-    this->_cameraMove = 0;
-}
-
-
-
-void Level::stopMoving() {
-	this->_dx = 0.0f;
-	this->_dy = 0.0f;
-    this->_unit.stopMovingParallax();
-    this->_slide.stopMovingParallax();
-}
 
 //http://www.jeffreythompson.org/collision-detection/line-circle.php
 void Level::handlePlayerCollisions(double elapsedTime, Graphics &graphics) {
@@ -962,20 +697,7 @@ void Level::handlePlayerCollisions(double elapsedTime, Graphics &graphics) {
     std::vector<Direction> collisionDirections;
     
     for (Structure &structureIter : this->_structures) {
-        
-        /*
-        //printf("%d, %d\n", structureIter.corners.at(0).x, structureIter.corners.at(0).y);
-        double x3 = structureIter.corners.at(0).x;
-        double y3 = structureIter.corners.at(0).y;
-        double x4 = structureIter.corners.at(1).x;
-        double y4 = structureIter.corners.at(1).y;
-        
-        //printf("%d\n", lineCircle(x3, y3, x4, y4, playerX, playerY, 8));
-        */
-        
-        //printf("%f, %f  :   %f, %f\n", x3, y3, playerX, playerY);
-        
-        
+
         
         for(int i = 0; i < structureIter.corners.size() - 1; i++) {
             double x1 = structureIter.corners.at(i).x;
@@ -1373,30 +1095,7 @@ void Level::changeX(int newX, int newCollisionX) {
     
 }
 
-/*
-void Level::changeAngle(float angle) {
-    this->_angle += angle;
-    if(this->_angle > 180) {
-        this->_angle = this->_angle - 360;
-    }
-    else if(this->_angle < -180) {
-        this->_angle = this->_angle + 360;
-    }
-}
-*/
-/*
-float Level::getAngle() {
-    return this->_angle;
-}
 
-float Level::getDX() {
-    return this->_dx;
-}
-
-float Level::getDY() {
-    return this->_dy;
-}
-*/
 
 void Level::setUnitAngle() {
     this->_unit.setPlayerAngle(this->_angle);
@@ -1408,10 +1107,12 @@ void Level::handleUnitMovement() {
     this->_unit.handleMovement();
 }
 
+ 
+ 
 void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graphics for testing
     //check if the path is clear
     
-    bool temp = checkPathCollisionNew(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, posX+8, posY+8, graphics);
+    bool temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, posX+8, posY+8, graphics);
     //printf("temp: %d\n", temp);
     
     //printf("%d, %d\n", posX, posY);
@@ -1445,11 +1146,11 @@ void Level::moveUnitToPosition(int posX, int posY, Graphics &graphics) { //graph
         double weight = 0.0;
         
         for(const auto& iter : vertices) {
-            temp = checkPathCollisionNew(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
+            temp = checkPathCollision(this->_unit.getStaticX()+8, this->_unit.getStaticY()+4+8, iter.second.x+8, iter.second.y+8,graphics);
             printf("vertex: %d \t collision:%d\n", iter.first, temp);
             
             
-            tempDestination = checkPathCollisionNew(posX+8, posY+8, iter.second.x+8, iter.second.y+8,graphics);
+            tempDestination = checkPathCollision(posX+8, posY+8, iter.second.x+8, iter.second.y+8,graphics);
             
             //printf("destination: %d, %d, %d, %d\n", posX, posY, iter.second.x, iter.second.y);
             
@@ -1540,22 +1241,25 @@ bool Level::checkSlideCollision(int xm, int ym) {
     
 }
 
+
 void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
     this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
     
     
     this->_fireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
-    
-    
-    
-    
+
 }
+
+
 
 void Level::centerSlideToZero(){
     this->_slide.centerSlideToZero();
 }
 
-bool Level::checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
+bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
+    
+    //GET ANGLE TO PATH
+    
     //we're going from center of vertices;
     double xdiff = endx - (beginx);
     double ydiff = endy - (beginy);
@@ -1578,392 +1282,62 @@ bool Level::checkPathCollisionNew(int beginx, int beginy, int endx, int endy, Gr
         angle += 360;
     }
     
-    double distanceToEnd = std::sqrt(std::pow(beginx - endx,2) + std::pow(beginy - endy,2));
     
+    //GET STARTING TOP AND BOTTOM POINTS
+    
+    double topBeginPosX = beginx - 8 * std::cos(angle*3.14159/180);      //radius of unit is 8
+    double topBeginPosY = beginy + 8 * std::sin(angle*3.14159/180);
+    
+    double bottomBeginPosX = beginx + 8 * std::cos(angle*3.14159/180);
+    double bottomBeginPosY = beginy - 8 * std::sin(angle*3.14159/180);
+    
+    
+    
+    double topEndPosX = endx - 8 * std::cos(angle*3.14159/180);      //radius of unit is 8
+    double topEndPosY = endy + 8 * std::sin(angle*3.14159/180);
+    
+    double bottomEndPosX = endx + 8 * std::cos(angle*3.14159/180);
+    double bottomEndPosY = endy - 8 * std::sin(angle*3.14159/180);
+    
+    
+    this->_gunShotPaths.push_back(GunshotPath(graphics, topBeginPosX, topBeginPosY, topEndPosX, topEndPosY, 6000));
+    this->_gunShotPaths.push_back(GunshotPath(graphics, bottomBeginPosX, bottomBeginPosY, bottomEndPosX, bottomEndPosY, 6000));
 
-    double topPosX = beginx - 8 * std::cos(angle*3.14159/180);      //radius of unit is 8
-    double topPosY = beginy + 8 * std::sin(angle*3.14159/180);
-    
-    double bottomPosX = beginx + 8 * std::cos(angle*3.14159/180);
-    double bottomPosY = beginy - 8 * std::sin(angle*3.14159/180);
+    bool collision = 0;
     
     
-    Vector2 collisionTop = checkShotCollisionNew(topPosX, topPosY, angle);
-    if(!(collisionTop.x == 0 && collisionTop.y == 0)) { //if there was a collision
-        double distanceToCollision = std::sqrt(std::pow(collisionTop.x - topPosX,2) + std::pow(collisionTop.y - topPosY,2));
-        if(distanceToCollision < distanceToEnd) { // then there is no clear path
-            return 1;
-        }
-    }
-    
-    Vector2 collisionBottom = checkShotCollisionNew(bottomPosX, bottomPosY, angle);
-    if(!(collisionBottom.x == 0 && collisionBottom.y == 0)) { //if there was a collision
-        double distanceToCollision = std::sqrt(std::pow(collisionBottom.x - bottomPosX,2) + std::pow(collisionBottom.y - bottomPosY,2));
-        if(distanceToCollision < distanceToEnd) { // then there is no clear path
-            return 1;
-        }
-    }
-    
-
-    //this->_gunShotPaths.push_back(GunshotPath(graphics, topPosX, topPosY, endx, endy, 6000));
-    //this->_gunShotPaths.push_back(GunshotPath(graphics, bottomPosX, bottomPosY, endx, endy, 6000));
-
-    
-    return 0; //no collision
-}
-
-
-
-bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
-
-    //double xdiff = endx - (this->_unit.getStaticX());
-    //double ydiff = endy - (this->_unit.getStaticY()+4);
-    double xdiff = endx - (beginx);
-    double ydiff = endy - (beginy);
-    
-    double angle = 0.0;
-    
-    if(ydiff < 0) {
-        angle = (-std::atan(xdiff/ydiff)*180/3.14159);
-    }
-    else {
-        angle = (-std::atan(xdiff/ydiff) - 3.14159)*180/3.14159;
-    }
-    
-    angle = -angle;
-    
-    if(angle > 180) {
-        angle -= 360;
-    }
-    else if(angle < -180) {
-        angle += 360;
-    }
-
-    
-    //printf("%f, %f\n", angle, this->_angle);
-    
-    //Vector2 temp = checkPathCollision(beginx, beginy, angle);
-    
-    //printf("%d, %d\n", temp.x, temp.y);
-    
-    double distanceToEnd = std::sqrt(std::pow(beginx - endx,2) + std::pow(beginy - endy,2));
-    
-    //double distanceToEnd = 0;
-    
-    //bool collision = checkPathCollisionHelp(beginx, beginy, angle, distanceToEnd);
-    
-    //(y - y1) = m (x - x1)
-    // y = mx + y1 - m * x1
-    
-    double m = ydiff / xdiff;
-    double b = beginy - m * beginx;
-    
-    //b = b + 8 / std::sin(angle*3.14159/180);
-    
-    //bool collision = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);   //checking collision with center
-    
-    b = b + 8 / std::sin(angle*3.14159/180);
-    bool collisionTop = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);
-    //graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collisionTop);
-    
-    
-    b = b - 16 / std::sin(angle*3.14159/180);
-    bool collisionBottom = checkPathCollisionHelp2(beginx, beginy, m, b, distanceToEnd, angle);
-    //graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collisionBottom);
-    
-    
-    
-    
-    
-    
-    /*
-    //graphics.storeLineDebug(beginx, beginy, endx, endy, collision);
-    
-    //y = m x + b
-    //graphics.storeLineDebug(0, b, 1280, 1280*m + b, 0);
-    
-    b = b + 8 / std::sin(angle*3.14159/180);
-    graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collision);
-    
-    b = b - 16 / std::sin(angle*3.14159/180);
-    graphics.storeLineDebug(beginx, beginx*m + b, endx, endx*m + b, collision);
-    */
-    
-    
-    
-    return (collisionTop || collisionBottom);
-}
-
-bool Level::checkPathCollisionHelp2(double beginx, double beginy, double m, double b, double distanceToEnd, double angle) {
-    
-    /*
-    float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
-    
-    
-    float b = beginy - m*beginx;
-    */
-    
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    float yhit = 0.0;
-    float xhit = 0.0;
-    
-    for(Rectangle &i : this->_collisionRects) {
-        
-        
-        
-        //check bottom
-        collisionx = (i.getStartY()+i.getHeight() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() <= (beginy - i.getHeight()) && std::abs(angle) <= 90)) {
-            //printf("I'm satisfied\n");
-            //printf("\n");
+    //check collisions with all structure lines
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
             
-            //printf("collisionx: %f\n", collisionx);
-            
-            
-            //printf("\n");
-            
-            if((collisionx >= i.getStartX()) && (collisionx <= (i.getStartX()+i.getWidth()))) {       //need ">=" to account for corners
-                
-                //yes collision
-                //printf("bottom\n");
-                
-                yhit = i.getStartY()+i.getHeight();
-                
-                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
-                    return 1;
-                }
+            if(isLineLineCollision(topBeginPosX, topBeginPosY, topEndPosX, topEndPosY, x3, y3, x4, y4) || isLineLineCollision(bottomBeginPosX, bottomBeginPosY, bottomEndPosX, bottomEndPosY, x3, y3, x4, y4)) {
                 
                 
                 
-                //return 1;
+                collision = 1;
                 
-                //return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
+                
+                
                 
             }
         }
-        
-        
-        
-        //check top
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        
-        if((i.getStartY() >= beginy && std::abs(angle) >= 90)) {
-            if(collisionx >= i.getStartX() && collisionx <= i.getStartX()+i.getWidth()) {
-                
-                //printf("top\n");
-                //return 1;
-                
-                //return Vector2(collisionx,this->_collisionRects.at(0).getY());
-                
-                yhit = i.getStartY();
-                
-                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-            }
-        }
-        
-        
-        
-        
-        //check left
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartX() >= beginx) && angle <= 0) {
-            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
-                
-                //printf("left\n");
-                
-                //return 1;
-                
-                xhit = i.getStartX();
-                
-                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-                //return Vector2(this->_collisionRects.at(0).getX(),collisiony);
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = (i.getStartX()+i.getWidth()) * m + b;
-        if((i.getStartX() <= beginx - i.getWidth()) && angle >= 0) {
-            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
-                
-                //printf("right\n");
-                
-                //return 1;
-                
-                xhit = i.getStartX()+i.getWidth();
-                
-                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-                //return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
-                
-            }
-        }
-        
-        
-        
     }
     
     
     
-    //no collision
-    return 0;
-    //return Vector2(0, 0);
     
+    
+    
+    return collision;
     
     
 }
 
 
-
-
-
-bool Level::checkPathCollisionHelp(double beginx, double beginy, double angle, double distanceToEnd) {
-    
-    //printf("begin: %f, %f, %f\n",beginx, beginy,angle);
-    
-    
-    float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
-    
-    
-    float b = beginy - m*beginx;
-    //printf("m: %f, b: %f\n", m, b);
-    
-    //printf("size: %d\n", this->_collisionRects.size());
-    
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    float yhit = 0.0;
-    float xhit = 0.0;
-           
-    for(Rectangle &i : this->_collisionRects) {
-        
-    
-        //check bottom
-        collisionx = (i.getStartY()+i.getHeight() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() <= (beginy - i.getHeight()) && std::abs(angle) <= 90)) {
-            //printf("I'm satisfied\n");
-            //printf("\n");
-            
-            //printf("collisionx: %f\n", collisionx);
-            
-            
-            //printf("\n");
-            
-            if((collisionx >= i.getStartX()) && (collisionx <= (i.getStartX()+i.getWidth()))) {       //need ">=" to account for corners
-                
-                //yes collision
-                //printf("bottom\n");
-                
-                yhit = i.getY()+i.getHeight();
-                
-                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-                
-                
-                //return 1;
-                
-                //return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
-                
-            }
-        }
-        
-        
-        
-        //check top
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        
-        if((i.getStartY() >= beginy && std::abs(angle) >= 90)) {
-            if(collisionx >= i.getStartX() && collisionx <= i.getStartX()+i.getWidth()) {
-                
-                //printf("top\n");
-                //return 1;
-                
-                //return Vector2(collisionx,this->_collisionRects.at(0).getY());
-                
-                yhit = i.getY();
-                
-                if (std::sqrt(std::pow(beginx - collisionx,2) + std::pow(beginy - yhit,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-            }
-        }
-        
-        
-        
-        
-        //check left
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartX() >= beginx) && angle <= 0) {
-            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
-                
-                //printf("left\n");
-                
-                //return 1;
-                
-                xhit = i.getX();
-                
-                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-                //return Vector2(this->_collisionRects.at(0).getX(),collisiony);
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = (i.getStartX()+i.getWidth()) * m + b;
-        if((i.getStartX() <= beginx - i.getWidth()) && angle >= 0) {
-            if(collisiony >= i.getStartY() && collisiony <= i.getStartY()+i.getHeight()) {
-                
-                //printf("right\n");
-                
-                //return 1;
-                
-                xhit = i.getX()+i.getWidth();
-                
-                if (std::sqrt(std::pow(beginx - xhit,2) + std::pow(beginy - collisiony,2)) < distanceToEnd) {
-                    return 1;
-                }
-                
-                //return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
-                
-            }
-        }
-    
-    
-    
-    }
-    
-
-    
-    //no collision
-    return 0;
-    //return Vector2(0, 0);
-    
-    
-    
-}
 Vector2 Level::checkShotCollisionNewNew(double beginx, double beginy, double endx, double endy, Graphics &graphics) {
     
     std::vector<Vector2> collisionPoints;
@@ -2029,307 +1403,7 @@ Vector2 Level::checkShotCollisionNewNew(double beginx, double beginy, double end
 }
 
 
-Vector2 Level::checkShotCollisionNew(double beginx, double beginy, double angle) {
-    
-    
-    //float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
-    float m = 1.0 / std::tan(angle*3.14159/180);
-    
-    float b = beginy - m*beginx;
-    
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    
-    std::vector<Vector2> collisionPoints;
-    
-    for(Rectangle i : this->_collisionRects) {
-        //check bottom
-        collisionx = (i.getStartY()+i.getHeight() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
-                //return Vector2(collisionx, i.getY()+i.getHeight());
-                collisionPoints.push_back(Vector2(collisionx, i.getStartY()+i.getHeight()));
-                
-            }
-        }
-        
-        
-        
-        //check top
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
-                //printf("top ");
-                
-                //return Vector2(collisionx, i.getY());
-                collisionPoints.push_back(Vector2(collisionx, i.getStartY()));
-                
-            }
-        }
-        
-        
-        
-        //check left
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartX() > beginx) && angle < 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                //return Vector2(i.getX(),collisiony);
-                collisionPoints.push_back(Vector2(i.getStartX(),collisiony));
-                
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = (i.getStartX()+i.getWidth()) * m + b;
-        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                //return Vector2(i.getX()+i.getWidth(), collisiony);
-                collisionPoints.push_back(Vector2(i.getStartX()+i.getWidth(), collisiony));
-                
-            }
-        }
-    }
-
-
-    if(collisionPoints.size() > 0) {
-
-        double min = 1000000;
-        double weight = 0.0;
-        int nearest = -1;
-        
-        for(int i = 0; i<collisionPoints.size(); i++) {
-            //weight = std::sqrt(std::pow(collisionPoints[i].x - 640,2) + std::pow(collisionPoints[i].y - 400,2));
-            weight = std::sqrt(std::pow(collisionPoints[i].x - beginx,2) + std::pow(collisionPoints[i].y - beginy,2));
-            if(weight < min) {
-                min = weight;
-                nearest = i;
-            }
-        }
-        
-        return collisionPoints[nearest];
-        
-    }
-
-    
-    
-    //no collision
-    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
-    
-    
-    
-}
-
-Vector2 Level::checkShotCollision(double beginx, double beginy, double angle) {
-    
-    
-    float m = (beginy - (beginy - 100*std::cos(angle*3.14159/180)))/(beginx-(beginx - 100*std::sin(angle*3.14159/180)));
-
-    
-    float b = beginy - m*beginx;
-    
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    
-    std::vector<Vector2> collisionPoints;
-    
-    for(Rectangle i : this->_collisionRects) {
-        //check bottom
-        collisionx = (i.getY()+i.getHeight() - b)/m;
-        collisiony = i.getX() * m + b;
-        if((i.getY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
-            if(collisionx > i.getX() && collisionx < i.getX()+i.getWidth()) {
-                
-                //return Vector2(collisionx, i.getY()+i.getHeight());
-                collisionPoints.push_back(Vector2(collisionx, i.getY()+i.getHeight()));
-                
-            }
-        }
-        
-        
-        
-        //check top
-        collisionx = (i.getY() - b)/m;
-        collisiony = i.getX() * m + b;
-        if((i.getY() > beginy && std::abs(angle) > 90)) {
-            if(collisionx > i.getX() && collisionx < i.getX()+i.getWidth()) {
-                
-                //printf("top ");
-                
-                //return Vector2(collisionx, i.getY());
-                collisionPoints.push_back(Vector2(collisionx, i.getY()));
-                
-            }
-        }
-        
-        
-        
-        
-        //check left
-        collisionx = (i.getY() - b)/m;
-        collisiony = i.getX() * m + b;
-        if((i.getX() > beginx) && angle < 0) {
-            if(collisiony > i.getY() && collisiony < i.getY()+i.getHeight()) {
-                
-                //return Vector2(i.getX(),collisiony);
-                collisionPoints.push_back(Vector2(i.getX(),collisiony));
-                
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getY() - b)/m;
-        collisiony = (i.getX()+i.getWidth()) * m + b;
-        if((i.getX() < beginx - i.getWidth()) && angle > 0) {
-            if(collisiony > i.getY() && collisiony < i.getY()+i.getHeight()) {
-                
-                //return Vector2(i.getX()+i.getWidth(), collisiony);
-                collisionPoints.push_back(Vector2(i.getX()+i.getWidth(), collisiony));
-                
-            }
-        }
-    }
-    
-    
-    
-    
-    if(collisionPoints.size() > 0) {
-        
-        double min = 1000000;
-        double weight = 0.0;
-        int nearest = -1;
-        
-        for(int i = 0; i<collisionPoints.size(); i++) {
-            weight = std::sqrt(std::pow(collisionPoints[i].x - 640,2) + std::pow(collisionPoints[i].y - 400,2));
-            if(weight < min) {
-                min = weight;
-                nearest = i;
-            }
-        }
-        
-        return collisionPoints[nearest];
-        
-    }
-        
-        
-    /*
-    //check bottom
-    float collisionx = (this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight() - b)/m;
-    float collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() < (beginy - this->_collisionRects.at(0).getHeight()) && std::abs(angle) < 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            
-            return Vector2(collisionx, this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight());
-
-        }
-    }
-    
-
-    
-    //check top
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getY() > beginy && std::abs(angle) > 90)) {
-        if(collisionx > this->_collisionRects.at(0).getX() && collisionx < this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) {
-            
-            //printf("top ");
-            
-            return Vector2(collisionx,this->_collisionRects.at(0).getY());
-
-        }
-    }
-
-
-    
-    
-    //check left
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = this->_collisionRects.at(0).getX() * m + b;
-    if((this->_collisionRects.at(0).getX() > beginx) && angle < 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            
-            return Vector2(this->_collisionRects.at(0).getX(),collisiony);
-            
-        }
-    }
-    
-    //check right
-    collisionx = (this->_collisionRects.at(0).getY() - b)/m;
-    collisiony = (this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth()) * m + b;
-    if((this->_collisionRects.at(0).getX() < beginx - this->_collisionRects.at(0).getWidth()) && angle > 0) {
-        if(collisiony > this->_collisionRects.at(0).getY() && collisiony < this->_collisionRects.at(0).getY()+this->_collisionRects.at(0).getHeight()) {
-            
-            return Vector2(this->_collisionRects.at(0).getX()+this->_collisionRects.at(0).getWidth(), collisiony);
-            
-        }
-    }
-    */
-    
-    //now check the collisions with other units
-    Rectangle unitRec = this->_unit.getCollisionRect();
-    
-    //check bottom
-    collisionx = (unitRec.getY()+unitRec.getHeight() - b)/m;
-    collisiony = unitRec.getX() * m + b;
-    if((unitRec.getY() < (beginy - unitRec.getHeight()) && std::abs(angle) < 90)) {
-        if(collisionx > unitRec.getX() && collisionx < unitRec.getX()+unitRec.getWidth()) {
-            
-            return Vector2(collisionx, unitRec.getY()+unitRec.getHeight());
-            
-        }
-    }
-    
-    //check top
-    collisionx = (unitRec.getY() - b)/m;
-    collisiony = unitRec.getX() * m + b;
-    if((unitRec.getY() > beginy && std::abs(angle) > 90)) {
-        if(collisionx > unitRec.getX() && collisionx < unitRec.getX()+unitRec.getWidth()) {
-            
-            return Vector2(collisionx, unitRec.getY());
-            
-        }
-    }
-
-    //check left
-    collisionx = (unitRec.getY() - b)/m;
-    collisiony = unitRec.getX() * m + b;
-    if((unitRec.getX() > beginx) && angle < 0) {
-        if(collisiony > unitRec.getY() && collisiony < unitRec.getY()+unitRec.getHeight()) {
-            
-            return Vector2(unitRec.getX(),collisiony);
-            
-        }
-    }
-    
-    //check right
-    collisionx = (unitRec.getY() - b)/m;
-    collisiony = (unitRec.getX()+unitRec.getWidth()) * m + b;
-    if((unitRec.getX() < beginx - unitRec.getWidth()) && angle > 0) {
-        if(collisiony > unitRec.getY() && collisiony < unitRec.getY()+unitRec.getHeight()) {
-            
-            return Vector2(unitRec.getX()+unitRec.getWidth(), collisiony);
-            
-        }
-    }
-    
-    
-    
-    //no collision
-    return Vector2(0, 0);                           //maybe change this? maybe it should be negative, then have the corner of the map at (0,0)
-    
-
-    
-}
-
+ 
 void Level::moveUnitToSlidePosition(Graphics &graphics) {
     moveUnitToPosition(std::round(this->_slide.getStaticX() + 75 - 8), std::round(this->_slide.getStaticY() + 12 - 8), graphics);
     
@@ -2420,10 +1494,27 @@ void Level::moveUnitToNearestCover(Graphics &graphics) {
 
 void Level::playerFireShot(Graphics &graphics) {
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
     double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
     
-    Vector2 shotCollision = checkShotCollisionNew(playerX, playerY, graphics.getCameraAngle());
+    //Vector2 shotCollision = checkShotCollision(playerX, playerY, graphics.getCameraAngle());
     
     
     double shotDistance = 400;
@@ -2493,10 +1584,10 @@ void Level::playerFireShot(Graphics &graphics) {
     double closestPointX = (-bPerpindicular + bShot) / (mPerpindicular - mShot);
     double closestPointY = (bShot*mPerpindicular - bPerpindicular*mShot)/(mPerpindicular - mShot);
     
-    double shotCollisionDistance = std::sqrt(std::pow(shotCollision.x - playerX,2) + std::pow(shotCollision.y - playerY,2));
+    double shotCollisionDistance = std::sqrt(std::pow(newShotCollision.x - playerX,2) + std::pow(newShotCollision.y - playerY,2));
     double closestColllisionDistance = std::sqrt(std::pow(closestPointX - playerX,2) + std::pow(closestPointY - playerY,2));
     
-    if((shotCollision.x == 0 && shotCollision.y == 0) || (shotCollisionDistance > closestColllisionDistance)) { //if no collision, or shot collision is farther from player than closest point
+    if((newShotCollision.x == 0 && newShotCollision.y == 0) || (shotCollisionDistance > closestColllisionDistance)) { //if no collision, or shot collision is farther from player than closest point
         this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
     }
     //this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
@@ -2892,74 +1983,7 @@ bool Level::checkShotCollisionFoWCorner(double beginx, double beginy, double ang
                
     return 0;
     
-    
-    
-    
-    /*
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    
-    float m = 1.0 / std::tan(angle*3.14159/180);
-    float b = beginy - m*beginx;
-    
-    
-    for(Rectangle i : this->_collisionRects) {
-        //check bottom
-        collisionx = (i.getStartY()+i.getHeight() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
-                
-                return 1;
-                
-                
-                
-            }
-        }
-        
-        
-        
-        //check top
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
-                return 1;
-                
-            }
-        }
-        
-        
-        
-        //check left
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartX() > beginx) && angle < 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                return 1;
-                
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = (i.getStartX()+i.getWidth()) * m + b;
-        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                return 1;
-                
-                
-            }
-        }
-    }
-    */
-    
-    //return 0;
+
     
     
 }
@@ -2989,167 +2013,7 @@ Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle,
             
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /*
-    
-    //need to also include boundaries of the camera
-    
-    
-    //printf("%f\n",angle);
-    
-    float m = 1.0 / std::tan(angle*3.14159/180);
-    
-    float b = beginy - m*beginx;
-    
-    float collisionx = 0.0;
-    float collisiony = 0.0;
-    
-    std::vector<Vector2> collisionPoints;
-    
-    Vector2 cornerVector(endx, endy);
-    
-    //first do camera boudaries
-    
-    //angle will be -180 < angle < 180
-    
-    double tmp = 180.0 / 3.14159 * std::atan(640.0/400.0);
-    
-    
-    //check top
-    //y = mx + b
-    //x =
-    
-    collisionx = ((beginy-400)-b)/m;
-    collisiony = beginy + 400;                          //based on where the player is located on screen. Same as cameraY
-    if(std::abs(angle) < tmp) {
-        collisionPoints.push_back(Vector2(collisionx, beginy - 400));
-        //return Vector2(300, 300);
-    }
-    //printf("top: %f\n", 180.0 / 3.14159 * std::atan(640.0/400.0));
-    
-    double tmp1 = (360.0 - tmp*2.0) / 2.0;
-    
-    //check right                                                                   //only one of these 4 works. probably not the one i expect. dont use 1280 and 400, use the static location values
-    collisionx = beginx + 640;
-    collisiony = m * (beginx + 640) + b;
-    if(-angle > tmp && -angle < tmp1) {
-        collisionPoints.push_back(Vector2(beginx + 640, collisiony));
-        //return Vector2(400, 400);
-        
-    }
-    
-    //check left
-    collisionx = beginx - 640;
-    collisiony = m*(beginx - 640) + b;
-    if(angle > -tmp && angle < (tmp1)) {
-        collisionPoints.push_back(Vector2(beginx - 640, collisiony));
-        //return Vector2(200, 400);
-    }
-    
-    //check bottom
-    collisionx = ((beginy + 400) - b) / m;
-    collisiony = beginy + 400;
-    if(std::abs(angle) > tmp1) {
-        //printf("printing\n");
-        collisionPoints.push_back(Vector2(collisionx, beginy + 400));
-        //return Vector2(300, 500);
-    }
-    
-    
-    
-    //printf("angle: %f\n", angle);
-    
-    
-    for(Rectangle i : this->_collisionRects) {
-        //check bottom
-        collisionx = (i.getStartY()+i.getHeight() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() < (beginy - i.getHeight()) && std::abs(angle) < 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
 
-                
-                
-                Vector2 collisionVector(collisionx, i.getStartY()+i.getHeight());
-                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
-                    collisionPoints.push_back(collisionVector);
-                }
-                
-
-                
-            }
-        }
-        
-        
-        
-        //check top
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartY() > beginy && std::abs(angle) > 90)) {
-            if(collisionx > i.getStartX() && collisionx < i.getStartX()+i.getWidth()) {
-                
-                Vector2 collisionVector(collisionx, i.getStartY());
-                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
-                    collisionPoints.push_back(collisionVector);
-                }
-                //collisionPoints.push_back(Vector2(collisionx, i.getStartY()));
-                
-            }
-        }
-        
-        
-        
-        //check left
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = i.getStartX() * m + b;
-        if((i.getStartX() > beginx) && angle < 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                //collisionPoints.push_back(Vector2(i.getStartX(),collisiony));
-                
-                Vector2 collisionVector(i.getStartX(), collisiony);
-                
-                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
-                    collisionPoints.push_back(collisionVector);
-                }
-                
-                
-            }
-        }
-        
-        //check right
-        collisionx = (i.getStartY() - b)/m;
-        collisiony = (i.getStartX()+i.getWidth()) * m + b;
-        if((i.getStartX() < beginx - i.getWidth()) && angle > 0) {
-            if(collisiony > i.getStartY() && collisiony < i.getStartY()+i.getHeight()) {
-                
-                //collisionPoints.push_back(Vector2(i.getStartX()+i.getWidth(), collisiony));
-                
-                
-                Vector2 collisionVector(i.getStartX()+i.getWidth(), collisiony);
-                
-                if(!arePointsVeryClose(cornerVector, collisionVector)) {        //if the collision is not the corner we are testing
-                    collisionPoints.push_back(collisionVector);
-                }
-                
-                
-            }
-        }
-    }
-    */
-    
-    
-    
-    
-    
     
     
     

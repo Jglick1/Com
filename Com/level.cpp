@@ -2874,6 +2874,28 @@ void Level::drawPolygonCorners(Graphics &graphics) {
 bool Level::checkShotCollisionFoWCorner(double beginx, double beginy, double angle, double endx, double endy) {
     
     
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
+            
+            if(isLineLineCollision(beginx, beginy, endx, endy, x3, y3, x4, y4)) {
+                return 1;
+            }
+               
+               
+        }
+    }
+    
+               
+    return 0;
+    
+    
+    
+    
+    /*
     float collisionx = 0.0;
     float collisiony = 0.0;
     
@@ -2935,9 +2957,9 @@ bool Level::checkShotCollisionFoWCorner(double beginx, double beginy, double ang
             }
         }
     }
+    */
     
-    
-    return 0;
+    //return 0;
     
     
 }
@@ -2945,6 +2967,38 @@ bool Level::checkShotCollisionFoWCorner(double beginx, double beginy, double ang
 
 Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle, double endx, double endy) {
     
+    
+    std::vector<Vector2> collisionPoints;
+    
+    
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
+            
+            if(isLineLineCollision(beginx, beginy, endx, endy, x3, y3, x4, y4)) {
+                
+                
+                
+                
+                
+            }
+            
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*
     
     //need to also include boundaries of the camera
     
@@ -3090,6 +3144,14 @@ Vector2 Level::checkShotCollisionFoW(double beginx, double beginy, double angle,
             }
         }
     }
+    */
+    
+    
+    
+    
+    
+    
+    
     
     if(collisionPoints.size() > 0) {
         

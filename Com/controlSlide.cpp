@@ -16,8 +16,8 @@ namespace player_constants {
 
 ControlSlide::ControlSlide() {}
 
-ControlSlide::ControlSlide(Graphics &graphics, Vector2 spawnPoint) :
-Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider.png", 0, 0, 150, 25, 0, 0),
+ControlSlide::ControlSlide(Graphics &graphics, Vector2 spawnPoint, bool allied) :
+//Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider.png", 0, 0, 150, 25, 0, 0),
 //_x(0),
 //_y(0),
 _staticx(spawnPoint.x),
@@ -38,7 +38,16 @@ _LrotatedY(0.0),
 _sideHoldR(0),
 _sideHoldL(0),
 _isSelected(0)
-{}
+{
+    
+    if(allied) {
+        this->_slideSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider.png", 0, 0, 150, 25, 0, 0);
+    }
+    else {
+        this->_slideSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider_enemy.png", 0, 0, 150, 25, 0, 0);
+    }
+
+}
 
 
 
@@ -51,7 +60,9 @@ void ControlSlide::draw(Graphics &graphics) {
     
     //Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + this->_playerAngle);
 
-    Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + graphics.getCameraAngle());
+    //Sprite::drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + graphics.getCameraAngle());
+    
+    this->_slideSprite.drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + graphics.getCameraAngle());
     
     graphics.drawPoint(this->_RrotatedX, this->_RrotatedY);
     graphics.drawPoint(this->_LrotatedX, this->_LrotatedY);
@@ -115,8 +126,14 @@ void ControlSlide::setPlayerAngle(float playerAngle) {
 
 bool ControlSlide::checkSlideCollision(int xm, int ym) {
     
-    int tx = std::round(this->_x + this->_staticx);
-    int ty = std::round(this->_y + this->_staticy);
+    //int tx = std::round(this->_x + this->_staticx);
+    //int ty = std::round(this->_y + this->_staticy);
+    
+    
+    int tx = std::round(this->_staticx);
+    int ty = std::round(this->_staticy);
+    
+    
     int width = std::round(this->_width);
     int height = std::round(this->_height);
     

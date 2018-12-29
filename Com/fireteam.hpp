@@ -22,7 +22,7 @@
 class Fireteam {
 public:
     Fireteam();
-    Fireteam(Graphics &graphics, bool allied);
+    Fireteam(Graphics &graphics, bool allied, Vector2 spawnPoint);
     ~Fireteam();
     void draw(Graphics &graphics);
     void update(int elapsedTime, Graphics &graphics);
@@ -45,6 +45,14 @@ public:
     bool isCenterSelected();
     void moveToSlideAngle();
     
+    Vector2 getSlideCenter();
+    double getSlideAngle();
+    
+    Vector2 checkUnitCollision(double shotBeginX, double shotBeginY, double shotEndX, double shotEndY);
+    bool linePoint(double x1, double y1, double x2, double y2, double px, double py);
+    double dist(double x1, double y1, double x2, double y2);
+    
+    
 private:
     int _id;
     int _numUnits;
@@ -61,6 +69,7 @@ private:
     
     
 };
+
 
 
 #endif /* fireteam_hpp */

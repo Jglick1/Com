@@ -14,10 +14,10 @@
 
 class Graphics;
 
-class ControlSlide : public Sprite {
+class ControlSlide {
 public:
     ControlSlide();
-    ControlSlide(Graphics &graphics, Vector2 spawnPoint);
+    ControlSlide(Graphics &graphics, Vector2 spawnPoint, bool allied);
 
     void draw(Graphics &graphics);
     void update(float elapsedTime, Graphics &graphics);
@@ -72,6 +72,8 @@ private:
     float _movingy;
     
     bool _isSelected;
+    
+    Sprite _slideSprite;
     
     
 };

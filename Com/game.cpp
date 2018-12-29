@@ -531,7 +531,7 @@ void Game::draw(Graphics &graphics) {
         this->_cursor.draw(graphics);
         
         graphics.drawDebug();       //draw all debug lines
-        //graphics.eraseDebugLines();      //erase all stored debug lines
+        graphics.eraseDebugLines();      //erase all stored debug lines
         
         graphics.drawCircle(640, 400, 8);
         

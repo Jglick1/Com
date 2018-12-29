@@ -83,6 +83,12 @@ public:
     void moveUnitToSlidePosition(Graphics &graphics);
     void moveUnitToNearestCover(Graphics &graphics);
     
+    
+    
+    
+    
+    
+    
     void playerFireShot(Graphics &graphics);
     
     //Vector2 checkShotCollisionNew(double beginx, double beginy, double angle);
@@ -121,6 +127,8 @@ public:
     
     void changeDrawFoVNode();
     
+    
+    
     bool isLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
     Vector2 whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
     double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
@@ -136,6 +144,10 @@ public:
     
     
     bool approxEqual(double x1, double x2);
+    
+    
+    bool closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction);
+    
     
     void handlePlayerCollisions(double elapsedTime, Graphics &graphics);
     bool lineCircle(double x1, double y1, double x2, double y2, double cx, double cy, double r, double &closestX, double &closestY);
@@ -204,8 +216,10 @@ private:
     
     Fireteam _fireteam;
     
-    std::vector<Structure> _structures;
+    Fireteam _enemyFireteam;
     
+    std::vector<Structure> _structures;
+    std::vector<Door> _doors;
     
     
 };

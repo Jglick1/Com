@@ -44,10 +44,8 @@ Level::Level(std::string mapName, Graphics &graphics) :
     this->_unit = Unit(graphics, Vector2(0,0), 1);
     
 
-    this->_fireteam = Fireteam(graphics, 1);
+    this->_fireteam = Fireteam(graphics, 1, Vector2(100,100));
     
-    
-
     //Unit * unitPointer = new Unit(graphics, Vector2(100,100), 1);
     //std::unique_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
     //this->_fireteam.addUnit( std::move(tmp) );                          //need to std::move the unique pointer
@@ -73,8 +71,36 @@ Level::Level(std::string mapName, Graphics &graphics) :
     //vector of unit types <allies>
     //printf("test\n");
     
+    this->_enemyFireteam = Fireteam(graphics, 0, Vector2(700, 700));
     
-    this->_slide = ControlSlide(graphics,Vector2(500, 500));
+    
+    
+    
+    
+    std::shared_ptr<Unit> tmp4(new Unit(graphics, Vector2(100 + 400, 100+ 400), 0) );
+    this->_enemyFireteam.addUnit( std::move(tmp4) );
+    
+    
+    std::shared_ptr<Unit> tmp5(new Unit(graphics, Vector2(200+ 400, 200+ 400), 0) );
+    this->_enemyFireteam.addUnit( std::move(tmp5) );
+    
+    
+    std::shared_ptr<Unit> tmp6(new Unit(graphics, Vector2(300+ 400, 300+ 400), 0) );
+    this->_enemyFireteam.addUnit( std::move(tmp6) );
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    this->_slide = ControlSlide(graphics,Vector2(500, 500), 1);
     
     
 
@@ -419,6 +445,8 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                         double startx = pObject->FloatAttribute("x");
                         double starty = pObject->FloatAttribute("y");
                         
+                        double name = pObject->IntAttribute("name");
+                        
                         std::vector<Vector2> tmp;
                         std::vector<Direction> tmp2;
                         
@@ -438,7 +466,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                             double oldN = -1, oldT = -1;
                             double n, t;
                             char tmp1;
-                            while(polyLineSS >> n){
+                            while(polyLineSS >> n) {
                                 
                                 polyLineSS >> tmp1;    //ignore comma and spaces
                                 polyLineSS >> t;
@@ -460,7 +488,26 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                             //    printf("%d, %d\n", iter.x, iter.y);
                             //}
                             
-                            this->_structures.push_back(Structure(tmp, 0.0, tmp2, 5));
+                            
+                            /*
+                            //check to see if this structure has already been constructed
+                            bool alreadyConstructed = 0;
+                            for(Structure &iter : this->_structures) {
+                                if(iter.name == name) {
+                                    alreadyConstructed = 1;
+                                }
+                            }
+                            if(alreadyConstructed) {
+                                
+                            }
+                            else {
+                                
+                            }
+                            */
+                            //door does not need to be tied to structure
+                            
+                            
+                            this->_structures.push_back(Structure(tmp, 0.0, tmp2, 5, name));
                             
                             
                             
@@ -474,6 +521,58 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                     }
                 }
             }
+            
+            if (ss.str() == "door") {
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+        
+                        double startx = pObject->FloatAttribute("x");
+                        double starty = pObject->FloatAttribute("y");
+                        
+                        double name = pObject->IntAttribute("name");
+                        
+                        std::vector<Vector2> tmp;
+                        Direction doorDirection;
+
+                        XMLElement * polyLine = pObject->FirstChildElement("polyline");
+                        if(polyLine != NULL) {
+                            
+                            std::stringstream polyLineSS;
+                            
+                            polyLineSS << polyLine->Attribute("points");
+
+                            double oldN = -1, oldT = -1;
+                            double n, t;
+                            char tmp1;
+                            while(polyLineSS >> n) {
+                                
+                                polyLineSS >> tmp1;    //ignore comma and spaces
+                                polyLineSS >> t;
+                                
+                                if(oldN != -1) {
+                                    doorDirection = findWallDirection(n, t, oldN, oldT);
+                                }
+                                
+                                
+                                tmp.push_back(Vector2(startx + n, starty + t));
+                                oldN = n;
+                                oldT = t;
+
+                            }
+
+                            this->_doors.push_back(Door(tmp[0].x, tmp[0].y, tmp[1].x, tmp[1].y, doorDirection));
+
+                            printf("x1: %d, y1: %d, x2: %d, y2: %d \n", tmp[0].x, tmp[0].y, tmp[1].x, tmp[1].y);
+                            
+                        
+                        }
+
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+            }
+            
             
             
 			
@@ -498,7 +597,7 @@ void Level::update(int elapsedTime, Graphics &graphics) {
     this->_slide.update(elapsedTime, graphics);
     
     this->_fireteam.update(elapsedTime, graphics);
-    
+    this->_enemyFireteam.update(elapsedTime, graphics);
     
     //update gunshots
     
@@ -593,6 +692,7 @@ void Level::draw(Graphics &graphics) {
     this->_unit.draw(graphics);
     
     this->_fireteam.draw(graphics);
+    this->_enemyFireteam.draw(graphics);
     
     //float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
     //float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
@@ -666,6 +766,20 @@ void Level::handleSlideRelease(Graphics &graphics) {
             
         this->_fireteam.centerSlideToZero();
         
+        
+        
+    }
+    else if(this->_enemyFireteam.isSelected()) {
+        if(this->_enemyFireteam.isCenterSelected()) {
+            this->_enemyFireteam.moveToSlidePosition(this->_graph, graphics);
+        }
+        else {
+            //printf("center not selected\n");
+            this->_enemyFireteam.moveToSlideAngle();
+        }
+        
+        
+        this->_enemyFireteam.centerSlideToZero();
         
         
     }
@@ -871,6 +985,82 @@ void Level::handlePlayerCollisions(double elapsedTime, Graphics &graphics) {
     //printf("%f, %f\n", graphics.getPlayerX(), graphics.getPlayerY());
     
     
+    
+    
+}
+
+bool Level::closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction) {
+    
+    // get length of the line
+    double distX = x1 - x2;
+    double distY = y1 - y2;
+    double len = std::sqrt( (distX*distX) + (distY*distY) );
+    
+    
+    // get dot product of the line and circle
+    double dot = ( ((px-x1)*(x2-x1)) + ((py-y1)*(y2-y1)) ) / std::pow(len,2);
+    
+    // find the closest point on the line
+    double closestX = x1 + (dot * (x2-x1));
+    double closestY = y1 + (dot * (y2-y1));
+    
+    closestx = closestX;
+    closesty = closestY;
+
+    
+
+    bool onSegment = linePoint(x1, y1, x2, y2, closestX, closestY);
+    if (!onSegment) return false;
+    
+    
+    //change closest points if on edge of line
+    
+    bool inside1 = pointCircle(x1, y1, closestX, closestY, 8);
+    bool inside2 = pointCircle(x2, y2, closestX, closestY, 8);
+    
+    if(inside1) {
+        //put on one side of the edge
+        switch(direction) {                         //change this with changing building angle
+            case RIGHT:
+                closestx = x1;
+                closesty = y1 - 8;
+                break;
+            case UP:
+                closestx = x1 - 8;
+                closesty = y1;
+                break;
+            case LEFT:
+                closestx = x1;
+                closesty = y1 + 8;
+                break;
+            case DOWN:
+                closestx = x1 + 8;
+                closesty = y1;
+                break;
+        }
+    }
+    else if(inside2) {
+        switch(direction) {                         //change this with changing building angle
+            case RIGHT:
+                closestx = x2;
+                closesty = y2 + 8;
+                break;
+            case UP:
+                closestx = x2 + 8;
+                closesty = y2;
+                break;
+            case LEFT:
+                closestx = x2;
+                closesty = y2 - 8;
+                break;
+            case DOWN:
+                closestx = x2 - 8;
+                closesty = y2;
+                break;
+        }
+    }
+    
+    return true;
     
     
 }
@@ -1236,6 +1426,10 @@ bool Level::checkSlideCollision(int xm, int ym) {
     //for each fireteam
     collisions += this->_fireteam.checkSlideCollision(xm, ym);
     
+    collisions += this->_enemyFireteam.checkSlideCollision(xm, ym);
+    
+    
+    
     return collisions;       //can only have 1 collision so this is 0 or 1
     
     
@@ -1246,8 +1440,221 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
     this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
     
     
-    this->_fireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    //find closest wall and light it up
+    
+    
+    //if not in building
+    bool inBuilding = 0;
+    Vector2 slideCenter = this->_fireteam.getSlideCenter();
+    
+    for(Rectangle &iter : this->_buildings) {
+        
+        if(slideCenter.x > iter.getX() && slideCenter.x < iter.getX() + iter.getWidth()) {
+            if(slideCenter.y > iter.getY() && slideCenter.y < iter.getY() + iter.getHeight()) {
+                inBuilding = 1;
+                //printf("inBuilding\n");
+            }
+        }
+        
+    }
+    
+    
+    //check angle of slider
+    
+    if(!inBuilding) {
+        
+        //get structure outside bounds function
+        
+        
+        //add this number to structure struct
+        
+        double minDist = 1000000;
+        double disToLine = 0.0;
+        double closestX = 0.0;
+        double closestY = 0.0;
+        
+        double closestOfClosestX = -1;
+        double closestOfClosestY = -1;
+        
+        int linePosition = -1;
+        
+        bool atLeastOne = 0;
+        
+        bool isDoor = 0;
+        
+        Direction closestLineDirection;
+        
+        Door closestDoor = Door();
+        
+        int doorLength = 0;
+        Direction doorDirection = NONE;
+        
+        
+        //find closest line
+        
+        //look over structure lines
+        for (Structure &structureIter : this->_structures) {
+            for(int i = 0; i < 5; i++) {                        //5 is the number of outside walls
+                double x3 = structureIter.corners.at(i).x;
+                double y3 = structureIter.corners.at(i).y;
+                double x4 = structureIter.corners.at(i+1).x;
+                double y4 = structureIter.corners.at(i+1).y;
+                
+                //graphics.storeLineDebug(x3, y3, x4, y4, 1);
+                
+                if(closestPointOnLine(x3, y3, x4, y4, slideCenter.x, slideCenter.y, closestX, closestY, structureIter.directions.at(i))) {
+                    //graphics.storeLineDebug(x3, y3, x4, y4, 1);
+                    
+                    atLeastOne = 1;
+                    
+                    
+                    //disToLine = std::sqrt(closestX*closestX + closestY*closestY);
+                    
+                    disToLine = std::sqrt(std::pow(slideCenter.x - closestX,2) + std::pow(slideCenter.y - closestY,2));
+                    
+                    if(disToLine < minDist) {
+                        minDist = disToLine;
+                        closestOfClosestX = closestX;
+                        closestOfClosestY = closestY;
+                        linePosition = i;
+                        isDoor = 0;
+                    }
+                }
+            }
+        }
+        
+        //look over door lines
+        for(Door iter : this->_doors) {
+            
+            if(closestPointOnLine(iter.x1, iter.y1, iter.x2, iter.y2, slideCenter.x, slideCenter.y, closestX, closestY, NONE)) { //change this
+                //graphics.storeLineDebug(iter.x1, iter.y1, iter.x2, iter.y2, 1);
+                
+                atLeastOne = 1;
+                
+                
+                //disToLine = std::sqrt(closestX*closestX + closestY*closestY);
+                
+                disToLine = std::sqrt(std::pow(slideCenter.x - closestX,2) + std::pow(slideCenter.y - closestY,2));
+                
+                if(disToLine < minDist) {
+                    minDist = disToLine;
+                    //closestOfClosestX = closestX;
+                    //closestOfClosestY = closestY;
+                    //linePosition = -1;
+                    isDoor = 1;
+                    //doorLength = std::abs(iter.x1 - iter.x2) + std::abs(iter.y1 - iter.y2);
+                    closestDoor = iter;
+                    
+                }
+            }
+            
+            
+            
+            
+        }
+        
+        
+        //draw the appropriate circle
+        
+        if(atLeastOne) {
+            //graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY, 8);
+            
+            //printf("%d \t", linePosition);
+            //printf("X: %f \t Y: %f\n", closestOfClosestX, closestOfClosestY);
+            
+            if(isDoor) {
+                switch(closestDoor.direction) {
+                    case DOWN:
+                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
+                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 + 8, 8);
+                        break;
+                    case UP:
+                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 - 8, 8);
+                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
+                        break;
+                    case RIGHT:
+                        graphics.storeDebugCircle(closestDoor.x1 + 8, closestDoor.y1 + 8, 8);
+                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
+                        break;
+                    case LEFT:
+                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
+                        graphics.storeDebugCircle(closestDoor.x2 - 8, closestDoor.y2 - 8, 8);
+                        break;
+                    //default:
+                    //    graphics.storeDebugCircle(0, 0, 10);
+                    //    break;
+                }
 
+            }
+            else {
+                if(linePosition == 0) {  //go down
+                    graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY + 8, 8);
+                    
+                }
+                else if (linePosition == 1) {   //go right
+                    graphics.storeDebugCircle(closestOfClosestX + 8, closestOfClosestY, 8);
+                    
+                }
+                else if(linePosition == 2) {    //go up
+                    graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY - 8, 8);
+                    
+                }
+                else if (linePosition == 3) {   //go left
+                    graphics.storeDebugCircle(closestOfClosestX - 8, closestOfClosestY, 8);
+                    
+                }
+                else if(linePosition == 4) {    //go down
+                    graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY + 8, 8);
+                }
+            }
+            
+        }
+        
+        
+        
+        /*
+        //try this
+        //the wall chosen depends on the position of the slider
+        //the position of the units on that wall depends on the location of the slider
+        //no
+        
+        
+        double sliderAngle = this->_fireteam.getSlideAngle();
+        
+        
+        //if slider angle is between -45 and 45 degrees
+        if(sliderAngle >= -45 && sliderAngle <= 45) {             //top
+            printf("top\n");
+        }
+        else if (sliderAngle > 45 && sliderAngle <= 135){        //right
+            printf("right\n");
+        }
+        else if (sliderAngle > 135 || sliderAngle < -135) {      //bottom
+            printf("bottom\n");
+            //then go to top
+            
+
+            
+        }
+        else if (sliderAngle < -45 && sliderAngle >= -135) {     //left
+            printf("left\n");
+        }
+        */
+        
+        
+    }
+    
+    
+    
+    
+    //this is the fireteam slide
+    this->_fireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    this->_enemyFireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    //find the closest, most appropriate positions
+    
+    
 }
 
 
@@ -1300,8 +1707,8 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graph
     double bottomEndPosY = endy - 8 * std::sin(angle*3.14159/180);
     
     
-    this->_gunShotPaths.push_back(GunshotPath(graphics, topBeginPosX, topBeginPosY, topEndPosX, topEndPosY, 6000));
-    this->_gunShotPaths.push_back(GunshotPath(graphics, bottomBeginPosX, bottomBeginPosY, bottomEndPosX, bottomEndPosY, 6000));
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, topBeginPosX, topBeginPosY, topEndPosX, topEndPosY, 6000));
+    //this->_gunShotPaths.push_back(GunshotPath(graphics, bottomBeginPosX, bottomBeginPosY, bottomEndPosX, bottomEndPosY, 6000));
 
     bool collision = 0;
     
@@ -1494,23 +1901,7 @@ void Level::moveUnitToNearestCover(Graphics &graphics) {
 
 void Level::playerFireShot(Graphics &graphics) {
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     double playerX = -graphics.getCameraX() + graphics.getPlayerCenterX();
     double playerY = -graphics.getCameraY() + graphics.getPlayerCenterY();
     
@@ -1521,38 +1912,33 @@ void Level::playerFireShot(Graphics &graphics) {
     double shotEndX = std::round(playerX) - shotDistance * std::sin(graphics.getCameraAngle()*3.14159/180);
     double shotEndY = std::round(playerY) - shotDistance * std::cos(graphics.getCameraAngle()*3.14159/180);
     
+    
+    
+    
+    //check collision with surfaces
     Vector2 newShotCollision = checkShotCollisionNewNew(playerX, playerY, shotEndX, shotEndY, graphics);
     
-    //calculate distance to unit
-    //find m
+    //check collision with enemies
+    Vector2 enemyCollision = this->_enemyFireteam.checkUnitCollision(playerX, playerY, shotEndX, shotEndY);
     
-    double mShot = 1.0 / std::tan(graphics.getCameraAngle()*3.14159/180);
-    //needs to go through player position
     
-    //y = mx + b
-    //playerY = m * playerX + b
-    //b = - m * playerX + playerY
     
-    double bShot = mShot * (-playerX) + playerY;
     
-    //now calculate y = mx + b for the perpindicular line
     
-    double mPerpindicular = - 1.0 / mShot;
     
-    //y = mx + b
-    //yUnit = m xUnit + b
-    //b = - m xUnit + yUnit
     
-    double bPerpindicular = -mPerpindicular * (this->_unit.getStaticX()+8) + (this->_unit.getStaticY() + 12);
+    
+    
+    
     
     //print player shot
+    
+
     if(newShotCollision.x == 0 && newShotCollision.y == 0) {   //if the shot did not collide with anything
         //graphics.storeMapLineDebug(0, bShot, 1280, mShot * 1280 + bShot, 0);
         
         //make sure shot only goes 400 pixels
-        
-        //this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), std::round(playerX) - 400 * std::sin(graphics.getCameraAngle()*3.14159/180), std::round(playerY) - 400 * std::cos(graphics.getCameraAngle()*3.14159/180), 1000));
-            //lifetime is 1 second
+
         
         this->_gunShotPaths.push_back(GunshotPath(graphics, std::round(playerX), std::round(playerY), shotEndX, shotEndY, 1000));
         
@@ -1564,33 +1950,16 @@ void Level::playerFireShot(Graphics &graphics) {
 
     }
     
-    //print perpindicular shot
     
     
     
-    //this->_gunShotPaths.push_back(GunshotPath(graphics, 0, bPerpindicular, 1280, mPerpindicular * 1280 + bPerpindicular, 1000));
+    //for calculating experience gain. is this incentivizing wasting bullets?
+    
+
     
     
-    //graphics.storeLineDebug(0, bPerpindicular, 1280, mPerpindicular * 1280 + bPerpindicular,0);
-    //printf("b: %f \t m: %f\n",bPerpindicular,mPerpindicular);
     
-    //find (x, y) where lines collide
-    // y = mPerpindicular * x + bPerpindicular
-    // y = mShot * x + bShot
     
-    //x = (-Bperp + Bshot) / (Mperp - Mshot)
-    //y = (Bshot*Mperp - Bperp*Mshot)/(Mperp - Mshot)
-    
-    double closestPointX = (-bPerpindicular + bShot) / (mPerpindicular - mShot);
-    double closestPointY = (bShot*mPerpindicular - bPerpindicular*mShot)/(mPerpindicular - mShot);
-    
-    double shotCollisionDistance = std::sqrt(std::pow(newShotCollision.x - playerX,2) + std::pow(newShotCollision.y - playerY,2));
-    double closestColllisionDistance = std::sqrt(std::pow(closestPointX - playerX,2) + std::pow(closestPointY - playerY,2));
-    
-    if((newShotCollision.x == 0 && newShotCollision.y == 0) || (shotCollisionDistance > closestColllisionDistance)) { //if no collision, or shot collision is farther from player than closest point
-        this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
-    }
-    //this->_gunShotPaths.push_back(GunshotPath(graphics, this->_unit.getStaticX()+8, this->_unit.getStaticY()+12, closestPointX, closestPointY, 1000));
     
     
     

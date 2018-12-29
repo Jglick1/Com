@@ -16,11 +16,15 @@ void delete_pointed_to(T* const ptr)
 
 Fireteam::Fireteam() {}
 
-Fireteam::Fireteam(Graphics &graphics, bool allied) :
+Fireteam::Fireteam(Graphics &graphics, bool allied, Vector2 spawnPoint) :
 _numUnits(0)
 {
-    this->_controlSlide = ControlSlide(graphics, Vector2(100, 100));
-    
+    if(allied) {
+        this->_controlSlide = ControlSlide(graphics, spawnPoint, allied);
+    }
+    else {
+        this->_controlSlide = ControlSlide(graphics, spawnPoint, allied);
+    }
     
 }
 
@@ -87,15 +91,24 @@ void Fireteam::addUnit(std::shared_ptr<Unit> unit) {
     
     this->_numUnits++;
     
-    
 }
+
+
 
 int Fireteam::checkSlideCollision(int xm, int ym) {
     return this->_controlSlide.checkSlideCollision(xm, ym);
 }
 
 void Fireteam::handleSlideMovement(int xm, int ym, double angle, float levelx, float levely, Graphics &graphics) {
+
+    
     this->_controlSlide.handleSlideMovement(xm, ym, angle, levelx, levely, graphics);
+
+    
+}
+
+double Fireteam::getSlideAngle() {
+    return this->_controlSlide.getAngle();
 }
 
 void Fireteam::centerSlideToZero() {
@@ -219,4 +232,100 @@ void Fireteam::moveToSlidePosition(Graph &graph, Graphics &graphics) {          
 
 bool Fireteam::isCenterSelected() {
     return this->_controlSlide.isCenterSelected();
+}
+
+Vector2 Fireteam::getSlideCenter() {
+    
+    return this->_controlSlide.getCenter();
+    
+}
+
+
+Vector2 Fireteam::checkUnitCollision(double x1, double y1, double x2, double y2) {                  //FIX THIS
+    //iterate over every unit in the fireteam
+    
+    // get length of the line
+    double distX = x1 - x2;
+    double distY = y1 - y2;
+    double len = std::sqrt( (distX*distX) + (distY*distY) );
+    
+    double dot = 0.0;
+    double closestX = 0.0;
+    double closestY = 0.0;
+    
+    bool onSegment = 0;
+    
+    double dist = 100.0;
+    
+    bool oneCollision = 0;
+    
+    double closestClosestX = 0.0;
+    double closestClosestY = 0.0;
+    
+    for (std::shared_ptr<Unit> &iter : this->_units) {
+        //iter->handleMovement();
+        //iter->update(elapsedTime, graphics);
+        
+        double px = iter->getStaticX() + 8;
+        double py = iter->getStaticY() + 12;
+        
+        
+        dot = ( ((px-x1)*(x2-x1)) + ((py-y1)*(y2-y1)) ) / std::pow(len,2);
+        closestX = x1 + (dot * (x2-x1));
+        closestY = y1 + (dot * (y2-y1));
+        
+        onSegment = linePoint(x1, y1, x2, y2, closestX, closestY);
+        
+        dist = std::sqrt(std::pow(px - closestX,2) + std::pow(py - closestY,2));
+        
+        
+        if(onSegment && (dist < 6.0)) {
+            //erase the unit
+            
+            printf("collision with unit %f\n", dist);
+            
+            
+            oneCollision = 1;
+        }
+        
+    }
+
+    if(oneCollision) {
+        return Vector2(closestClosestX, closestClosestY);
+    }
+
+    return Vector2(-1, -1);
+}
+
+// LINE/POINT
+bool Fireteam::linePoint(double x1, double y1, double x2, double y2, double px, double py) {
+    
+    // get distance from the point to the two ends of the line
+    double d1 = dist(px,py, x1,y1);
+    double d2 = dist(px,py, x2,y2);
+    
+    // get the length of the line
+    double lineLen = dist(x1,y1, x2,y2);
+    
+    // since floats are so minutely accurate, add
+    // a little buffer zone that will give collision
+    double buffer = 0.1;    // higher # = less accurate
+    
+    // if the two distances are equal to the line's
+    // length, the point is on the line!
+    // note we use the buffer here to give a range,
+    // rather than one #
+    if (d1+d2 >= lineLen-buffer && d1+d2 <= lineLen+buffer) {
+        return true;
+    }
+    return false;
+}
+
+double Fireteam::dist(double x1, double y1, double x2, double y2) {
+    
+    double distX = x1 - x2;
+    double distY = y1 - y2;
+    
+    return std::sqrt( (distX*distX) + (distY*distY) );
+    
 }

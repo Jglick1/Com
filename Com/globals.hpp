@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <vector>
+//#include "rectangle.hpp"
 
 namespace globals {
     
@@ -141,24 +142,52 @@ struct PolygonCorner {
 };
 
 struct Structure {
+    
+    
+    //std::vector<std::vector<int>> doors;
     std::vector<Vector2> corners;
     double angle;
     std::vector<Direction> directions;
     int numOutsideWalls;
+    int name;
     
-    Structure() : angle(0.0), numOutsideWalls(0) {}
-    Structure(std::vector<Vector2> corners, double angle, std::vector<Direction> directions, int numOutsideWalls) : angle(angle), numOutsideWalls(numOutsideWalls) {
+
+    Structure() : angle(0.0), numOutsideWalls(0), name(0) {}
+    Structure(std::vector<Vector2> corners, double angle, std::vector<Direction> directions, int numOutsideWalls, int name) : angle(angle), numOutsideWalls(numOutsideWalls), name(name) {
         this->corners = corners;
         this->directions = directions;
-        
         
         //for (Vector2 &iter : this->_corners) {
         //    printf("%d, %d\n", iter.x, iter.y);
         //}
         
     }
+    //Structure(std::vector<std::vector<int>> doors, int name): angle(0.0), numOutsideWalls(0), name(name) {
+    //    this->doors = doors;
+    //}
+    
 };
 
+struct Door {
+    int x1, y1;
+    int x2, y2;
+    Direction direction;
+    
+    Door() : x1(0), y1(0), x2(0), y2(0), direction(NONE) {}
+    
+    Door(int x1, int y1, int x2, int y2, Direction direction) : x1(x1), y1(y1), x2(x2), y2(y2), direction(direction) {}
+    
+    
+};
 
+/*
+struct Building {
+    std::vector<Rectangle> buildingInside;
+    std::vector<CoverNode> preferredCover;
+    
+    Building();
+
+};
+*/
 
 #endif /* globals_h */

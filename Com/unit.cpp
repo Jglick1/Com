@@ -48,8 +48,8 @@ _destinationDirection(NONE)
     
     //graphics.loadImage("/Users/jonahglick/Documents/Com/rifelman_final_96x96.png");
     
-    this->_x = 0;
-    this->_y = 0;
+    //this->_x = 0;
+    //this->_y = 0;
     
     //this->_staticx = 500;
     //this->_staticy = 400;
@@ -65,87 +65,6 @@ _destinationDirection(NONE)
 
 }
 
-
-
-void Unit::moveForwardParallax() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
-}
-
-void Unit::moveBackwardParallax() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
-}
-
-
-void Unit::moveRightParallax() {
-    this->_dx = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
-}
-
-void Unit::moveLeftParallax() {
-    this->_dx = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180);
-}
-
-void Unit::stopMovingParallax() {
-    this->_dx = 0.0;
-    this->_dy = 0.0;
-}
-
-void Unit::moveUpRightParallax() {                 //should have said forwardRight and backwardRight instead
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 - player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
-    //this->_unit.moveForwardRightParallax();
-}
-void Unit::moveUpLeftParallax() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
-    //this->_unit.moveForwardRightParallax();
-}
-void Unit::moveDownRightParallax() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
-}
-void Unit::moveDownLeftParallax() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421 + -player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421;
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_playerAngle * 3.14159 / 180)/1.41421 + player_constants::WALK_SPEED * std::sin(this->_playerAngle * 3.14159 / 180)/1.41421;
-}
-
-
-void Unit::setDXDY(float dx, float dy) {
-    this->_dx = dx;
-    this->_dy = dy;
-}
-
-
-/*
-void Unit::moveForward() {
-    this->_dx += 0.0;
-    this->_dy += -player_constants::WALK_SPEED;
-}
-
-void Unit::moveBackward() {
-    this->_dx += 0.0;
-    this->_dy += player_constants::WALK_SPEED;
-}
-
-void Unit::moveRight() {
-    this->_dx += player_constants::WALK_SPEED;
-    this->_dy += 0.0;
-}
-
-void Unit::moveLeft() {
-    this->_dx += -player_constants::WALK_SPEED;
-    this->_dy += 0.0;
-}
-
-
-void Unit::stopMoving() {
-    this->_dx = 0.0;
-    this->_dy = 0.0;
-}
- */
 
 void Unit::moveForward() {
     this->_staticdx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
@@ -173,28 +92,6 @@ void Unit::stopMoving() {
     this->_staticdy = 0.0;
 }
 
-/*
-void Level::moveForward() {
-    this->_dx = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-}
-
-void Level::moveBackward() {
-    this->_dx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-}
-
-
-void Level::moveRight() {
-    this->_dx = player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = -player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-}
-
-void Level::moveLeft() {
-    this->_dx = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
-    this->_dy = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
-}
- */
 
 void Unit::moveToNextPosition() {
     this->_unitMovementOrders.erase(this->_unitMovementOrders.begin());//erase last order
@@ -229,12 +126,6 @@ void Unit::moveToPosition(int posX, int posY) {
     
     //position vector
         //decide the best path to take and fill the positon array
-    
-    
-    
-    
-    
-    
     
     
     stopMoving();
@@ -453,29 +344,12 @@ void Unit::draw(Graphics &graphics) {
     //graphics.drawLine(this->_staticx+15, this->_staticy+30, this->_staticx+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy+30 - 100*std::cos(this->_angle*3.14159/180) );
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     //graphics.drawLine(this->_staticx + this->_x+15, this->_staticy + this->_y+30, this->_staticx + this->_x+15 + 100*std::sin(this->_angle*3.14159/180), this->_staticy + this->_y+30 - 100*std::cos(this->_angle*3.14159/180) );
     
 
-    
-    
 
-    
-    
 
 }
 
@@ -506,44 +380,6 @@ void Unit::setPlayerAngle(float playerAngle) {
 }
 
 
-float Unit::getDX() {
-    return this->_dx;
-}
-
-float Unit::getDY() {
-    return this->_dy;
-}
-
-
-void Unit::setDX(float dx) {
-    this->_dx = dx;
-}
-void Unit::setDY(float dy) {
-    this->_dy = dy;
-}
-
-void Unit::setX(float x) {
-    this->_x = x;
-}
-void Unit::setY(float y) {
-    this->_y = y;
-}
-/*
-int Unit::getStartX() {
-    return this->_startX;
-}
-
-int Unit::getStartY() {
-    return this->_startY;
-}
-*/
-int Unit::getX() {
-    return this->_x;
-}
-
-int Unit::getY() {
-    return this->_y;
-}
 
 float Unit::getStaticX() {
     return this->_staticx;
@@ -552,6 +388,7 @@ float Unit::getStaticY() {
     return this->_staticy;
 }
 
+/*
 void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
 
     
@@ -588,7 +425,9 @@ void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTim
         
     }
 }
+*/
 
+/*
 void Unit::changeX(int newX) {
     this->_x = newX;
 }
@@ -596,7 +435,8 @@ void Unit::changeX(int newX) {
 void Unit::changeY(int newY) {
     this->_y = newY;
 }
-
+*/
+ 
 State Unit::getState() {
     return this->_state;
 }

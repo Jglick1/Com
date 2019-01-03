@@ -1257,7 +1257,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
     }
     
     
-    this->_unit.handleTileCollisions(others, elapsedTime);
+    //this->_unit.handleTileCollisions(others, elapsedTime);
     this->_slide.handleTileCollisions(others, elapsedTime);
     
     

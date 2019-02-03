@@ -118,6 +118,9 @@ public:
     Vector2 whereLineLineCollision(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4);
     double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
     
+    void drawText(SDL_Texture* texture, SDL_Rect* destinationRectangle);
+    
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

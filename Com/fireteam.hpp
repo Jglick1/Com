@@ -42,6 +42,7 @@ public:
     bool isSelected();
     
     void moveToSlidePosition(Graph & graph, Graphics &graphics);
+    void moveToSlidePosition(Graph & graph, Graphics &graphics, std::vector<Vector2> positions);
     bool isCenterSelected();
     void moveToSlideAngle();
     
@@ -52,6 +53,7 @@ public:
     bool linePoint(double x1, double y1, double x2, double y2, double px, double py);
     double dist(double x1, double y1, double x2, double y2);
     
+    int getSize();
     
 private:
     int _id;

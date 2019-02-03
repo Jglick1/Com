@@ -46,6 +46,10 @@ Level::Level(std::string mapName, Graphics &graphics) :
 
     this->_fireteam = Fireteam(graphics, 1, Vector2(100,100));
     
+    this->_fireteam2 = Fireteam(graphics, 1, Vector2(640, 50));
+    
+    this->_fireteam3 = Fireteam(graphics, 1, Vector2(800, 400));
+    
     //Unit * unitPointer = new Unit(graphics, Vector2(100,100), 1);
     //std::unique_ptr<Unit> tmp(new Unit(graphics, Vector2(100,100), 1) );
     //this->_fireteam.addUnit( std::move(tmp) );                          //need to std::move the unique pointer
@@ -80,24 +84,35 @@ Level::Level(std::string mapName, Graphics &graphics) :
     std::shared_ptr<Unit> tmp4(new Unit(graphics, Vector2(100 + 400, 100+ 400), 0) );
     this->_enemyFireteam.addUnit( std::move(tmp4) );
     
-    
     std::shared_ptr<Unit> tmp5(new Unit(graphics, Vector2(200+ 400, 200+ 400), 0) );
     this->_enemyFireteam.addUnit( std::move(tmp5) );
-    
     
     std::shared_ptr<Unit> tmp6(new Unit(graphics, Vector2(300+ 400, 300+ 400), 0) );
     this->_enemyFireteam.addUnit( std::move(tmp6) );
     
     
     
+    //fireteam2
+    std::shared_ptr<Unit> tmp7(new Unit(graphics, Vector2(500, 100), 1) );
+    this->_fireteam2.addUnit( std::move(tmp7) );
+    
+    std::shared_ptr<Unit> tmp8(new Unit(graphics, Vector2(600, 100), 1) );
+    this->_fireteam2.addUnit( std::move(tmp8) );
+    
+    std::shared_ptr<Unit> tmp9(new Unit(graphics, Vector2(700, 100), 1) );
+    this->_fireteam2.addUnit( std::move(tmp9) );
     
     
     
+    //fireteam3
+    std::shared_ptr<Unit> tmp10(new Unit(graphics, Vector2(900, 400), 1) );
+    this->_fireteam3.addUnit( std::move(tmp10) );
     
+    std::shared_ptr<Unit> tmp11(new Unit(graphics, Vector2(1000, 400), 1) );
+    this->_fireteam3.addUnit( std::move(tmp11) );
     
-    
-    
-    
+    //std::shared_ptr<Unit> tmp12(new Unit(graphics, Vector2(1100, 700), 1) );
+    //this->_fireteam3.addUnit( std::move(tmp12) );
     
     
     this->_slide = ControlSlide(graphics,Vector2(500, 500), 1);
@@ -127,6 +142,8 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 	XMLElement * mapNode = doc.FirstChildElement("map");
 
     
+    //std::map<int, Vector2> tempForPreferredCover;
+    std::vector< std::vector<double> > tempForPreferredCover;
     
 	
 	XMLElement * pObjectGroup = mapNode->FirstChildElement("objectgroup");
@@ -355,18 +372,40 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                         int height = pObject->IntAttribute("height");
                         
                         
-                        Rectangle building(x, y, width, height);
+                        Building building(x, y, width, height, 0.0, id);
                         
                         this->_buildings.push_back(building);
                         
+                    
                         
                         
-                        if(cornerHasBeenCalled) { //then graph has already been initlized
-                            this->_graph.addToCoverTable(id, x, y);
-                        }
-                        else {
-                            tempForCoverTable.insert(std::make_pair(id, Vector2(x, y)));
-                        }
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                
+            }
+            
+            else if (ss.str() == "preferredCover") {                                         //needs to come after graph has been created. graph is created in "corners" so "corner" must come first
+                
+                //add all building rects to cover building table
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        int buildingID = pObject->IntAttribute("name");
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        
+                        
+                        printf("size: %d\n", tempForPreferredCover.size());
+                        //tempForPreferredCover.insert(std::make_pair(buildingID, Vector2(x, y)));
+                        tempForPreferredCover.push_back({double(buildingID), double(x), double(y)});    //cast as doubles
+                        
+                        
+                        printf("size: %d\n", tempForPreferredCover.size());
+                        
+                        printf("\n");
                         
                         
                         pObject = pObject->NextSiblingElement("object");
@@ -581,6 +620,33 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 	}
     
     
+    //so all buildings have been created
+    //now insert preferred cover nodes into the appropriate building struct
+    
+    //printf("preferredCover : %d\n", tempForPreferredCover.size());
+    
+    for(auto const& coverIter : tempForPreferredCover) {
+        
+        //printf("preferredCover\n");
+        
+        for(Building & buildingIter : this->_buildings) {
+            if(buildingIter.id == coverIter[0]) {
+                buildingIter.addPreferredCover(Vector2(coverIter[1], coverIter[2]));
+            }
+        }
+
+        
+        //iter.first; //building id
+        //iter.second; //Vector2 location
+
+        
+    }
+    
+    
+    
+    
+    
+    
     
 }
 
@@ -597,6 +663,8 @@ void Level::update(int elapsedTime, Graphics &graphics) {
     this->_slide.update(elapsedTime, graphics);
     
     this->_fireteam.update(elapsedTime, graphics);
+    this->_fireteam2.update(elapsedTime, graphics);
+    this->_fireteam3.update(elapsedTime, graphics);
     this->_enemyFireteam.update(elapsedTime, graphics);
     
     //update gunshots
@@ -662,9 +730,9 @@ void Level::draw(Graphics &graphics) {
     
     
     //draw unit collision rects
-    Rectangle unitRec = this->_unit.getCollisionRect();
+    //Rectangle unitRec = this->_unit.getCollisionRect();
 
-    graphics.drawRect(std::round(unitRec.getX()), std::round(unitRec.getY()), unitRec.getWidth(), unitRec.getHeight());
+    //graphics.drawRect(std::round(unitRec.getX()), std::round(unitRec.getY()), unitRec.getWidth(), unitRec.getHeight());
     
     
     
@@ -692,6 +760,8 @@ void Level::draw(Graphics &graphics) {
     this->_unit.draw(graphics);
     
     this->_fireteam.draw(graphics);
+    this->_fireteam2.draw(graphics);
+    this->_fireteam3.draw(graphics);
     this->_enemyFireteam.draw(graphics);
     
     //float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
@@ -748,21 +818,23 @@ const Vector2 Level::getPlayerSpawnPoint() const {
 	return this->_spawnPoint;
 }
 
-void Level::handleSlideRelease(Graphics &graphics) {
+void Level::handleSlideRelease(int xm, int ym, Graphics &graphics) {
     
-
+    //find the slide position
+    //this changes this->_unitMovePositions to find the appropriate positions we want the selected units to move to
+    handleSlideMovement(xm, ym, graphics, 1);
 
     //find the slide in question
     
     if(this->_fireteam.isSelected()) {
         if(this->_fireteam.isCenterSelected()) {
-            this->_fireteam.moveToSlidePosition(this->_graph, graphics);
+            //this->_fireteam.moveToSlidePosition(this->_graph, graphics);
+            this->_fireteam.moveToSlidePosition(this->_graph, graphics, this->_unitMovePositions);
         }
         else {
             //printf("center not selected\n");
             this->_fireteam.moveToSlideAngle();
         }
-            
             
         this->_fireteam.centerSlideToZero();
         
@@ -790,6 +862,30 @@ void Level::handleSlideRelease(Graphics &graphics) {
         //moveUnitAngleToSlideAngle(graphics);
         
         
+    }
+    else if(this->_fireteam2.isSelected()) {
+        if(this->_fireteam2.isCenterSelected()) {
+            //this->_fireteam.moveToSlidePosition(this->_graph, graphics);
+            this->_fireteam2.moveToSlidePosition(this->_graph, graphics, this->_unitMovePositions);
+        }
+        else {
+            //printf("center not selected\n");
+            this->_fireteam2.moveToSlideAngle();
+        }
+        
+        this->_fireteam2.centerSlideToZero();
+    }
+    else if(this->_fireteam3.isSelected()) {
+        if(this->_fireteam3.isCenterSelected()) {
+            //this->_fireteam.moveToSlidePosition(this->_graph, graphics);
+            this->_fireteam3.moveToSlidePosition(this->_graph, graphics, this->_unitMovePositions);
+        }
+        else {
+            //printf("center not selected\n");
+            this->_fireteam3.moveToSlideAngle();
+        }
+        
+        this->_fireteam3.centerSlideToZero();
     }
     
 
@@ -989,7 +1085,7 @@ void Level::handlePlayerCollisions(double elapsedTime, Graphics &graphics) {
     
 }
 
-bool Level::closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction) {
+bool Level::closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction, int fireteamSize) {
     
     // get length of the line
     double distX = x1 - x2;
@@ -1015,26 +1111,26 @@ bool Level::closestPointOnLine(double x1, double y1, double x2, double y2, doubl
     
     //change closest points if on edge of line
     
-    bool inside1 = pointCircle(x1, y1, closestX, closestY, 8);
-    bool inside2 = pointCircle(x2, y2, closestX, closestY, 8);
+    bool inside1 = pointCircle(x1, y1, closestX, closestY, 8 + 8*(fireteamSize-1));
+    bool inside2 = pointCircle(x2, y2, closestX, closestY, 8 + 8*(fireteamSize-1));
     
     if(inside1) {
         //put on one side of the edge
         switch(direction) {                         //change this with changing building angle
             case RIGHT:
                 closestx = x1;
-                closesty = y1 - 8;
+                closesty = y1 - (8 + 8*(fireteamSize-1));
                 break;
             case UP:
-                closestx = x1 - 8;
+                closestx = x1 - (8 + 8*(fireteamSize-1));
                 closesty = y1;
                 break;
             case LEFT:
                 closestx = x1;
-                closesty = y1 + 8;
+                closesty = y1 + (8 + 8*(fireteamSize-1));
                 break;
             case DOWN:
-                closestx = x1 + 8;
+                closestx = x1 + (8 + 8*(fireteamSize-1));
                 closesty = y1;
                 break;
         }
@@ -1043,18 +1139,18 @@ bool Level::closestPointOnLine(double x1, double y1, double x2, double y2, doubl
         switch(direction) {                         //change this with changing building angle
             case RIGHT:
                 closestx = x2;
-                closesty = y2 + 8;
+                closesty = y2 + (8 + 8*(fireteamSize-1));
                 break;
             case UP:
-                closestx = x2 + 8;
+                closestx = x2 + (8 + 8*(fireteamSize-1));
                 closesty = y2;
                 break;
             case LEFT:
                 closestx = x2;
-                closesty = y2 - 8;
+                closesty = y2 - (8 + 8*(fireteamSize-1));
                 break;
             case DOWN:
-                closestx = x2 - 8;
+                closestx = x2 - (8 + 8*(fireteamSize-1));
                 closesty = y2;
                 break;
         }
@@ -1179,6 +1275,8 @@ bool Level::linePoint(double x1, double y1, double x2, double y2, double px, dou
 }
 
 
+
+/*
 void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime, Graphics &graphics) { //other are the level's collision rects
     
 
@@ -1194,20 +1292,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
         
         //printf("map: %d, player: %d",others.at(i).getHeight(),playerRec.getHeight());
         
-        /*
-        if(collisionSide == sides::Side::TOP) {
-            printf("top\n");
-        }
-        else if(collisionSide == sides::Side::BOTTOM) {
-            printf("bottom\n");
-        }
-        else if(collisionSide == sides::Side::LEFT) {
-            printf("left\n");
-        }
-        else if(collisionSide == sides::Side::RIGHT) {
-            printf("right\n");
-        }
-        */
+
         
         
         
@@ -1263,7 +1348,7 @@ void Level::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTi
     
     
 }
-
+*/
 
 
 
@@ -1428,7 +1513,9 @@ bool Level::checkSlideCollision(int xm, int ym) {
     
     collisions += this->_enemyFireteam.checkSlideCollision(xm, ym);
     
+    collisions += this->_fireteam2.checkSlideCollision(xm, ym);
     
+    collisions += this->_fireteam3.checkSlideCollision(xm, ym);
     
     return collisions;       //can only have 1 collision so this is 0 or 1
     
@@ -1436,7 +1523,8 @@ bool Level::checkSlideCollision(int xm, int ym) {
 }
 
 
-void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
+
+void Level::handleSlideMovement(int xm, int ym, Graphics &graphics, bool once) {
     this->_slide.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
     
     
@@ -1445,8 +1533,42 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
     
     //if not in building
     bool inBuilding = 0;
-    Vector2 slideCenter = this->_fireteam.getSlideCenter();
     
+    
+    //need to know which fireteam is selected
+    Vector2 slideCenter = this->_fireteam.getSlideCenter();
+    int fireteamSize = this->_fireteam.getSize();
+    
+    //Vector2 slideCenter = selectedFireteam->getSlideCenter();
+    //int fireteamSize = selectedFireteam->getSize();
+    
+    if(this->_fireteam.isSelected()) {
+        slideCenter = this->_fireteam.getSlideCenter();
+        fireteamSize = this->_fireteam.getSize();
+    }
+    else if(this->_fireteam2.isSelected()) {
+        slideCenter = this->_fireteam2.getSlideCenter();
+        fireteamSize = this->_fireteam2.getSize();
+    }
+    else if(this->_fireteam3.isSelected()) {
+        slideCenter = this->_fireteam3.getSlideCenter();
+        fireteamSize = this->_fireteam3.getSize();
+    }
+    
+    
+    for(Building &iter : this->_buildings) {
+        
+        if(slideCenter.x > iter.innerds.x && slideCenter.x < iter.innerds.x + iter.innerds.width) {
+            if(slideCenter.y > iter.innerds.y && slideCenter.y < iter.innerds.y + iter.innerds.height) {
+                inBuilding = 1;
+                //printf("inBuilding\n");
+            }
+        }
+        
+    }
+    
+    
+    /*
     for(Rectangle &iter : this->_buildings) {
         
         if(slideCenter.x > iter.getX() && slideCenter.x < iter.getX() + iter.getWidth()) {
@@ -1457,7 +1579,9 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
         }
         
     }
+    */
     
+    std::vector<Vector2> positions;
     
     //check angle of slider
     
@@ -1489,6 +1613,8 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
         int doorLength = 0;
         Direction doorDirection = NONE;
         
+        std::vector<double> closestLine;
+        
         
         //find closest line
         
@@ -1502,7 +1628,7 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
                 
                 //graphics.storeLineDebug(x3, y3, x4, y4, 1);
                 
-                if(closestPointOnLine(x3, y3, x4, y4, slideCenter.x, slideCenter.y, closestX, closestY, structureIter.directions.at(i))) {
+                if(closestPointOnLine(x3, y3, x4, y4, slideCenter.x, slideCenter.y, closestX, closestY, structureIter.directions.at(i), fireteamSize)) {
                     //graphics.storeLineDebug(x3, y3, x4, y4, 1);
                     
                     atLeastOne = 1;
@@ -1518,6 +1644,8 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
                         closestOfClosestY = closestY;
                         linePosition = i;
                         isDoor = 0;
+                        closestLine = {x3, y3, x4, y4};
+                        
                     }
                 }
             }
@@ -1526,7 +1654,7 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
         //look over door lines
         for(Door iter : this->_doors) {
             
-            if(closestPointOnLine(iter.x1, iter.y1, iter.x2, iter.y2, slideCenter.x, slideCenter.y, closestX, closestY, NONE)) { //change this
+            if(closestPointOnLine(iter.x1, iter.y1, iter.x2, iter.y2, slideCenter.x, slideCenter.y, closestX, closestY, NONE, 0)) { //change this
                 //graphics.storeLineDebug(iter.x1, iter.y1, iter.x2, iter.y2, 1);
                 
                 atLeastOne = 1;
@@ -1562,6 +1690,9 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
             //printf("%d \t", linePosition);
             //printf("X: %f \t Y: %f\n", closestOfClosestX, closestOfClosestY);
             
+            //std::vector<Vector2> positions;
+            positions.clear();
+            
             if(isDoor) {
                 switch(closestDoor.direction) {
                     case DOWN:
@@ -1587,8 +1718,52 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
 
             }
             else {
+                
+                
+                //this is close
+                
+                //graphics.storeDebugCircle(closestOfClosestX + (y2 - y1)/8, closestOfClosestY + (x1 - x2)/8, 8);
+                
+                
+                //this is right
+                //https://stackoverflow.com/questions/1243614/how-do-i-calculate-the-normal-vector-of-a-line-segment
+                double lineLength = dist(closestLine[0], closestLine[1], closestLine[2], closestLine[3]);
+                
+                //graphics.storeDebugCircle(closestOfClosestX - 8 * (closestLine[3] - closestLine[1])/lineLength, closestOfClosestY - 8 * (closestLine[0] - closestLine[2])/lineLength, 8);
+                
+                double centerX = closestOfClosestX - 8 * (closestLine[3] - closestLine[1])/lineLength;
+                double centerY = closestOfClosestY - 8 * (closestLine[0] - closestLine[2])/lineLength;
+                
+                
+                
+                
+                //graphics.storeDebugCircle(centerX, centerY, 8);
+                
+                //graphics.storeDebugCircle(centerX + 8 * (y2 - y1)/dist, centerY + 8 * (x2 - x1)/dist, 8);
+                //graphics.storeDebugCircle(centerX + 8 * (closestLine[2] - closestLine[0])/lineLength, centerY + 8 * (closestLine[3] - closestLine[1])/lineLength, 8);
+                
+
+                for(int i = 0; i < fireteamSize; i++) {
+                    positions.push_back(Vector2(centerX + (-8*(fireteamSize-1) + 16*i) * (closestLine[2] - closestLine[0])/lineLength, centerY + (-8*(fireteamSize-1) + 16*i) * (closestLine[3] - closestLine[1])/lineLength));
+                }
+                
+                
+                
+                /*
+                for(int i = 0; i < fireteamSize; i++) {
+                    positions.push_back(Vector2(closestOfClosestX - 4 * fireteamSize + 16 * i, closestOfClosestY + 8));
+                }
+                */
+
+                
+                
+                /*
                 if(linePosition == 0) {  //go down
-                    graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY + 8, 8);
+                    
+                    for(int i = 0; i < fireteamSize; i++) {
+                        positions.push_back(Vector2(closestOfClosestX - 4 * fireteamSize + 16 * i, closestOfClosestY + 8));
+                    }
+
                     
                 }
                 else if (linePosition == 1) {   //go right
@@ -1606,53 +1781,62 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
                 else if(linePosition == 4) {    //go down
                     graphics.storeDebugCircle(closestOfClosestX, closestOfClosestY + 8, 8);
                 }
+                 
+                 */
             }
-            
-        }
-        
-        
-        
-        /*
-        //try this
-        //the wall chosen depends on the position of the slider
-        //the position of the units on that wall depends on the location of the slider
-        //no
-        
-        
-        double sliderAngle = this->_fireteam.getSlideAngle();
-        
-        
-        //if slider angle is between -45 and 45 degrees
-        if(sliderAngle >= -45 && sliderAngle <= 45) {             //top
-            printf("top\n");
-        }
-        else if (sliderAngle > 45 && sliderAngle <= 135){        //right
-            printf("right\n");
-        }
-        else if (sliderAngle > 135 || sliderAngle < -135) {      //bottom
-            printf("bottom\n");
-            //then go to top
-            
 
             
+            for (Vector2 i : positions) {
+                graphics.storeDebugCircle(i.x, i.y, 8);
+            }
+
+                 
+                 
         }
-        else if (sliderAngle < -45 && sliderAngle >= -135) {     //left
-            printf("left\n");
+        
+    }
+    
+    
+    
+    else {      //it is in a building
+        //printf("f\n");
+        
+        for(Vector2 &it : this->_buildings.at(0).preferredCover) {
+            //printf("hello\n");
+            graphics.storeDebugCircle(it.x + 8, it.y + 8, 8);
+            
         }
-        */
+        
+        
+        //graphics.storeDebugCircle(closestOfClosestX + 8, closestOfClosestY, 8);
         
         
     }
     
     
     
-    
     //this is the fireteam slide
     this->_fireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    this->_fireteam2.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
+    
+    this->_fireteam3.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
     
     this->_enemyFireteam.handleSlideMovement(xm, ym, this->_angle, graphics.getCameraX(), graphics.getCameraY(), graphics);
     
     //find the closest, most appropriate positions
+    
+    
+    //shift the positions
+    for(int i = 0; i < positions.size(); i++) {
+        positions[i].x -= 8;
+        positions[i].y -= 8;
+    }
+    
+    if(once) {
+        this->_unitMovePositions = positions;
+    }
+    
     
     
 }
@@ -1662,6 +1846,7 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics) {
 void Level::centerSlideToZero(){
     this->_slide.centerSlideToZero();
 }
+
 
 bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graphics &graphics) {
     
@@ -1920,6 +2105,10 @@ void Level::playerFireShot(Graphics &graphics) {
     
     //check collision with enemies
     Vector2 enemyCollision = this->_enemyFireteam.checkUnitCollision(playerX, playerY, shotEndX, shotEndY);
+    
+    
+    
+    
     
     
     

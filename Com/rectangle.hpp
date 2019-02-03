@@ -64,6 +64,7 @@ public:
     const int getWidth() const { return this->_width; }
     const int getHeight() const { return this->_height; }
     
+    /*
     const int getSide(const sides::Side side) const {
         return
         side == sides::LEFT ? this->getLeft() :
@@ -72,7 +73,8 @@ public:
         side == sides::BOTTOM ? this->getBottom() :
         sides::NONE;
     }
-    
+    */
+     
     const bool collidesWith(const Rectangle &other) const {
         return
         this->getRight() >= other.getLeft() &&
@@ -80,7 +82,7 @@ public:
         this->getTop() <= other.getBottom() &&
         this->getBottom() >= other.getTop();
     }
-     
+    
     
     
     const bool isValidRectangle() const {
@@ -108,6 +110,7 @@ public:
         this->_y = y;
     }
     
+    /*
     const sides::Side getCollisionSide(Rectangle &other) const { //player is the other
         int amtRight, amtLeft, amtTop, amtBottom;
         amtRight = getRight() - other.getLeft();
@@ -147,7 +150,7 @@ public:
         sides::NONE;
         
     }
-    
+    */
     void setXY(float newX, float newY) {
         this->_x = newX;
         this->_y = newY;

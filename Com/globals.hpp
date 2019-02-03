@@ -13,6 +13,9 @@
 #include <vector>
 //#include "rectangle.hpp"
 
+class Rectangle;
+
+
 namespace globals {
     
     const int SCREEN_WIDTH = 1280; //640;
@@ -75,6 +78,10 @@ enum FoWNodePosition {
 
 enum Weapon {
     MP40, KAR98, M1GARAND
+};
+
+enum StructureType {
+    WALL, SANDBAG, BRUSH
 };
 
 struct Vector2 {
@@ -141,6 +148,14 @@ struct PolygonCorner {
     
 };
 
+struct newRectangle {
+    double x, y;
+    double width, height;
+    double angle;
+    newRectangle() : x(0), y(0), width(0), height(0), angle(0.0) {}
+    newRectangle(double x, double y, double width, double height, double angle) : x(x), y(y), width(width), height(height), angle(angle) {}
+};
+
 struct Structure {
     
     
@@ -151,6 +166,7 @@ struct Structure {
     int numOutsideWalls;
     int name;
     
+    StructureType structureType = WALL;
 
     Structure() : angle(0.0), numOutsideWalls(0), name(0) {}
     Structure(std::vector<Vector2> corners, double angle, std::vector<Direction> directions, int numOutsideWalls, int name) : angle(angle), numOutsideWalls(numOutsideWalls), name(name) {
@@ -165,6 +181,23 @@ struct Structure {
     //Structure(std::vector<std::vector<int>> doors, int name): angle(0.0), numOutsideWalls(0), name(name) {
     //    this->doors = doors;
     //}
+    
+};
+
+struct Building {
+    newRectangle innerds;
+    
+    std::vector<Vector2> preferredCover;
+
+    int id;
+    
+    Building(double x, double y, double width, double height, double angle, int id) : id(id) {
+        innerds = newRectangle(x, y, width, height, angle);
+    }
+    
+    void addPreferredCover(Vector2 node) {
+        preferredCover.push_back(node);
+    }
     
 };
 

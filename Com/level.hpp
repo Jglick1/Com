@@ -57,7 +57,7 @@ public:
     void changeY(int newY, int newCollisionY);
     void changeX(int newX, int newCollisionX);
     
-
+    
     
     void setUnitAngle();
     
@@ -69,8 +69,7 @@ public:
     
     
     bool checkSlideCollision(int xm, int ym);
-    void handleSlideMovement(int xm, int ym, Graphics &graphics);
-    
+    void handleSlideMovement(int xm, int ym, Graphics &graphics, bool once);
     
     void centerSlideToZero();
     
@@ -109,7 +108,7 @@ public:
     
     
     
-    void handleSlideRelease(Graphics &graphics);
+    void handleSlideRelease(int x, int y, Graphics &graphics);
     
     void drawFogOfWar(Graphics &graphics);
     
@@ -146,7 +145,7 @@ public:
     bool approxEqual(double x1, double x2);
     
     
-    bool closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction);
+    bool closestPointOnLine(double x1, double y1, double x2, double y2, double px, double py, double &closestx, double &closesty, Direction direction, int fireteamSize);
     
     
     void handlePlayerCollisions(double elapsedTime, Graphics &graphics);
@@ -195,8 +194,7 @@ private:
 
     std::vector<GunshotPath> _gunShotPaths;
     
-    std::vector<Rectangle> _buildings;
-    
+    std::vector<Building> _buildings;
     
     
     
@@ -215,11 +213,17 @@ private:
     
     
     Fireteam _fireteam;
+    Fireteam _fireteam2;
+    Fireteam _fireteam3;
     
     Fireteam _enemyFireteam;
     
     std::vector<Structure> _structures;
     std::vector<Door> _doors;
+    
+    
+    std::vector<Vector2> _unitMovePositions;
+
     
     
 };

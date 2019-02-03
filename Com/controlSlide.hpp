@@ -75,6 +75,8 @@ private:
     
     Sprite _slideSprite;
     
+    //Sprite _unitSelected;
+    
     
 };
 

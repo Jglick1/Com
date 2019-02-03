@@ -35,13 +35,24 @@ Graphics::Graphics() :
     _cameraCommandOffsetY(0.0)
     {
     SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
+        
+        
+    //SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI, &this->_window, &this->_renderer);
+        
+        
+        
+        
+        
     SDL_SetWindowTitle(this->_window, "Com");
     
     this->_font = NULL;
     
     //printf("loading font\n");
-    this->_font =  TTF_OpenFont("/Users/jonahglick/Documents/Com/OpenSans_Semibold.ttf", 28 );
+    //this->_font =  TTF_OpenFont("/Users/jonahglick/Documents/Com/Moms_typewriter.ttf", 12); //12 sets the size of the font
+    this->_font =  TTF_OpenFont("/Users/jonahglick/Documents/Com/OpenSans_Semibold.ttf", 12);
     
+        
+        
     if( this->_font == NULL ) {
         printf( "Failed to load font\n");
     }
@@ -117,14 +128,20 @@ void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_
 
 /*
 void Graphics::renderText() {
-    std::string aMessage = "Hello World";
+    std::string aMessage = "Hello World1";
     SDL_Color textColor = { 0, 0, 0 };
     SDL_Surface* textSurface = TTF_RenderText_Solid( this->_font, aMessage.c_str(), textColor );
     SDL_CreateTextureFromSurface( this->_renderer, textSurface );
     SDL_FreeSurface( textSurface );
     
 }
- */
+*/
+
+void Graphics::drawText(SDL_Texture* texture, SDL_Rect* destinationRectangle) {
+    
+    SDL_RenderCopy(this->_renderer, texture, NULL, destinationRectangle);
+    
+}
 
 void Graphics::flip() {
     SDL_RenderPresent(this->_renderer);

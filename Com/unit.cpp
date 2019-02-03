@@ -34,7 +34,13 @@ _staticy(0),
 _state(STILL),
 _destinationx(0),
 _destinationy(0),
-_destinationDirection(NONE)
+_destinationDirection(NONE),
+_distTraveled(0.0),
+_distToNextPoint(1.0),
+_isMoving(0),
+_isAngleMoving(0),
+_firstName("John"),
+_lastName("Doe")
 {
 
     if(allie) {
@@ -44,6 +50,7 @@ _destinationDirection(NONE)
         this->_unitSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/rifleman_enemy.png", 0, 0, 16, 20, 0, 0);
     }
     
+    this->_unitSelected = Sprite(graphics, "/Users/jonahglick/Documents/Com/unit_selected.png", 0, 0, 16, 16, 0, 0);
     
     
     //graphics.loadImage("/Users/jonahglick/Documents/Com/rifelman_final_96x96.png");
@@ -57,15 +64,29 @@ _destinationDirection(NONE)
     this->_staticx = spawnPoint.x;
     this->_staticy = spawnPoint.y;
     
-    Rectangle rec(0,4,16,16);
+    //Rectangle rec(0,4,16,16);
     
-    this->_collisionRect = rec;
+    //this->_collisionRect = rec;
     
     //this->_fov = Sprite(graphics, "/Users/jonahglick/Documents/Com/view_direction.png", 0, 0, 96, 128, 600, 600);
 
+    
+    
+    
+    
+    
+    
+    //find way to randomly assign first and last names
+    
+    
+    
+    
+    
 }
 
 
+
+/*
 void Unit::moveForward() {
     this->_staticdx = player_constants::WALK_SPEED * std::sin(this->_angle * 3.14159 / 180);
     this->_staticdy = -player_constants::WALK_SPEED * std::cos(this->_angle * 3.14159 / 180);
@@ -91,6 +112,9 @@ void Unit::stopMoving() {
     this->_staticdx = 0.0;
     this->_staticdy = 0.0;
 }
+*/
+
+
 
 
 void Unit::moveToNextPosition() {
@@ -128,7 +152,11 @@ void Unit::moveToPosition(int posX, int posY) {
         //decide the best path to take and fill the positon array
     
     
-    stopMoving();
+    //stopMoving();
+    
+    
+    
+    
     
     //find the angle the unit will need to be at
     //float xdiff = posX - (this->_staticx+15);
@@ -186,6 +214,29 @@ void Unit::moveToPosition(int posX, int posY) {
     
     
     
+    
+    
+    //we want to change staticdx and staticdy
+    
+    double dx = posX - this->_staticx;
+    double dy = posY - (this->_staticy+4);
+    
+    double distTotal = std::sqrt(dx*dx + dy*dy);
+    
+    this->_distToNextPoint = std::sqrt(dx*dx + dy*dy);
+    
+    
+    this->_staticdx = (dx / distTotal) * player_constants::WALK_SPEED; //then *elapsedTime in update
+    this->_staticdy = (dy / distTotal) * player_constants::WALK_SPEED;
+    
+    
+    this->_distTraveled = 0;
+    
+    this->_isMoving = 1;
+    
+    this->_isAngleMoving = 1;
+    
+    /*
     if(this->_destinationx >= this->_staticx && this->_destinationy >= this->_staticy) {
         this->_destinationDirection = DOWNRIGHT;
         
@@ -251,6 +302,18 @@ void Unit::moveToPosition(int posX, int posY) {
         
         printf("UPLEFT\n");
     }
+    */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     //printf("angle: %f, destAngle: %f\n", this->_angle, this->_destinationAngle);
     
@@ -316,11 +379,16 @@ void Unit::draw(Graphics &graphics) {
     
     double playerAngle = graphics.getCameraAngle();
     
+    
+    
+    
+    double renderX = playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180);
+    double renderY = playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180));
 
-    this->_unitSprite.drawAngle(graphics, playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180), playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180)), this->_angle + playerAngle);
+    this->_unitSprite.drawAngle(graphics, renderX, renderY, this->_angle + playerAngle);
     
     
-    
+
     
     
     
@@ -353,6 +421,35 @@ void Unit::draw(Graphics &graphics) {
 
 }
 
+void Unit::draw(Graphics &graphics, bool isSelected) {
+
+    
+    float posx = graphics.getCameraX() + this->_staticx;
+    float posy = graphics.getCameraY() + this->_staticy;
+
+
+    int playerx = graphics.getPlayerCenterX();
+    int playery = graphics.getPlayerCenterY();
+
+    double playerAngle = graphics.getCameraAngle();
+    
+    
+    
+    
+    double renderX = playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180);
+    double renderY = playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180));
+    
+    this->_unitSprite.drawAngle(graphics, renderX, renderY, this->_angle + playerAngle);
+    
+    
+    if(isSelected) {            //
+        this->_unitSelected.drawAngle(graphics, renderX, renderY, this->_angle + playerAngle);
+    }
+       
+}
+
+
+
 void Unit::update(int elapsedTime, Graphics &graphics) {
     //movement
 
@@ -365,10 +462,20 @@ void Unit::update(int elapsedTime, Graphics &graphics) {
     this->_staticy += this->_staticdy * elapsedTime;
     this->_staticx += this->_staticdx * elapsedTime;
     
+    
+    
+    if(this->_isMoving) {
+        this->_distTraveled += player_constants::WALK_SPEED * elapsedTime;
+    }
+    
+    
+    
+    
+    
     //this->_collisionRect.update(elapsedTime, this->_dx+this->_staticdx, this->_dy+this->_staticdy);
     //this->_collisionRect.setXY(this->_x+this->_staticx, this->_y+this->_staticy + 4);
     
-    this->_collisionRect.setXY(graphics.getCameraX()+this->_staticx, graphics.getCameraY()+this->_staticy + 4);
+    //this->_collisionRect.setXY(graphics.getCameraX()+this->_staticx, graphics.getCameraY()+this->_staticy + 4);
     
     this->_unitSprite.update();
     
@@ -388,54 +495,8 @@ float Unit::getStaticY() {
     return this->_staticy;
 }
 
-/*
-void Unit::handleTileCollisions(std::vector<Rectangle> &others, float elapsedTime) { //other are the level's collision rects
 
-    
-    Rectangle playerRec = Rectangle(632, 392, 16, 16);
 
-    for (int i = 0; i < others.size(); i++) {
-        sides::Side collisionSide = playerRec.getCollisionSide(others.at(i));
-        
-        if (collisionSide != sides::NONE) {
-            switch (collisionSide) {
-                case sides::TOP:                    //top refers to player's box
-                    this->changeY(-(others.at(i).getStartY() + others.at(i).getHeight()) + 400 - 8); //this->_staticy);
-                    this->_dy = 0.0f;
-                    
-                    break;
-                case sides::BOTTOM:
-                    this->changeY(-(others.at(i).getStartY()) + 400-12 + 20);// + this->_staticy);
-                    this->_dy = 0.0f;
-                    
-                    break;
-                case sides::LEFT:
-                    this->changeX((-others.at(i).getStartX()) + 640 - 8 - others.at(i).getWidth());// + this->_staticx);
-                    this->_dx = 0.0f;
-
-                    break;
-                case sides::RIGHT:
-                    this->changeX((-others.at(i).getStartX()) + 640 + 8);// + this->_staticx);
-                    this->_dx = 0.0f;
-                    
-                    break;
-            }
-        }
-        
-        
-    }
-}
-*/
-
-/*
-void Unit::changeX(int newX) {
-    this->_x = newX;
-}
-
-void Unit::changeY(int newY) {
-    this->_y = newY;
-}
-*/
  
 State Unit::getState() {
     return this->_state;
@@ -451,6 +512,91 @@ float Unit::getPlayerAngle() {
 
 void Unit::handleMovement() {
     
+    
+    
+    //check if destination arrived
+    if(this->_isMoving) {
+        if(this->_distTraveled > this->_distToNextPoint) {
+            
+            printf("%f, %f\n", this->_distTraveled, this->_distToNextPoint);
+            
+            
+            //stop the unit
+            this->_staticdx = 0;
+            this->_staticdy = 0;
+            
+            
+            this->_staticx = this->_destinationx;
+            this->_staticy = this->_destinationy - 4;
+            
+            this->_isMoving = 0;
+            
+            
+            //move on to next destination
+            if(this->_unitMovementOrders.size() > 0) {
+                moveToNextPosition();
+            }
+            
+        }
+    }
+    
+    
+    //check for angle things
+    if(this->_isAngleMoving) {                      //this is sloppy. it just checks every cycle. FIX ME!
+        switch(this->_state)  {
+            case CHANGE_ANGLE_UP:
+                if(this->_angle < this->_destinationAngle) {
+                    this->_angle += 20;
+                }
+                else {
+                    this->_angle = this->_destinationAngle;
+                    /*
+                    if(this->_unitMovementOrders.size() > 0) {
+                        this->_state = MOVE_FORWARD;
+                    }
+                    else {
+                        this->_state = STILL;
+                    }
+                     */
+                    //this->_isAngleMoving = 0;
+                }
+                
+                break;
+            case CHANGE_ANGLE_DOWN:
+                
+                if(this->_angle > this->_destinationAngle) {
+                    this->_angle -= 20;
+                }
+                else {
+                    this->_angle = this->_destinationAngle;
+                    /*
+                    if(this->_unitMovementOrders.size() > 0) {
+                        this->_state = MOVE_FORWARD;
+                    }
+                    else {
+                        this->_state = STILL;
+                    }
+                     */
+                    
+                    //this->_isAngleMoving = 0;
+                }
+                
+                break;
+        }
+        
+        
+        
+        
+        
+        
+    }
+
+    
+    
+    
+
+    
+    
     /*
     for( double i : this->_unitAngleOrders) {
         printf("%f, ", i);
@@ -461,6 +607,8 @@ void Unit::handleMovement() {
     //printf("staticx: %f, staticy: %f\n", this->_staticx, this->_staticy);
 
     
+    
+    /*
     switch(this->_state) {
         case CHANGE_ANGLE_UP:
             if(this->_angle < this->_destinationAngle) {
@@ -600,23 +748,15 @@ void Unit::handleMovement() {
             
             //printf("sx: %f sy: %f dx: %f dy: %f\n", this->_staticx, this->_staticy, this->_destinationx, this->_destinationy);
             
-            
-            /*
-            if(!((std::floor(this->_staticx) == std::floor(this->_destinationx)) && (std::floor(this->_staticy) == std::floor(this->_destinationy)))) { // don't need y because angle is already defined
-                
-                moveForward();
-            }
-            else {
-                stopMoving();
-                this->_state = STILL;
-            }
-             */
+     
             break;
             
         case STILL:
             //stopMoving();
             break;
     }
+    */
+    
     
 }
 
@@ -631,9 +771,7 @@ void Unit::addToMovementOrders(std::vector<Vector2> pos) {
     
     //start moving to first position
     moveToPosition(pos[0].x, pos[0].y);
-    
-    
-    
+
 }
 
 void Unit::addToMovementOrders(Vector2 pos) {
@@ -667,7 +805,8 @@ void Unit::printMovementOrders() {
     }
 }
 
+/*
 Rectangle Unit::getCollisionRect() {
     return this->_collisionRect;
 }
-
+*/

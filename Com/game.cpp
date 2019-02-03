@@ -67,12 +67,12 @@ void Game::gameLoop() {
     graphics.loadSound();
     
     
-    /*
-    textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
-    if(textSheet == NULL) {
+    
+    this->_textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
+    if(this->_textSheet == NULL) {
         printf("Error: Unable to load text\n");
     }
-     */
+     
 
     
     this->_player = Player(graphics, Vector2(3,3));
@@ -133,6 +133,10 @@ void Game::gameLoop() {
                         this->_actionState = COMMAND;
                         graphics.storeCameraCoordinates();
                     }
+                    else if(this->_actionState == ORGANIZATION) {
+                        this->_organizationChart.cameraDragging();
+                        this->_organizationChart.handleCameraMove(xm, ym);
+                    }
 
                     
                     
@@ -156,6 +160,7 @@ void Game::gameLoop() {
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     rightMouseDown = 0;
                     //printf("mouse up\n");
+                    this->_organizationChart.cameraStopDragging();
                 }
                 if (event.button.button == SDL_BUTTON_LEFT) {   //left mouse up
                     if(this->_actionState == ORGANIZATION) {
@@ -246,15 +251,16 @@ void Game::gameLoop() {
             if(rightMouseDown == 0) {   //sliders is released
                 this->_actionState = COMMAND;
                 
-                this->_level.handleSlideRelease(graphics);
+                this->_level.handleSlideRelease(xm, ym, graphics);
                 
             }
             else {
-                this->_level.handleSlideMovement(xm, ym, graphics);
+                this->_level.handleSlideMovement(xm, ym, graphics, 0);
             }
         }
         else if(this->_actionState == ORGANIZATION) {
             this->_organizationChart.handleMouseHover(xm, ym, graphics);
+            this->_organizationChart.handleCameraMove(xm, ym);
         }
         else if (this->_actionState == COMMAND) {
             //graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state
@@ -539,6 +545,24 @@ void Game::draw(Graphics &graphics) {
     else {
         
         this->_organizationChart.draw(graphics);
+        
+        //drawing some text
+        SDL_Rect desintationRectangle;
+        desintationRectangle.x = 0;
+        desintationRectangle.y = 0;
+        
+        SDL_Surface* tmp = graphics.loadText("Hello World");
+        
+        desintationRectangle.w = tmp->w;
+        desintationRectangle.h = tmp->h;
+        
+        
+        //desintationRectangle.w = 200;
+        //desintationRectangle.h = 50;
+        
+        
+        graphics.drawText(this->_textSheet, &desintationRectangle);
+        
         
     }
 

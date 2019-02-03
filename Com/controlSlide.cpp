@@ -46,6 +46,9 @@ _isSelected(0)
     else {
         this->_slideSprite = Sprite(graphics, "/Users/jonahglick/Documents/Com/control_slider_enemy.png", 0, 0, 150, 25, 0, 0);
     }
+    
+    //this->_unitSelected = Sprite(graphics, "/Users/jonahglick/Documents/Com/unit_selected.png", 0, 0, 16, 16, 0, 0);
+    
 
 }
 
@@ -66,6 +69,8 @@ void ControlSlide::draw(Graphics &graphics) {
     
     graphics.drawPoint(this->_RrotatedX, this->_RrotatedY);
     graphics.drawPoint(this->_LrotatedX, this->_LrotatedY);
+    
+    //this->_unitSelected.drawControlSlider(graphics, this->_camerax, this->_cameray, this->_angle + graphics.getCameraAngle());
     
 
     

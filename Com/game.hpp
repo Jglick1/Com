@@ -45,7 +45,7 @@ private:
     
     
     
-    SDL_Texture* textSheet;
+    SDL_Texture* _textSheet;
     
     HUD _hud;
     

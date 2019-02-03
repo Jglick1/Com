@@ -15,7 +15,9 @@ OrganizationChart::~OrganizationChart() {}
 OrganizationChart::OrganizationChart(Graphics &graphics) :
 _isSelected(0),
 _mouseOffsetX(0),
-_mouseOffsetY(0)
+_mouseOffsetY(0),
+_cameraX(0.0),
+_cameraY(0.0)
 {
     
     this->_background = Sprite(graphics, "/Users/jonahglick/Documents/Com/organizationChart.png", 0, 0, 1280, 800, 0, 0);
@@ -175,25 +177,27 @@ void OrganizationChart::draw(Graphics &graphics) {
     //this->_formationCard.draw(graphics);
     
     
+    
     //draw lines
+    
     //squad to fireteam lines
     int numFireteams = this->_mapToNumChildren[std::vector<int> {0}];
     if(numFireteams == 1) {
-        graphics.drawLine(620 + 32, 100 + 64, 620 + 32, 100 + 64 + 20);
+        graphics.drawLine(620 + 32 + this->_cameraX, 100 + 64 + this->_cameraY, 620 + 32 + this->_cameraX, 100 + 64 + 20 + this->_cameraY);
     }
     else if (numFireteams > 1) {
-        graphics.drawLine(620 + 32, 100 + 64, 620 + 32, 100 + 64 + 10); // verticle
-        graphics.drawLine(620 + 32 - (56 * (numFireteams-1)) , 100 + 64 + 10, 620 + 32 + (56 * (numFireteams-1)), 100 + 64 + 10); //horizontal
+        graphics.drawLine(620 + 32 + this->_cameraX, 100 + 64 + this->_cameraY, 620 + 32 + this->_cameraX, 100 + 64 + 10  + this->_cameraY); // verticle
+        graphics.drawLine(620 + 32 - (56 * (numFireteams-1)) + this->_cameraX , 100 + 64 + 10 + this->_cameraY, 620 + 32 + (56 * (numFireteams-1)) + this->_cameraX, 100 + 64 + 10 + this->_cameraY); //horizontal
         for(int i = 0 ; i < numFireteams; i++) {
-            graphics.drawLine(620 + 32 - (56 * (numFireteams-1)) + 112 * i, 100 + 64 + 10, 620 + 32 - (56 * (numFireteams-1)) + 112 * i, 100 + 64 + 10 + 10);
+            graphics.drawLine(620 + 32 - (56 * (numFireteams-1)) + 112 * i + this->_cameraX, 100 + 64 + 10 + this->_cameraY, 620 + 32 - (56 * (numFireteams-1)) + 112 * i + this->_cameraX, 100 + 64 + 10 + 10 + this->_cameraY);
         }
     }
     
     //fireteam to unit lines
     for(int i = 0; i < numFireteams; i++) {
         
-        int startX = 620 + 32 - (56 * (numFireteams-1)) + 112 * i;
-        int startY = 100 + 64 + 10 + 10;
+        int startX = 620 + 32 - (56 * (numFireteams-1)) + 112 * i + this->_cameraX;
+        int startY = 100 + 64 + 10 + 10 + this->_cameraY;
         
         startY += 32;
         
@@ -216,10 +220,15 @@ void OrganizationChart::draw(Graphics &graphics) {
     
     
     
+    
+    
+    
     //draw formation cards
     for(FormationCard iter : this->_formationCards) {
         iter.draw(graphics);
     }
+    
+    
     
     //draw unit cards
     if(this->_isSelected) {     //fix this!
@@ -441,6 +450,15 @@ void OrganizationChart::handleMouseLiftCollision(Graphics &graphics, int mx, int
 }
 
 
+void OrganizationChart::handleCameraMove(int xm, int ym) {
+    
+    if(this->_cameraDrag) {
+        this->_cameraX = xm;
+        this->_cameraY = ym;
+    }
+
+}
+
 
 void OrganizationChart::update(int mx, int my) {
     
@@ -454,6 +472,7 @@ void OrganizationChart::update(int mx, int my) {
 }
 
 
+
 int OrganizationChart::getNumberOfChildren(std::vector<int> path) {
     
     FormationCard tmp = this->_formationCard.getSubFormation(path.at(0));
@@ -461,4 +480,16 @@ int OrganizationChart::getNumberOfChildren(std::vector<int> path) {
     
     
 }
+
+
+
+void OrganizationChart::cameraDragging() {
+    this->_cameraDrag = 1;
+}
+
+void OrganizationChart::cameraStopDragging() {
+    this->_cameraDrag = 0;
+}
+
+
 

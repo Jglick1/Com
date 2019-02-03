@@ -26,6 +26,8 @@ _numUnits(0)
         this->_controlSlide = ControlSlide(graphics, spawnPoint, allied);
     }
     
+    printf("spawnPoint, x: %d, y %d\n", spawnPoint.x, spawnPoint.y);
+    
 }
 
 Fireteam::~Fireteam() {                             //MEMORY LEAKS?
@@ -46,21 +48,26 @@ Fireteam::~Fireteam() {                             //MEMORY LEAKS?
 
 void Fireteam::draw(Graphics &graphics) {
     //draw all units
+
+
+    if(this->_controlSlide.isSelected()) {
+        for (std::shared_ptr<Unit>& iter : this->_units) {
+            iter->draw(graphics, 1);
+            
+        }
+    }
+    else {
+        for (std::shared_ptr<Unit>& iter : this->_units) {
+            iter->draw(graphics, 0);
+            
+        }
+    }
     
-    //for (Unit * iter : this->_units) {
-        //iter->draw(graphics);
-    //}
     
     //draw control slide
     
-    for (std::shared_ptr<Unit>& iter : this->_units) {
-        iter->draw(graphics);
-        //printf("x: %f, y: %f\n", iter->getStaticX(), iter->getStaticY());
-        
-    }
-    
     this->_controlSlide.draw(graphics);
-    
+
     
 }
 
@@ -230,6 +237,19 @@ void Fireteam::moveToSlidePosition(Graph &graph, Graphics &graphics) {          
     
 }
 
+void Fireteam::moveToSlidePosition(Graph &graph, Graphics &graphics, std::vector<Vector2> positions) {
+    
+    int count = 0;
+    for(Vector2 it : positions) {
+        this->_units.at(count)->addToMovementOrders(it);
+        count++;
+    }
+
+    
+}
+
+
+
 bool Fireteam::isCenterSelected() {
     return this->_controlSlide.isCenterSelected();
 }
@@ -261,7 +281,13 @@ Vector2 Fireteam::checkUnitCollision(double x1, double y1, double x2, double y2)
     
     double closestClosestX = 0.0;
     double closestClosestY = 0.0;
+
     
+    
+    
+    std::vector<int> unitsToErase;
+    
+    int index = 0;
     for (std::shared_ptr<Unit> &iter : this->_units) {
         //iter->handleMovement();
         //iter->update(elapsedTime, graphics);
@@ -284,11 +310,104 @@ Vector2 Fireteam::checkUnitCollision(double x1, double y1, double x2, double y2)
             
             printf("collision with unit %f\n", dist);
             
+            unitsToErase.push_back(index);
+            
             
             oneCollision = 1;
         }
         
+        index++;
+        
     }
+    //sort unitsToErase vector by largest first
+    std::sort(unitsToErase.rbegin(), unitsToErase.rend());
+    
+    
+    
+    for(int i : unitsToErase) {
+        
+        printf("%d\n", i);
+        
+        
+    }
+    
+    for(int i : unitsToErase) {
+        this->_units.erase(this->_units.begin() + i);
+        this->_numUnits--;
+    }
+
+    /*
+    //this is bad
+    for(int i : unitsToErase) {
+
+        printf("hello\n");
+        index = 0;
+        std::vector< std::shared_ptr<Unit> >::iterator it = this->_units.begin();
+        while(it != this->_units.end()) {
+            
+            
+            if(index == i) {
+                
+                
+                
+                if(it != this->_units.end()) {
+                    it = this->_units.erase(it);
+                }
+                else {
+                    it++;
+                }
+                
+                
+                
+                this->_numUnits--;
+                
+                
+            }
+            
+            printf("%d\n", index);
+            
+            index++;
+            
+        }
+            
+            
+            
+            
+            
+    }
+    */
+        /*
+        for(std::vector< std::shared_ptr<Unit> >::iterator it = this->_units.begin(); it != this->_units.end(); ++it) {
+            
+            if(index == i) {
+                
+                
+                
+                if(it != this->_units.end()) {
+                    it = this->_units.erase(it);
+                }
+                else {
+                    this->_units.erase(it);
+                }
+                
+                
+                
+                this->_numUnits--;
+                
+
+            }
+            
+            printf("%d\n", index);
+            
+            index++;
+            
+        }
+
+        
+    }
+    */
+    
+    
 
     if(oneCollision) {
         return Vector2(closestClosestX, closestClosestY);
@@ -328,4 +447,8 @@ double Fireteam::dist(double x1, double y1, double x2, double y2) {
     
     return std::sqrt( (distX*distX) + (distY*distY) );
     
+}
+
+int Fireteam::getSize() {
+    return this->_numUnits;
 }

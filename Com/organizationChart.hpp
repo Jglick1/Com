@@ -48,8 +48,15 @@ public:
     
     void handleMouseHover(int xm, int ym, Graphics &graphics);
     
+    void cameraDragging();
+    void cameraStopDragging();
+    
+    
     bool _drawHover = 1;
     Vector2 _hoverShadowPosition;
+    
+    void handleCameraMove(int xm, int ym);
+
     
 private:
     
@@ -78,6 +85,11 @@ private:
     //map from collision rec (of formation card) to vector<int> of how to get there {0, 2, 3} like
     
     std::map< std::vector<int>, int> _mapToNumChildren;
+    
+    double _cameraX;
+    double _cameraY;
+    
+    bool _cameraDrag;
     
 };
 

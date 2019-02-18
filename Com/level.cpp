@@ -1696,25 +1696,23 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics, bool once) {
             if(isDoor) {
                 switch(closestDoor.direction) {
                     case DOWN:
-                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
-                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 + 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x2 + 8, closestDoor.y2 + 8, 8);
                         break;
                     case UP:
-                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 - 8, 8);
-                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x1 - 8, closestDoor.y1 - 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
                         break;
                     case RIGHT:
-                        graphics.storeDebugCircle(closestDoor.x1 + 8, closestDoor.y1 + 8, 8);
-                        graphics.storeDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x1 + 8, closestDoor.y1 + 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x2 + 8, closestDoor.y2 - 8, 8);
                         break;
                     case LEFT:
-                        graphics.storeDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
-                        graphics.storeDebugCircle(closestDoor.x2 - 8, closestDoor.y2 - 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x1 - 8, closestDoor.y1 + 8, 8);
+                        graphics.storeRotatedDebugCircle(closestDoor.x2 - 8, closestDoor.y2 - 8, 8);
                         break;
-                    //default:
-                    //    graphics.storeDebugCircle(0, 0, 10);
-                    //    break;
                 }
+                //previously storeDebugCircle
 
             }
             else {
@@ -1787,7 +1785,7 @@ void Level::handleSlideMovement(int xm, int ym, Graphics &graphics, bool once) {
 
             
             for (Vector2 i : positions) {
-                graphics.storeDebugCircle(i.x, i.y, 8);
+                graphics.storeRotatedDebugCircle(i.x, i.y, 8);
             }
 
                  
@@ -2784,6 +2782,38 @@ void Level::printDirection(Direction direction) {
             break;
         case NONE:
             printf("NONE\n");
+            break;
+    }
+}
+
+
+
+void Level::moveUnitAssignment() {
+    //move unit from this->_fireteam3
+    //to this->_fireteam1;
+    
+    //this works!
+    
+    std::shared_ptr<Unit> tmp = this->_fireteam3.getUnitPointer();
+    tmp->printFirstName();
+    
+    this->_fireteam.addUnit(tmp);
+    
+}
+
+Fireteam Level::returnFireteam(int fireteamNumber) {
+    switch(fireteamNumber) {
+        case 0:
+            return this->_fireteam;
+            break;
+        case 1:
+            return this->_fireteam2;
+            break;
+        case 2:
+            return this->_fireteam3;
+            break;
+        default:
+            return this->_fireteam;
             break;
     }
 }

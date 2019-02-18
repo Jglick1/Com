@@ -805,6 +805,10 @@ void Unit::printMovementOrders() {
     }
 }
 
+void Unit::printFirstName() {
+    printf("%s\n", this->_firstName.c_str());
+}
+
 /*
 Rectangle Unit::getCollisionRect() {
     return this->_collisionRect;

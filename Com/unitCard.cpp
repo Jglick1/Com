@@ -90,10 +90,10 @@ void UnitCard::draw(Graphics &graphics) {
 }
 
 void UnitCard::draw(Graphics &graphics, int x, int y) {
-    this->_rank.draw(graphics, x, y);
-    this->_role.draw(graphics, x + 16, y - 4 + 8);
+    this->_rank.draw(graphics, this->_x + x, this->_y + y);
+    this->_role.draw(graphics, this->_x + x + 16, this->_y + y - 4 + 8);
     
-    graphics.drawRect(x, y, this->_rectangle.getWidth(), this->_rectangle.getHeight());
+    graphics.drawRect(this->_x + x, this->_y + y, this->_rectangle.getWidth(), this->_rectangle.getHeight());
     
     
 }

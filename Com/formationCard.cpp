@@ -116,6 +116,11 @@ void FormationCard::addSubFormation(FormationCard &subFormationCard) {
     this->_numberOfSubFormations++;
 }
 
+void FormationCard::draw(Graphics &graphics, int x, int y) {
+    this->_template.draw(graphics, this->_x + x, this->_y + y);
+    graphics.drawRect(std::round(this->_rectangle.getX() + x), std::round(this->_rectangle.getY() + y), this->_rectangle.getWidth(), this->_rectangle.getHeight());
+}
+
 void FormationCard::draw(Graphics &graphics) {
     
     this->_template.draw(graphics, this->_x, this->_y);
@@ -197,6 +202,8 @@ void FormationCard::draw(Graphics &graphics) {
     */
 }
 
+
+/*
 void FormationCard::draw(Graphics &graphics, int x, int y) {
     
     this->_template.draw(graphics, x, y);
@@ -250,12 +257,7 @@ void FormationCard::draw(Graphics &graphics, int x, int y) {
             graphics.drawLine(startx - length/2 + i*(32), starty+10, startx - length/2 + i*(32), starty+20);
         }
         
-        /*
-        //then draw subcounters
-        for(int i = 0; i < this->_subUnits.size(); i++) {
-            this->_subUnits.at(i).draw(graphics, startx - (this->_width*(this->_numberOfSubUnits)) + i*(32)+32+64 , starty+40);
-        }
-        */
+
     }
     else if(this->_numberOfSubUnits == 1) {
         int startx = x + this->_width/2;
@@ -269,7 +271,7 @@ void FormationCard::draw(Graphics &graphics, int x, int y) {
     
     
 }
-
+*/
 
 Rectangle FormationCard::getRectangle() {
     return this->_rectangle;

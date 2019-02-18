@@ -121,6 +121,8 @@ public:
     void drawText(SDL_Texture* texture, SDL_Rect* destinationRectangle);
     
     
+    void storeRotatedDebugCircle(double centerX, double centerY, double radius);
+    
 private:
     SDL_Window* _window;
     SDL_Renderer* _renderer;

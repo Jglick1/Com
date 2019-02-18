@@ -55,6 +55,8 @@ public:
     
     int getSize();
     
+    std::shared_ptr<Unit> getUnitPointer();
+    
 private:
     int _id;
     int _numUnits;

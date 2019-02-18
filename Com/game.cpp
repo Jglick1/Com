@@ -16,7 +16,7 @@
 
 
 namespace {
-    const int FPS = 30;
+    const int FPS = 60;
     const int MAX_FRAME_TIME = 1000 / FPS;
 }
 
@@ -42,6 +42,9 @@ Game::Game() {
     }
     
     this->_actionState = NORMAL;
+    
+    //this might be the wrong spot for it. But it seems to work here.
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     
     this->gameLoop();
     
@@ -79,6 +82,9 @@ void Game::gameLoop() {
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test6", graphics);
     this->_organizationChart = OrganizationChart(graphics);
     this->_hud = HUD(graphics, this->_player);
+    
+    this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), graphics);
+    
     
     int LAST_UPDATE_TIME = SDL_GetTicks();
     
@@ -135,7 +141,7 @@ void Game::gameLoop() {
                     }
                     else if(this->_actionState == ORGANIZATION) {
                         this->_organizationChart.cameraDragging();
-                        this->_organizationChart.handleCameraMove(xm, ym);
+                        this->_organizationChart.handleCameraMove(xm - old_xm, ym - old_ym);
                     }
 
                     
@@ -214,6 +220,10 @@ void Game::gameLoop() {
             //this->_level.moveUnitToPosition(790, 400, graphics);
             this->_level.changeDrawFoVNode();
         }
+        if(input.wasKeyPressed(SDL_SCANCODE_F)) {
+            this->_level.moveUnitAssignment();
+            this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), graphics);
+        }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
             this->_level.moveUnitToPosition(0, 0, graphics);
@@ -259,8 +269,9 @@ void Game::gameLoop() {
             }
         }
         else if(this->_actionState == ORGANIZATION) {
+            //printf("%d, %d\n", xm - old_xm, ym - old_ym);
             this->_organizationChart.handleMouseHover(xm, ym, graphics);
-            this->_organizationChart.handleCameraMove(xm, ym);
+            this->_organizationChart.handleCameraMove(xm - old_xm, ym - old_ym);
         }
         else if (this->_actionState == COMMAND) {
             //graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state

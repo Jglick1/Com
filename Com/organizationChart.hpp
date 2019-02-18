@@ -16,6 +16,7 @@
 #include "formationCard.hpp"
 #include "graphics.hpp"
 #include "plusSign.hpp"
+#include "fireteam.hpp"
 
 class Graphics;
 
@@ -57,6 +58,8 @@ public:
     
     void handleCameraMove(int xm, int ym);
 
+    void readUnitInformation(Fireteam f1, Fireteam f2, Fireteam f3, Graphics &graphics);
+    
     
 private:
     
@@ -86,10 +89,12 @@ private:
     
     std::map< std::vector<int>, int> _mapToNumChildren;
     
-    double _cameraX;
-    double _cameraY;
+    int _cameraX;
+    int _cameraY;
     
     bool _cameraDrag;
+    
+    int _mx, _my;
     
 };
 

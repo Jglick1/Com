@@ -158,9 +158,9 @@ public:
     
     
     
+    void moveUnitAssignment();
     
-    
-    
+    Fireteam returnFireteam(int fireteamNumber);
     
     
     

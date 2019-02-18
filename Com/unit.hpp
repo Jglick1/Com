@@ -70,6 +70,8 @@ public:
     void addToAngleOrders(double angle);
     void moveToAngle(double angle);
     
+    void printFirstName();
+    
 private:
     //float _x, _y;
     float _dx, _dy;

@@ -16,8 +16,10 @@ OrganizationChart::OrganizationChart(Graphics &graphics) :
 _isSelected(0),
 _mouseOffsetX(0),
 _mouseOffsetY(0),
-_cameraX(0.0),
-_cameraY(0.0)
+_cameraX(0),
+_cameraY(0),
+_mx(0),
+_my(0)
 {
     
     this->_background = Sprite(graphics, "/Users/jonahglick/Documents/Com/organizationChart.png", 0, 0, 1280, 800, 0, 0);
@@ -73,6 +75,24 @@ _cameraY(0.0)
     tmp = {0, 1, 2};
     UnitCard unit3(SGT, RIFLEMAN, tmp, this->_mapToNumChildren, graphics);
     this->_Unitcards.push_back(unit3);
+    
+    
+    
+    
+    //read in unit formation
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     /*
@@ -143,9 +163,91 @@ _cameraY(0.0)
     
 }
 
+void OrganizationChart::readUnitInformation(Fireteam f1, Fireteam f2, Fireteam f3, Graphics &graphics) {
+    
+    
+    //read in children numbers
+    int numF1 = f1.getSize();
+    int numF2 = f2.getSize();
+    int numF3 = f3.getSize();
+    
+    this->_mapToNumChildren.clear();
+    
+    
+    std::vector<int> tmp = {0};
+    this->_mapToNumChildren.insert(std::make_pair(tmp, 3)); //squad {0} has three fireteams
+    
+    tmp = {0, 0};
+    this->_mapToNumChildren.insert(std::make_pair(tmp, numF1));
+    tmp = {0, 1};
+    this->_mapToNumChildren.insert(std::make_pair(tmp, numF2));
+    tmp = {0, 2};
+    this->_mapToNumChildren.insert(std::make_pair(tmp, numF3));
+    
+    
+    this->_formationCards.clear();
+    
+    
+    //read formation information
+    tmp = {0};
+    FormationCard testCard(SQUAD, tmp, this->_mapToNumChildren, graphics);
+    this->_formationCards.push_back(testCard);
+    
+    tmp = {0, 0};
+    FormationCard fireTeam1(FIRETEAM, tmp, this->_mapToNumChildren, graphics);
+    this->_formationCards.push_back(fireTeam1);
+    
+    tmp = {0, 1};
+    FormationCard fireTeam2(FIRETEAM, tmp, this->_mapToNumChildren, graphics);
+    this->_formationCards.push_back(fireTeam2);
+    
+    tmp = {0, 2};
+    FormationCard fireTeam3(FIRETEAM, tmp, this->_mapToNumChildren, graphics);
+    this->_formationCards.push_back(fireTeam3);
+    
+    
+    //read unit cards
+    
+    //MUST BE A BETTER WAY TO DO THIS.
+    
+    this->_Unitcards.clear();
+    
+    //for fireteam1
+    for(int i = 0; i < numF1; i++) {
+        tmp = {0, 0, i};
+        UnitCard unit1(PFC, RIFLEMAN, tmp, this->_mapToNumChildren, graphics);
+        this->_Unitcards.push_back(unit1);
+    }
+    
+    //for fireteam2
+    for(int i = 0; i < numF2; i++) {
+        tmp = {0, 1, i};
+        UnitCard unit1(PFC, RIFLEMAN, tmp, this->_mapToNumChildren, graphics);
+        this->_Unitcards.push_back(unit1);
+    }
+    
+    //for fireteam3
+    for(int i = 0; i < numF3; i++) {
+        tmp = {0, 2, i};
+        UnitCard unit1(PFC, RIFLEMAN, tmp, this->_mapToNumChildren, graphics);
+        this->_Unitcards.push_back(unit1);
+    }
+    
+
+    
+    //maybe every unit should just have it's own unitCard class. As well as every formation class and squad class. just put the card information with the cooresponding class.
+    
+    
+    
+}
+
+
 void OrganizationChart::handleMouseHover(int mx, int my, Graphics &graphics) {
     //printf("organization\n");
     Rectangle tmp;
+    mx = mx - this->_cameraX;
+    my = my - this->_cameraY;
+    
     for (UnitCard card : this->_Unitcards) {
         tmp = card.getRectangle();
         if(mx > tmp.getX() && mx < tmp.getX() + tmp.getWidth()) {
@@ -225,7 +327,7 @@ void OrganizationChart::draw(Graphics &graphics) {
     
     //draw formation cards
     for(FormationCard iter : this->_formationCards) {
-        iter.draw(graphics);
+        iter.draw(graphics, this->_cameraX, this->_cameraY);
     }
     
     
@@ -233,18 +335,26 @@ void OrganizationChart::draw(Graphics &graphics) {
     //draw unit cards
     if(this->_isSelected) {     //fix this!
         for(int i = 0; i < this->_selectedUnitCardIndex; i++) {
-            this->_Unitcards.at(i).draw(graphics);
+            this->_Unitcards.at(i).draw(graphics, this->_cameraX, this->_cameraY);
         }
         
+        
+        //it is not efficient to have the mouse information inputted into all unitsCards. just keep it in organization chart.
         this->_Unitcards.at(this->_selectedUnitCardIndex).drawTmp(graphics);
         
+        
+        this->_hoverShadow.draw(graphics, this->_mouseOffsetX + this->_mx, this->_mouseOffsetY + this->_my);
+        
         for(int i = this->_selectedUnitCardIndex+1; i < this->_Unitcards.size(); i++) {
-            this->_Unitcards.at(i).draw(graphics);
+            this->_Unitcards.at(i).draw(graphics, this->_cameraX, this->_cameraY);
         }
     }
     else {
         for(UnitCard card : this->_Unitcards) {
-            card.draw(graphics);
+            card.draw(graphics, this->_cameraX, this->_cameraY);
+        }
+        if(this->_drawHover) {
+            this->_hoverShadow.draw(graphics, this->_hoverShadowPosition.x + this->_cameraX, this->_hoverShadowPosition.y + this->_cameraY);
         }
     }
     
@@ -257,13 +367,7 @@ void OrganizationChart::draw(Graphics &graphics) {
     */
     
     //this->_plusSign.draw(graphics);
-    
-    
-    
-    if(this->_drawHover) {
-        this->_hoverShadow.draw(graphics, this->_hoverShadowPosition.x, this->_hoverShadowPosition.y);
-    }
-    
+
 
 }
 
@@ -278,6 +382,9 @@ bool OrganizationChart::isSelected() {
 void OrganizationChart::handleMouseCollision(Graphics &graphics, int mx, int my) {
     
     Rectangle tmp;
+    
+    mx = mx - this->_cameraX;
+    my = my - this->_cameraY;
     
     
     //check cards
@@ -333,12 +440,20 @@ void OrganizationChart::handleMouseCollision(Graphics &graphics, int mx, int my)
 
 void OrganizationChart::handleMouseLiftCollision(Graphics &graphics, int mx, int my) {
     //collision rects that are the formation counters
-    printf("lift up\n");
+    //printf("lift up\n");
 
-    
+    mx = mx - this->_cameraX;
+    my = my - this->_cameraY;
     
     
     Rectangle tmp;
+    //better to iterate through
+    
+    
+    
+    
+    
+    
     
     
     //check formation cards
@@ -450,11 +565,12 @@ void OrganizationChart::handleMouseLiftCollision(Graphics &graphics, int mx, int
 }
 
 
-void OrganizationChart::handleCameraMove(int xm, int ym) {
+void OrganizationChart::handleCameraMove(int d_xm, int d_ym) {
     
     if(this->_cameraDrag) {
-        this->_cameraX = xm;
-        this->_cameraY = ym;
+        this->_cameraX += d_xm;
+        this->_cameraY += d_ym;
+        //printf("t:    %d, %d\n", this->_cameraX, this->_cameraY);
     }
 
 }
@@ -467,6 +583,9 @@ void OrganizationChart::update(int mx, int my) {
         this->_Unitcards.at(this->_selectedUnitCardIndex).update(mx, my, this->_mouseOffsetX, this->_mouseOffsetY);
         //this->_collisionCards.at(this->_selectedUnitCardIndex)->update(mx, my, this->_mouseOffsetX, this->_mouseOffsetY);
     }
+    
+    this->_mx = mx;
+    this->_my = my;
     
     
 }

@@ -452,3 +452,12 @@ double Fireteam::dist(double x1, double y1, double x2, double y2) {
 int Fireteam::getSize() {
     return this->_numUnits;
 }
+
+std::shared_ptr<Unit> Fireteam::getUnitPointer() {
+    
+    std::shared_ptr<Unit> tmp = std::move(this->_units.back());
+    this->_units.pop_back();
+    this->_numUnits--;
+    
+    return tmp;  //move this one unit
+}

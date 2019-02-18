@@ -322,13 +322,13 @@ void Graphics::drawDebug() {
     
     //drawFrameTimes
     
-    /*
+    
     SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255);
     for(int i = 0; i < 100; i++) {      //max frame time at 30 FPS. 1000 / 30
         drawLine(i, 100, i, this->_frameTimes.at(i)/33.33*100);
     }
     SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
-    */
+    
     
     
     //drawShape();
@@ -539,6 +539,47 @@ void Graphics::storeDebugCircle(double centerX, double centerY, double radius) {
     std::vector<double> tmp = {centerX, centerY, radius};
     
     this->_debugCircles.push_back(tmp);
+    
+    
+}
+
+void Graphics::storeRotatedDebugCircle(double centerX, double centerY, double radius) {
+    
+    /*
+    float posx = graphics.getCameraX() + this->_staticx;
+    float posy = graphics.getCameraY() + this->_staticy;
+    
+    
+    int playerx = graphics.getPlayerCenterX();
+    int playery = graphics.getPlayerCenterY();
+    
+    double playerAngle = graphics.getCameraAngle();
+    
+    double renderX = playerx-8 + ( (posx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((posy)-playery+12) * std::sin(playerAngle*3.14159/180);
+    double renderY = playery-12 + ( ((posy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((posx)-playerx+8) * std::sin(playerAngle*3.14159/180));
+    */
+    
+    
+    
+    
+    double posX = centerX + this->_cameraX;
+    double posY = centerY + this->_cameraY;
+    
+    int playerx = this->_playerCenterX;
+    int playery = this->_playerCenterY;
+    
+    //printf("%d, %d\n", this->_playerCenterX, this->_playerCenterY);
+    
+    //this->_camerax = 640-75 + ( (posx)-640+75)* std::cos(playerAngle*3.14159/180) - ((posy)-400+12) * std::sin(playerAngle*3.14159/180);
+    //this->_cameray = 400-12 + ( ((posy)-400+12) * std::cos(playerAngle*3.14159/180) + ((posx)-640+75) * std::sin(playerAngle*3.14159/180));
+    
+    double newCenterX = playerx + ( (posX)- playerx)* std::cos(this->_cameraAngle*3.14159/180) - ((posY)-playery) * std::sin(this->_cameraAngle*3.14159/180);
+    double newCenterY = playery + ( ((posY)-playery) * std::cos(this->_cameraAngle*3.14159/180) + ((posX)-playerx) * std::sin(this->_cameraAngle*3.14159/180));
+    
+    
+    
+    storeDebugCircle(newCenterX, newCenterY, radius);
+    
     
     
 }

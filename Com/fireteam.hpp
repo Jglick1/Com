@@ -18,6 +18,7 @@
 #include "graphics.hpp"
 #include "graph.hpp"
 
+class Unit;
 
 class Fireteam {
 public:
@@ -57,6 +58,13 @@ public:
     
     std::shared_ptr<Unit> getUnitPointer();
     
+    void checkIfPlayerInLOS(Graphics &graphics);
+    void updateUnitFocus(Fireteam &fireteamToBeChecked);
+    
+    
+    std::shared_ptr<Unit> getPointerToAUnit(int unitIndex);
+    
+    
 private:
     int _id;
     int _numUnits;
@@ -69,8 +77,8 @@ private:
     
     //Squad * _parentSquad
     
-    
-    
+    double _playerInLOSCheckTime;
+    double _timeSinceLastLOSCheck;
     
 };
 

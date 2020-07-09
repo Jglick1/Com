@@ -19,7 +19,11 @@ namespace player_constants {
 }
 
 
-Graphics::Graphics() :
+Graphics::Graphics() {
+    printf("graphics fake constructor called\n");
+}
+
+Graphics::Graphics(int real) :
     _cameraX(0.01),
     _cameraY(0.01),
     _cameraAngle(0.01),
@@ -34,16 +38,43 @@ Graphics::Graphics() :
     _cameraCommandOffsetX(0.0),
     _cameraCommandOffsetY(0.0)
     {
-    SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
-        
-        
+    
+        printf("graphics real constructor called\n");
+    
+    //the original
+    //SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
+    
+    
+    //the option for high dpi
     //SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI, &this->_window, &this->_renderer);
+    
+
+        
+    //this new way for creating the window and renderer seems to fix the problem of the window not be selected when it is created!
+    //no, I take that back.
+    //Check to see how many displays we have
+    int num_displays = SDL_GetNumVideoDisplays();
+    printf("num displays: %d \n", num_displays);
+    
+    
+    std::vector<SDL_Rect> display_bounds;
+    if(num_displays > 1){
+        for(int i = 0; i < num_displays; i++) {
+            display_bounds.push_back(SDL_Rect() );
+            SDL_GetDisplayBounds(i, &display_bounds.back());
+        }
+    }
+        
+    //printf("x1: %d, y1: %d\n", display_bounds[0].x, display_bounds[0].y);
+    //printf("x1: %d, y1: %d\n", display_bounds[1].x, display_bounds[1].y);
+    
+    //print on the second screen
+    this->_window = SDL_CreateWindow("Com", display_bounds[1].x, display_bounds[1].y, globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0);
+    this->_renderer = SDL_CreateRenderer(this->_window, -1, 0);
         
         
-        
-        
-        
-    SDL_SetWindowTitle(this->_window, "Com");
+    
+    //SDL_SetWindowTitle(this->_window, "Com");
     
     this->_font = NULL;
     
@@ -63,19 +94,23 @@ Graphics::Graphics() :
     //SDL_WarpMouseInWindow(this->_window, 10, 10);
     //SDL_SetWindowFullscreen(this->_window, SDL_WINDOW_FULLSCREEN);
         
-        for(int i = 0; i < 100; i++) {
-            this->_frameTimes.push_back(0);
-        }
+    for(int i = 0; i < 100; i++) {
+        this->_frameTimes.push_back(0);
+    }
         
         
         
         
         
         
-        SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);   //for the transparent gunshots
+    //SDL_SetRenderDrawBlendMode(this->_renderer, SDL_BLENDMODE_BLEND);   //for the transparent gunshots
+        
+        
 }
 
 Graphics::~Graphics() {
+    
+    printf("Graphics desctructor called\n");
     
     //TTF_CloseFont(this->_font);
     
@@ -107,6 +142,15 @@ SDL_Surface * Graphics::loadText(const std::string &text) {
     }
     return this->_textSheets[text];
 }
+
+SDL_Surface * Graphics::loadText(const std::string &text, Uint8 r, Uint8 g, Uint8 b) {
+    SDL_Color textColor = { r, g, b };
+    if(this->_textSheets.count(text) == 0) {
+        this->_textSheets[text] = TTF_RenderText_Solid(this->_font, text.c_str(), textColor);
+    }
+    return this->_textSheets[text];
+}
+
 
 void Graphics::loadSound() {
     this->_shot = Mix_LoadWAV("/Users/jonahglick/Documents/Com/kar98_fp.wav");
@@ -143,6 +187,20 @@ void Graphics::drawText(SDL_Texture* texture, SDL_Rect* destinationRectangle) {
     
 }
 
+void Graphics::drawColoredText(SDL_Texture* texture, SDL_Rect* destinationRectangle, int r, int g, int b) {
+    //ok, so this is not so straightfoward. SDL_RenderCopy just copies down textures, we can't change the color of the texture from here
+    //TODO
+    
+    
+    //SDL_SetRenderDrawColor(this->_renderer, r, g, b, 255);
+    SDL_RenderCopy(this->_renderer, texture, NULL, destinationRectangle);
+    
+    //back to black
+    //SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
+    
+}
+
+
 void Graphics::flip() {
     SDL_RenderPresent(this->_renderer);
 }
@@ -162,6 +220,17 @@ void Graphics::moveMouse() {
 void Graphics::drawRect(int x, int y, int width, int height) {
     SDL_Rect destRect = {x, y, width, height};
     SDL_RenderDrawRect(this->_renderer, &destRect);
+}
+
+void Graphics::drawFilledRect(int x, int y, int width, int height) {
+    SDL_Rect destRect = {x, y, width, height};
+    
+    //set color
+    SDL_SetRenderDrawColor(this->_renderer, 200, 200, 200, 255);
+    SDL_RenderFillRect(this->_renderer, &destRect);
+    
+    //set color back to black
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255);
 }
 
 void Graphics::drawLine(int x1, int y1, int x2, int y2) {
@@ -208,8 +277,8 @@ void Graphics::update(int elapsedTime) {
     this->_cameraX += this->_cameraDx * elapsedTime;
     this->_cameraY += this->_cameraDy * elapsedTime;
     
-    this->_playerX = this->_cameraX + this->_playerCenterX + this->_cameraCommandOffsetX;
-    this->_playerY = this->_cameraY + this->_playerCenterY + this->_cameraCommandOffsetY;
+    this->_playerX = -this->_cameraX + this->_playerCenterX + this->_cameraCommandOffsetX;
+    this->_playerY = -this->_cameraY + this->_playerCenterY + this->_cameraCommandOffsetY;
     
     
     //printf("%f, %f\n", this->_playerX, this->_playerY);
@@ -345,6 +414,11 @@ void Graphics::storeLineDebug(int x1, int y1, int x2, int y2, int color) {
 void Graphics::eraseDebugLines() {
     
     this->_debugLines.clear();
+    
+}
+
+void Graphics::eraseDebugLines2() {
+    
     this->_mapDebugLines.clear();
     this->_debugCircles.clear();
     
@@ -623,4 +697,96 @@ double Graphics::distToLine(double playerX, double playerY, double x1, double y1
     
     return 0.0;
     
+}
+
+void Graphics::storeLineOnBackground(double x1, double y1, double x2, double y2, double color) {
+    
+    std::vector<double> tmp = {x1, y1, x2, y2, color};
+    this->_debugBackgroundLines.push_back(tmp);
+}
+
+void Graphics::clearBackgroundLines() {
+    this->_debugBackgroundLines.clear();
+}
+
+void Graphics::drawColorLine(int x1, int y1, int x2, int y2, int color) {
+    
+    if(color == 0) { //black
+        
+    }
+    else if (color == 1) {
+        SDL_SetRenderDrawColor(this->_renderer, 255, 0, 0, 255); //red
+    }
+    else if (color == 2) {
+        SDL_SetRenderDrawColor(this->_renderer, 255, 165, 0, 255); //orange
+    }
+    
+    
+    SDL_RenderDrawLine(this->_renderer, x1, y1, x2, y2);
+    SDL_SetRenderDrawColor(this->_renderer, 0, 0, 0, 255); //back to black
+    
+}
+
+void Graphics::drawBackgroundLines() {
+    
+    for(std::vector<double> & iter : this->_debugBackgroundLines) {
+        double x1 = iter[0];
+        double y1 = iter[1];
+        double x2 = iter[2];
+        double y2 = iter[3];
+        int color = iter[4];
+        
+        Vector2 point1Rotated = rotatePoint(Vector2(x1, y1), Vector2(this->_playerX, this->_playerY));
+        Vector2 point2Rotated = rotatePoint(Vector2(x2, y2), Vector2(this->_playerX, this->_playerY));
+        
+        drawColorLine(point1Rotated.x, point1Rotated.y, point2Rotated.x, point2Rotated.y, color);
+        
+    }
+    
+    /*
+    //rotate the points on the line
+    double x1 = this->_debugBackgroundLines[0][0];
+    double y1 = this->_debugBackgroundLines[0][1];
+    double x2 = this->_debugBackgroundLines[0][2];
+    double y2 = this->_debugBackgroundLines[0][3];
+    
+    
+    Vector2 point1Rotated = rotatePoint(Vector2(x1, y1), Vector2(this->_playerX, this->_playerY));
+    Vector2 point2Rotated = rotatePoint(Vector2(x2, y2), Vector2(this->_playerX, this->_playerY));
+    
+    //printf("%f \t %d \n", this->_playerY, this->_playerCenterY);
+    
+    drawLine(point1Rotated.x, point1Rotated.y, point2Rotated.x, point2Rotated.y);
+    */
+    
+    
+    
+}
+
+//http://www.alecjacobson.com/weblog/?p=1659
+Vector2 Graphics::rotatePoint(Vector2 point, Vector2 rotateAxis) {
+
+    Vector2 tmp = point - rotateAxis;
+    /*
+    Vector2 tmp1 = Vector2(
+                           std::cos(this->_cameraAngle * 180 / 3.14159) * tmp.x - std::sin(this->_cameraAngle * 180 / 3.14159) * tmp.y,
+                           std::sin(this->_cameraAngle * 180 / 3.14159) * tmp.x + std::sin(this->_cameraAngle * 180 / 3.14159) * tmp.y
+                           );
+    */
+    
+    Vector2 tmp1 = Vector2(
+                           std::cos(this->_cameraAngle * 3.14159/180) * tmp.x - std::sin(this->_cameraAngle * 3.14159/180) * tmp.y,
+                           std::sin(this->_cameraAngle * 3.14159/180) * tmp.x + std::cos(this->_cameraAngle * 3.14159/180) * tmp.y
+                           );
+    
+    return (tmp1 + rotateAxis - Vector2(this->_playerX - 640, this->_playerY - 400));
+
+}
+
+void Graphics::setCameraDx(double dx){
+    this->_cameraDx = dx;
+}
+
+void Graphics::setCameraDy(double dy) {
+    this->_cameraDy = dy;
 }

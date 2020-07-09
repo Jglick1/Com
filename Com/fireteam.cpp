@@ -28,6 +28,11 @@ _numUnits(0)
     
     printf("spawnPoint, x: %d, y %d\n", spawnPoint.x, spawnPoint.y);
     
+    
+    this->_playerInLOSCheckTime = 1000;
+    this->_timeSinceLastLOSCheck = 0;
+    
+    
 }
 
 Fireteam::~Fireteam() {                             //MEMORY LEAKS?
@@ -81,7 +86,13 @@ void Fireteam::update(int elapsedTime, Graphics &graphics) {
 
         
     }
+    //implement at timer here
     
+    this->_timeSinceLastLOSCheck += elapsedTime;
+    if(this->_timeSinceLastLOSCheck > this->_playerInLOSCheckTime) {
+        this->_timeSinceLastLOSCheck = 0;
+        checkIfPlayerInLOS(graphics);
+    }
     
     
     //update controlSlide
@@ -130,7 +141,7 @@ void Fireteam::moveToSlideAngle() {
     
     for (std::shared_ptr<Unit> &iter : this->_units) {
         iter->addToAngleOrders(this->_controlSlide.getAngle());
-        //printf("unit move\n");
+        //printf("unit move to slide angle\n");
     }
 
 }
@@ -461,3 +472,53 @@ std::shared_ptr<Unit> Fireteam::getUnitPointer() {
     
     return tmp;  //move this one unit
 }
+
+void Fireteam::checkIfPlayerInLOS(Graphics &graphics) {
+
+    //printf("check!\n");
+    //let's just print a line between the units and the player here.
+    
+    
+    
+    //graphics.storeMapLineDebug(0, 0, graphics.getPlayerX(), graphics.getPlayerY(), 0);
+    //printf("x: %f,y: %f\n", graphics.getPlayerX(), graphics.getPlayerY());
+    
+    //iterate over all players
+    for (std::shared_ptr<Unit> &iter : this->_units) {
+        graphics.storeMapLineDebug(iter->getStaticX() + 4, iter->getStaticY() + 12, graphics.getPlayerX(), graphics.getPlayerY(), 0);
+    }
+    
+    
+    
+    
+}
+
+
+
+void Fireteam::updateUnitFocus(Fireteam &fireteamToBeChecked) {
+    
+    /*
+    //check each unit against the fireteam
+    for (std::shared_ptr<Unit> &iter : this->_units) {
+        
+        if(0) {
+            iter->update
+        }
+        
+        
+    }
+    
+*/
+    
+}
+
+
+
+std::shared_ptr<Unit> Fireteam::getPointerToAUnit(int unitIndex) {
+
+    
+    return this->_units.at(unitIndex);
+    
+    
+}
+

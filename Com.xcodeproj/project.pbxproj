@@ -19,6 +19,7 @@
 		411043A92175711300DCC740 /* gunshotPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411043A72175711300DCC740 /* gunshotPath.cpp */; };
 		411043AC2178012100DCC740 /* fogOfWar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 411043AA2178012100DCC740 /* fogOfWar.cpp */; };
 		411043B121780E2400DCC740 /* SDL2_gfx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 411043B021780E2400DCC740 /* SDL2_gfx.framework */; };
+		41249C6D24B64CC800323D25 /* debugWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41249C6B24B64CC800323D25 /* debugWindow.cpp */; };
 		419E04C6211541A300FBF9C3 /* hud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04C4211541A300FBF9C3 /* hud.cpp */; };
 		419E04CC2115685300FBF9C3 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 419E04CA2115685300FBF9C3 /* cursor.cpp */; };
 		41D4195620DB531C00A97956 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41D4195520DB531C00A97956 /* main.cpp */; };
@@ -72,6 +73,9 @@
 		411043AA2178012100DCC740 /* fogOfWar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fogOfWar.cpp; sourceTree = "<group>"; };
 		411043AB2178012100DCC740 /* fogOfWar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fogOfWar.hpp; sourceTree = "<group>"; };
 		411043B021780E2400DCC740 /* SDL2_gfx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_gfx.framework; path = ../../../../Library/Frameworks/SDL2_gfx.framework; sourceTree = "<group>"; };
+		41249C6B24B64CC800323D25 /* debugWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = debugWindow.cpp; sourceTree = "<group>"; };
+		41249C6C24B64CC800323D25 /* debugWindow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = debugWindow.hpp; sourceTree = "<group>"; };
+		41249C6F24B69E9A00323D25 /* button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = button.hpp; sourceTree = "<group>"; };
 		419E04C4211541A300FBF9C3 /* hud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hud.cpp; sourceTree = "<group>"; };
 		419E04C5211541A300FBF9C3 /* hud.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = hud.hpp; sourceTree = "<group>"; };
 		419E04CA2115685300FBF9C3 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
@@ -171,6 +175,7 @@
 				411043A4216AFC0600DCC740 /* plusSign.cpp */,
 				411043A72175711300DCC740 /* gunshotPath.cpp */,
 				411043AA2178012100DCC740 /* fogOfWar.cpp */,
+				41249C6B24B64CC800323D25 /* debugWindow.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -202,6 +207,8 @@
 				411043A5216AFC0600DCC740 /* plusSign.hpp */,
 				411043A82175711300DCC740 /* gunshotPath.hpp */,
 				411043AB2178012100DCC740 /* fogOfWar.hpp */,
+				41249C6C24B64CC800323D25 /* debugWindow.hpp */,
+				41249C6F24B69E9A00323D25 /* button.hpp */,
 			);
 			name = headers;
 			sourceTree = "<group>";
@@ -296,6 +303,7 @@
 				411011D421278D96002F6A09 /* graph.cpp in Sources */,
 				41D4196C20DB548900A97956 /* input.cpp in Sources */,
 				41D4196220DB538200A97956 /* graphics.cpp in Sources */,
+				41249C6D24B64CC800323D25 /* debugWindow.cpp in Sources */,
 				411043A6216AFC0600DCC740 /* plusSign.cpp in Sources */,
 				41D4196F20DB578000A97956 /* sprite.cpp in Sources */,
 			);

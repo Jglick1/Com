@@ -471,3 +471,18 @@ bool Graph::isCoverOccupied(int coverNode) {
 }
 
 
+
+void Graph::draw(Graphics &graphics) {
+    
+    
+    for(int i = 0; i < this->_vertexCount; i++) {
+        graphics.drawCircle(this->_vertices[i].x, this->_vertices[i].y);
+    }
+    
+    
+    
+    
+    //graphics.draw();
+    
+}
+

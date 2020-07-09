@@ -542,7 +542,8 @@ void Unit::handleMovement() {
     
     
     //check for angle things
-    if(this->_isAngleMoving) {                      //this is sloppy. it just checks every cycle. FIX ME!
+    //if(this->_isAngleMoving) {                      //this is sloppy. it just checks every cycle. FIX ME!
+    if(1) {
         switch(this->_state)  {
             case CHANGE_ANGLE_UP:
                 if(this->_angle < this->_destinationAngle) {
@@ -550,14 +551,15 @@ void Unit::handleMovement() {
                 }
                 else {
                     this->_angle = this->_destinationAngle;
-                    /*
+
+                    
                     if(this->_unitMovementOrders.size() > 0) {
                         this->_state = MOVE_FORWARD;
                     }
                     else {
                         this->_state = STILL;
                     }
-                     */
+                    
                     //this->_isAngleMoving = 0;
                 }
                 
@@ -569,14 +571,14 @@ void Unit::handleMovement() {
                 }
                 else {
                     this->_angle = this->_destinationAngle;
-                    /*
+                    
                     if(this->_unitMovementOrders.size() > 0) {
                         this->_state = MOVE_FORWARD;
                     }
                     else {
                         this->_state = STILL;
                     }
-                     */
+                    
                     
                     //this->_isAngleMoving = 0;
                 }
@@ -785,6 +787,8 @@ void Unit::addToMovementOrders(Vector2 pos) {
 void Unit::addToAngleOrders(double angle) {
     this->_unitAngleOrders.clear();
     
+    //printState();
+    
     
     //if your not busy, move to that angle
     if(this->_state == STILL) {
@@ -795,6 +799,9 @@ void Unit::addToAngleOrders(double angle) {
         this->_unitAngleOrders.push_back(angle);
     }
     
+    //this->_unitAngleOrders.push_back(angle);
+     
+    //printf("add to angel orders %lu\n", this->_unitAngleOrders.size());
     
     
 }
@@ -814,3 +821,47 @@ Rectangle Unit::getCollisionRect() {
     return this->_collisionRect;
 }
 */
+
+void Unit::updateUnitFocus(Fireteam & fireteamToBeChecked) {
+    
+    //int size = fireteamToBeChecked.getSize();
+    /*
+    for(int i = 0; i < fireteamToBeChecked.getSize(); i++) {
+        std::shared_ptr<Unit> enemyUnit = fireteamToBeChecked.getPointerToAUnit(i);
+        //then check if that unit is in the line of sight
+        
+        
+        
+        
+        this->_staticx,
+        this->_staticy,
+        enemyUnit->getStaticX()
+        enemyUnit->getStaticY()
+        
+        
+    }
+    */
+    
+    
+}
+
+void Unit::printState() {
+    //CHANGE_ANGLE_UP, CHANGE_ANGLE_DOWN, MOVE_FORWARD, STILL, SCAN
+    switch(this->_state) {
+        case CHANGE_ANGLE_UP:
+            printf("CHANGE_ANGLE_UP\n");
+            break;
+        case CHANGE_ANGLE_DOWN:
+            printf("CHANGE_ANGLE_DOWN\n");
+            break;
+        case MOVE_FORWARD:
+            printf("MOVE_FORWARD\n");
+            break;
+        case STILL:
+            printf("STILL\n");
+            break;
+        default:
+            printf("ERROR\n");
+            break;
+    }
+}

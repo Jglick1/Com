@@ -270,6 +270,10 @@ void OrganizationChart::handleMouseHover(int mx, int my, Graphics &graphics) {
 
 void OrganizationChart::draw(Graphics &graphics) {
     
+    //should do this recursvily
+    
+    
+    
     //draw the formation cards and the unit cards in position according to each one's vector<int> position
     
     

@@ -12,6 +12,7 @@
 #include "sprite.hpp"
 #include "globals.hpp"
 //#include "level.hpp"
+#include "Unit.hpp"
 
 
 class Graphics;
@@ -52,11 +53,15 @@ public:
     //const float getDX() const;
     //const float getDY() const;
     
+    void setPlayerFocus(std::shared_ptr<Unit> &closestVisibleEnemy);
+    void printPlayerFocusInfo();
+    
 private:
     float _dx, _dy;
     int _mx, _my; //mouse x and mouse y
     //Sprite _fov;
     
+    std::shared_ptr<Unit> _closestVisibleEnemy;
     
     //Direction _facing;
     

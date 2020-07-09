@@ -14,6 +14,7 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include "graphics.hpp"
 
 class Graph {
     
@@ -46,6 +47,9 @@ public:
     void setCoverToOccupied(int coverNode);
     
     bool isCoverOccupied(int coverNode);
+    
+    void draw(Graphics &graphics);
+    
     
 private:
     //double** _adjacencyMatrix;

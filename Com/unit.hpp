@@ -13,9 +13,11 @@
 #include "globals.hpp"
 //#include "level.hpp"
 #include <vector>
+#include "fireteam.hpp"
 
 
 class Graphics;
+class Fireteam;
 
 class Unit {
     
@@ -72,6 +74,10 @@ public:
     
     void printFirstName();
     
+    void updateUnitFocus(Fireteam & fireteamToBeChecked);
+    
+    void printState();
+    
 private:
     //float _x, _y;
     float _dx, _dy;
@@ -110,6 +116,7 @@ private:
     std::string _firstName;
     std::string _lastName;
     
+    std::shared_ptr<Unit> _closestVisibleEnemy;
     
 };
 

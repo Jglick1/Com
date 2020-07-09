@@ -18,7 +18,7 @@
 #include "cursor.hpp"
 #include "gamestate.hpp"
 #include "organizationChart.hpp"
-
+#include "debugWindow.hpp"
 
 class Game {
 public:
@@ -28,14 +28,19 @@ public:
     void printActionState(ActionState direction);
     
     
+    void giveUnitPointerToPlayer(std::shared_ptr<Unit> unit);
+    
     
     
 private:
     void gameLoop();
-    void draw(Graphics &graphics);
-    void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym, Graphics &graphics);
-    void handleMovement(Direction &inPower, Input &input, Graphics &graphics);
-    
+    void draw();
+    //void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym, Graphics &graphics);
+    void update(float elapsedTime, Direction &inPower, int mx, int my, int old_xm, int old_ym);
+    void handleEvents();
+    void handleMouseEvent();
+    //void handleMovement(Direction &inPower, Input &input, Graphics &graphics);
+    void handleMovement(Direction &inPower, Input &input);
     
     
     
@@ -54,6 +59,18 @@ private:
     ActionState _actionState;
     
     OrganizationChart _organizationChart;
+    
+    DebugWindow _debugWindow;
+    
+    bool _isCameraFloating;
+    bool _rightMouseDown;
+    bool _isCameraRotating;
+    
+    int _mouseX;
+    int _mouseY;
+    
+    Graphics _graphics;
+    
     
     
 };

@@ -84,6 +84,11 @@ enum StructureType {
     WALL, SANDBAG, BRUSH
 };
 
+//we'll add more debug options the more debug tools we create
+enum ButtonType {
+    MAP_MESH, FREE_CAMERA, LINE_OF_SIGHT
+};
+
 struct Vector2 {
     int x, y;
     Vector2() : x(0), y(0) {}
@@ -91,6 +96,25 @@ struct Vector2 {
     Vector2 zero() {
         return Vector2(0, 0);
     }
+    
+    Vector2 & operator = (const Vector2 & a) {
+        x = a.x;
+        y = a.y;
+        return *this;
+    }
+    
+    Vector2 operator + (const Vector2 & a) const {
+        return Vector2(a.x + x, a.y + y);
+    }
+    
+    Vector2 operator - (const Vector2 & a) const {      //this might be the other way around
+        return Vector2(x - a.x, y - a.y);
+    }
+    
+    bool operator == (const Vector2 & a) const {
+        return (x == a.x && y == a.y);
+    }
+    
 };
 
 struct CoverNode {
@@ -114,7 +138,7 @@ struct CornerNode {
     Direction directionOfCorner;
     
     CornerNode() : x(0), y(0), directionOfCorner(NONE) {}
-    CornerNode(int x, int y, Direction direction) : x(x), y(y), directionOfCorner(direction) {}
+    CornerNode(int x, int y, Direction direction, int id) : x(x), y(y), directionOfCorner(direction), id(id) {}
     
 };
 
@@ -164,7 +188,10 @@ struct Structure {
     double angle;
     std::vector<Direction> directions;
     int numOutsideWalls;
+    int num_corners;
     int name;
+    std::vector< std::vector<bool> > occupation_marker;
+    std::vector<int> lengths;
     
     StructureType structureType = WALL;
 
@@ -177,10 +204,59 @@ struct Structure {
         //    printf("%d, %d\n", iter.x, iter.y);
         //}
         
+        //let's count the number of occupation points on the wall
+        
+        this->num_corners = this->corners.size();
+        
+        double length;
+        for(int i = 1; i < this->num_corners; i++) {
+            length = std::sqrt(std::pow(corners[i].x - corners[i-1].x, 2) + std::pow(corners[i].y - corners[i-1].y, 2));
+            lengths.push_back(length);
+        }
+
+         
+        //printf("numbers check:\n");
+        //printf("%d, %d\n", lengths.size(), numOutsideWalls);
+        
+        /*
+        for(Vector2 i : corners) {
+            printf("%d, %d\n", i.x, i.y);
+        }
+        */
+        
+        for(int i = 0; i < lengths.size(); i++) {
+            std::vector<bool> tmp;
+            //printf("%d\n", lengths[i]);
+            
+            for(int j = 0; j < (lengths[i] / 16); j++) {
+                tmp.push_back(0);
+            }
+            occupation_marker.push_back(tmp);
+        }
+        
+        
+        
+        printf("occupation markers: \n");
+        //print occupation marker for testing
+        for(int i = 0; i < occupation_marker.size(); i++) {
+            for(int j = 0; j < occupation_marker[i].size(); j++) {
+                printf("%d ", int(occupation_marker[i][j]));
+            }
+            printf("\n");
+        }
+        //looking good
+        
+        
+        
+        
     }
     //Structure(std::vector<std::vector<int>> doors, int name): angle(0.0), numOutsideWalls(0), name(name) {
     //    this->doors = doors;
     //}
+    
+    //let's assign position occupation numbers the walls of the structur
+    
+    
     
 };
 

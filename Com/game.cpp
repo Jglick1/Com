@@ -21,8 +21,13 @@ namespace {
 }
 
 
-Game::Game() {
+Game::Game() :
+_graphics(Graphics(2)),
+_debugWindow(DebugWindow())
+{
 
+    //this->_graphics = Graphics(1);
+    /*
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
     
@@ -34,6 +39,7 @@ Game::Game() {
         return;
     }
     
+    
     //Initialize SDL_mixer
     if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
     {
@@ -41,10 +47,47 @@ Game::Game() {
         return;
     }
     
+    */
+    
     this->_actionState = NORMAL;
     
     //this might be the wrong spot for it. But it seems to work here.
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    
+    this->_isCameraFloating = 1;
+    this->_rightMouseDown = 0;
+    this->_isCameraRotating = 0;
+    
+    
+    
+    //we might actually not need this
+    //this->_graphics = Graphics(2);
+    
+    
+    //this->_debugWindow = DebugWindow(2);
+    
+    this->_player = Player(this->_graphics, Vector2(3,3));
+    printf("player called\n");
+    
+    this->_level = Level("/Users/jonahglick/Documents/Com/com_test6", this->_graphics);
+    //this->_level = Level("/Users/jonahglick/Documents/Com/dehast.png", this->_graphics);
+    this->_organizationChart = OrganizationChart(this->_graphics);
+    this->_hud = HUD(this->_graphics, this->_player);
+    
+    this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), this->_graphics);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     this->gameLoop();
     
@@ -62,28 +105,53 @@ Game::~Game() {
 
 void Game::gameLoop() {
     
-    Graphics graphics;
+    //Graphics graphics;
+    
+    
+    
+    //graphics.storeLineOnBackground(0, 0, 100, 100);
+    //graphics.storeLineOnBackground(200, 200, 500, 500);
+    
     
     SDL_Event event;
+    
+    
+    
+    
     Input input;
     
-    graphics.loadSound();
+    this->_graphics.loadSound();
     
     
     
-    this->_textSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadText("Hello World"));
+    this->_textSheet = SDL_CreateTextureFromSurface(this->_graphics.getRenderer(), this->_graphics.loadText("Hello World"));
     if(this->_textSheet == NULL) {
         printf("Error: Unable to load text\n");
     }
      
 
-    
+    /*
     this->_player = Player(graphics, Vector2(3,3));
     this->_level = Level("/Users/jonahglick/Documents/Com/com_test6", graphics);
+    //this->_level = Level("/Users/jonahglick/Documents/Com/dehast.png", graphics);
     this->_organizationChart = OrganizationChart(graphics);
     this->_hud = HUD(graphics, this->_player);
     
     this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), graphics);
+    */
+     
+     
+    printf("test\n");
+    //this->_debugWindow = DebugWindow(graphics);
+    
+    
+    
+    std::shared_ptr<Unit> testUnit = this->_level.getPointerToAUnit();
+    giveUnitPointerToPlayer(testUnit);
+    
+    
+    
+    
     
     
     int LAST_UPDATE_TIME = SDL_GetTicks();
@@ -111,6 +179,11 @@ void Game::gameLoop() {
         
         input.beginNewFrame();
         
+        
+        this->handleEvents();
+        
+        
+        
         //HANDLE INPUT
         
         old_xm = xm;
@@ -133,32 +206,44 @@ void Game::gameLoop() {
             if (event.type == SDL_MOUSEBUTTONDOWN) {
 
                 if (event.button.button == SDL_BUTTON_RIGHT) {
-                    
+                    this->_rightMouseDown = 1;
                     rightMouseDown = 1;
-                    if(this->_actionState == NORMAL) {
+                    if(this->_actionState == NORMAL && this->_isCameraFloating == 0) {
                         this->_actionState = COMMAND;
-                        graphics.storeCameraCoordinates();
+                        this->_graphics.storeCameraCoordinates();
                     }
-                    else if(this->_actionState == ORGANIZATION) {
+                    else if(this->_actionState == ORGANIZATION && this->_isCameraFloating == 0) {
                         this->_organizationChart.cameraDragging();
                         this->_organizationChart.handleCameraMove(xm - old_xm, ym - old_ym);
                     }
-
-                    
-                    
+                    else if((this->_actionState == COMMAND) && this->_isCameraFloating == 0) {
+                        if(this->_level.checkSlideCollision(xm, ym)) {
+                            this->_actionState = SLIDE_MOVE;
+                            //printf("collision!\n");
+                        }
+                    }
                 }
                 if(event.button.button == SDL_BUTTON_LEFT) {
                     if(this->_actionState == ORGANIZATION) {
-                        this->_organizationChart.handleMouseCollision(graphics, xm, ym);
+                        this->_organizationChart.handleMouseCollision(this->_graphics, xm, ym);
                     }
-                    else if(this->_actionState == COMMAND) {
-                        this->_actionState = NORMAL;
-                        //graphics.revertToRegularCameraCoordinates();                      nwe command state
+                    else if (this->_isCameraFloating == 0) {
+                        if(this->_actionState == COMMAND) {
+                            this->_actionState = NORMAL;
+                            //graphics.revertToRegularCameraCoordinates();                      nwe command state
+                        }
+                        else {
+                            this->_level.playerFireShot(this->_graphics);
+                            //printf("left mouse down");
+                        }
                     }
-                    else {
-                        this->_level.playerFireShot(graphics);
-                        //printf("left mouse down");
+                    else if (this->_isCameraFloating == 1) {
+                        if(this->_level.checkSlideCollision(xm, ym)) {
+                            this->_actionState = SLIDE_MOVE;
+                            //printf("collision!\n");
+                        }
                     }
+
                     
                 }
             }
@@ -167,18 +252,50 @@ void Game::gameLoop() {
                     rightMouseDown = 0;
                     //printf("mouse up\n");
                     this->_organizationChart.cameraStopDragging();
+                    this->_rightMouseDown = 0;
+                    this->_graphics.setCameraDx(0.0);
+                    this->_graphics.setCameraDy(0.0);
+                    if(this->_actionState == SLIDE_MOVE && this->_isCameraFloating == 0) {
+                        this->_actionState = COMMAND;
+                        this->_level.handleSlideRelease(xm, ym, this->_graphics);
+                    }
                 }
                 if (event.button.button == SDL_BUTTON_LEFT) {   //left mouse up
                     if(this->_actionState == ORGANIZATION) {
                         if(this->_organizationChart.isSelected()) {
-                            this->_organizationChart.handleMouseLiftCollision(graphics, xm, ym);
+                            this->_organizationChart.handleMouseLiftCollision(this->_graphics, xm, ym);
                         }
                         this->_organizationChart.setToNotSelected();
+                    }
+                    if(this->_actionState == SLIDE_MOVE && this->_isCameraFloating == 1) {
+                        this->_actionState = NORMAL;
+                        this->_level.handleSlideRelease(xm, ym, this->_graphics);
                     }
                 }
             }
             
         }
+        
+        
+        
+        
+        if (input.isKeyHeld(SDL_SCANCODE_T)) {
+            this->_level.playerTriggerPull(this->_graphics);
+            this->_hud.cycleFireMode();
+        }
+        
+        if(input.isKeyHeld(SDL_SCANCODE_LSHIFT) && this->_isCameraFloating == 1) {
+            //rotate
+            this->_isCameraRotating = 1;
+        }
+        else {
+            this->_isCameraRotating = 0;
+        }
+        
+        
+        
+        
+        
         
         
         //check for click
@@ -197,7 +314,7 @@ void Game::gameLoop() {
             double_time = 0;
         }
         
-        
+        //printf("%d, %d\n", rightMouseClick, rightMouseDown);
         
 
         
@@ -222,17 +339,17 @@ void Game::gameLoop() {
         }
         if(input.wasKeyPressed(SDL_SCANCODE_F)) {
             this->_level.moveUnitAssignment();
-            this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), graphics);
+            this->_organizationChart.readUnitInformation(this->_level.returnFireteam(0), this->_level.returnFireteam(1), this->_level.returnFireteam(2), this->_graphics);
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_H)){                   //this breaks it
-            this->_level.moveUnitToPosition(0, 0, graphics);
+            this->_level.moveUnitToPosition(0, 0, this->_graphics);
             //graphics.drawShape();
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_G)) {
             //graphics.playShot();
-            graphics.eraseDebugLines();
+            this->_graphics.eraseDebugLines();
             this->_level.clearGunshotPaths();
         }
         
@@ -246,39 +363,33 @@ void Game::gameLoop() {
         }
         
         if(input.wasKeyPressed(SDL_SCANCODE_C)) {
-            //graphics.playShot();
-            this->_level.moveUnitToNearestCover(graphics);
-        }
-
-        if((this->_actionState == COMMAND) && rightMouseClick) {
-            if(this->_level.checkSlideCollision(xm, ym)) {
-                this->_actionState = SLIDE_MOVE;
-                //printf("collision!\n");
-            }
+            //this->_graphics.playShot();
+            this->_level.moveUnitToNearestCover(this->_graphics);
         }
         
-        if(this->_actionState == SLIDE_MOVE) {                      //slider is released
-            if(rightMouseDown == 0) {   //sliders is released
-                this->_actionState = COMMAND;
-                
-                this->_level.handleSlideRelease(xm, ym, graphics);
-                
-            }
-            else {
-                this->_level.handleSlideMovement(xm, ym, graphics, 0);
-            }
+        //change to floating camera mode
+        if(input.wasKeyPressed(SDL_SCANCODE_K)) {
+            this->_isCameraFloating = !this->_isCameraFloating;
+        }
+        
+        
+        
+        if(this->_actionState == SLIDE_MOVE) {
+            this->_level.handleSlideMovement(xm, ym, this->_graphics, 0);
         }
         else if(this->_actionState == ORGANIZATION) {
             //printf("%d, %d\n", xm - old_xm, ym - old_ym);
-            this->_organizationChart.handleMouseHover(xm, ym, graphics);
+            this->_organizationChart.handleMouseHover(xm, ym, this->_graphics);
             this->_organizationChart.handleCameraMove(xm - old_xm, ym - old_ym);
         }
         else if (this->_actionState == COMMAND) {
-            //graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state
+            //this->_graphics.updateCommandCameraOffset(old_xm, old_ym, xm, ym);                           new command state
         }
         
 
-        this->handleMovement(inPower, input, graphics);
+        if(this->_isCameraFloating == 0) {
+            this->handleMovement(inPower, input);
+        }
         
 
         
@@ -289,7 +400,7 @@ void Game::gameLoop() {
         
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
         
-        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym, graphics);
+        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME), inPower, xm, ym, old_xm, old_ym);
         
         
         
@@ -306,7 +417,7 @@ void Game::gameLoop() {
         
         
         
-        this->draw(graphics);
+        this->draw();
         
         
         
@@ -325,31 +436,52 @@ void Game::gameLoop() {
         
         
         
-        graphics.updateFrameTimeIndicator(TOTAL_CALC_TIME);
+        this->_graphics.updateFrameTimeIndicator(TOTAL_CALC_TIME);
         
     }
     
 }
 
-void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) {
+void Game::handleEvents() {
+    SDL_Event event;
+    
+    
+    
+    
+    
+    
+    
+    this->handleMouseEvent();
+
+
+}
+
+void Game::handleMouseEvent() {
+ 
+    
+    
+}
+
+
+void Game::handleMovement(Direction &inPower, Input &input) {
     
 
     switch (inPower) {
         case UP:
             if (input.wasKeyReleased(SDL_SCANCODE_W)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
                 inPower = UPRIGHT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
                 inPower = UPLEFT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraForward();
+                this->_graphics.moveCameraForward();
             }
             
             break;
@@ -357,18 +489,18 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
         case DOWN:
             if (input.wasKeyReleased(SDL_SCANCODE_S)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_D)) {
                 inPower = DOWNRIGHT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_A)) {
                 inPower = DOWNLEFT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraBackward();
+                this->_graphics.moveCameraBackward();
             }
             
             break;
@@ -376,36 +508,36 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
         case RIGHT:
             if (input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
                 inPower = UPRIGHT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
                 inPower = DOWNRIGHT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraRight();
+                this->_graphics.moveCameraRight();
             }
             break;
             
         case LEFT:
             if (input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = NONE;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_W)) {
                 inPower = UPLEFT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.wasKeyPressed(SDL_SCANCODE_S)) {
                 inPower = DOWNLEFT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraLeft();
+                this->_graphics.moveCameraLeft();
             }
             
             break;
@@ -413,117 +545,117 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
             if(input.wasKeyReleased(SDL_SCANCODE_W)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = RIGHT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = UP;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraUpRight();
+                this->_graphics.moveCameraUpRight();
             }
             break;
         case UPLEFT:
             if(input.wasKeyReleased(SDL_SCANCODE_W)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = LEFT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = UP;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraUpLeft();
+                this->_graphics.moveCameraUpLeft();
             }
             break;
         case DOWNRIGHT:
             if(input.wasKeyReleased(SDL_SCANCODE_S)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = RIGHT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_D)) {
                 inPower = DOWN;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraDownRight();
+                this->_graphics.moveCameraDownRight();
             }
             break;
         case DOWNLEFT:
             if(input.wasKeyReleased(SDL_SCANCODE_S)) {
                 if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                     inPower = NONE;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = LEFT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.wasKeyReleased(SDL_SCANCODE_A)) {
                 inPower = DOWN;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.moveCameraDownLeft();
+                this->_graphics.moveCameraDownLeft();
             }
             break;
         case NONE:
             if(input.isKeyHeld(SDL_SCANCODE_W)) {
                 if(input.isKeyHeld(SDL_SCANCODE_D)) {
                     inPower = UPRIGHT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                     inPower = UPLEFT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = UP;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.isKeyHeld(SDL_SCANCODE_S)) {
                 if(input.isKeyHeld(SDL_SCANCODE_D)) {
                     inPower = DOWNRIGHT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                     inPower = DOWNLEFT;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
                 else {
                     inPower = DOWN;
-                    this->handleMovement(inPower, input, graphics);
+                    this->handleMovement(inPower, input);
                 }
             }
             else if(input.isKeyHeld(SDL_SCANCODE_A)) {
                 inPower = LEFT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else if(input.isKeyHeld(SDL_SCANCODE_D)) {
                 inPower = RIGHT;
-                this->handleMovement(inPower, input, graphics);
+                this->handleMovement(inPower, input);
             }
             else {
-                graphics.stopCameraMoving();
+                this->_graphics.stopCameraMoving();
             }
             break;
             
@@ -533,36 +665,46 @@ void Game::handleMovement(Direction &inPower, Input &input, Graphics &graphics) 
 }
 
 
-void Game::draw(Graphics &graphics) {
-    graphics.clear();
+void Game::draw() {
+    this->_graphics.clear();
 
     
     if(this->_actionState != ORGANIZATION) {
-        this->_level.draw(graphics);
-        this->_player.draw(graphics);
+        this->_level.draw(this->_graphics);
+        this->_player.draw(this->_graphics);
         
-        //graphics.renderText();
+        //this->_graphics.renderText();
         
-        this->_hud.draw(graphics);
+        this->_hud.draw(this->_graphics);
         
-        this->_cursor.draw(graphics);
+        this->_cursor.draw(this->_graphics);
         
-        graphics.drawDebug();       //draw all debug lines
-        graphics.eraseDebugLines();      //erase all stored debug lines
         
-        graphics.drawCircle(640, 400, 8);
+        this->_graphics.drawDebug();       //draw all debug lines
+        this->_graphics.eraseDebugLines2();
+        
+        this->_graphics.drawCircle(640, 400, 8);
+        
+        this->_graphics.drawBackgroundLines();
+        
+        
+        
+        this->_debugWindow.draw(this->_graphics);
+        
+        
+        
         
     }
     else {
         
-        this->_organizationChart.draw(graphics);
+        this->_organizationChart.draw(this->_graphics);
         
         //drawing some text
         SDL_Rect desintationRectangle;
         desintationRectangle.x = 0;
         desintationRectangle.y = 0;
         
-        SDL_Surface* tmp = graphics.loadText("Hello World");
+        SDL_Surface* tmp = this->_graphics.loadText("Hello World");
         
         desintationRectangle.w = tmp->w;
         desintationRectangle.h = tmp->h;
@@ -572,43 +714,69 @@ void Game::draw(Graphics &graphics) {
         //desintationRectangle.h = 50;
         
         
-        graphics.drawText(this->_textSheet, &desintationRectangle);
+        this->_graphics.drawText(this->_textSheet, &desintationRectangle);
         
         
     }
 
     
-    
-    graphics.flip();
+    this->_graphics.flip();
     
     
 }
 
-void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym, Graphics &graphics) {
+void Game::update(float elapsedTime, Direction &inPower, int xm, int ym, int old_xm, int old_ym) {
 
     
-    if ((this->_actionState == NORMAL) && std::abs((xm - old_xm)) < 100) {
-        
-        graphics.changeAngle(-0.5*(xm - old_xm));
-        
+    if(this->_isCameraFloating == 0) {
+        if ((this->_actionState == NORMAL) && std::abs((xm - old_xm)) < 100) {
+            this->_graphics.changeAngle(-0.5*(xm - old_xm));
+        }
+        this->_level.setUnitAngle();
     }
+    else {
+        if(this->_actionState == NORMAL && this->_rightMouseDown) {
+            //printf("test1\n");
+            //update the camera position in graphics
+            //graphics.setCameraX(xm);
+            //graphics.setCameraY(ym);
+            
+            if(this->_isCameraRotating == 1) {
+                this->_graphics.changeAngle(-0.5*(xm - old_xm));
+            }
+            else {
+                //this will depend on the resolution of the screen
+                this->_graphics.setCameraDx((xm - old_xm) / 16.0);
+                this->_graphics.setCameraDy((ym - old_ym) / 16.0);
+            }
 
+        }
+        //else {
+        //    graphics.setCameraDx(0.0);
+        //    graphics.setCameraDy(0.0);
+        //}
+    }
+    //printf("test2\n");
     
-    this->_level.setUnitAngle();
     
-    graphics.update(elapsedTime);
     
-    this->_level.update(elapsedTime, graphics);
+    
+    
+    
+    this->_graphics.update(elapsedTime);
+    
+    this->_level.update(elapsedTime, this->_graphics);
     
     this->_player.update(elapsedTime, xm, ym);
 
-    this->_cursor.update(elapsedTime, ym, old_ym, xm, old_xm, graphics.getCameraAngle(), graphics);
+    this->_cursor.update(elapsedTime, ym, old_ym, xm, old_xm, this->_graphics.getCameraAngle(), this->_graphics);
     
     this->_organizationChart.update(xm, ym);
     
     
-    
-    this->_level.handlePlayerCollisions(elapsedTime, graphics);
+    if(this->_isCameraFloating == 0) {
+        this->_level.handlePlayerCollisions(elapsedTime, this->_graphics);
+    }
     
     
     this->_hud.update(elapsedTime, this->_player);
@@ -662,4 +830,8 @@ void Game::printActionState(ActionState actionState) {
             printf("NONE\n");
             break;
     }
+}
+
+void Game::giveUnitPointerToPlayer(std::shared_ptr<Unit> unit) {
+    this->_player.setPlayerFocus(unit);
 }

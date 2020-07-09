@@ -185,6 +185,8 @@ void Player::update(float elapsedTime, int mx, int my) {
 
     Sprite::update();
     
+    //printPlayerFocusInfo();
+    
 }
 
 void Player::draw(Graphics &graphics) {
@@ -203,3 +205,13 @@ void Player::draw(Graphics &graphics) {
     
     
 }
+
+
+void Player::setPlayerFocus(std::shared_ptr<Unit> & closestVisibleEnemy) {
+    this->_closestVisibleEnemy = closestVisibleEnemy;
+}
+
+void Player::printPlayerFocusInfo() {
+    printf("x: %f\n", this->_closestVisibleEnemy->getStaticX());
+}
+

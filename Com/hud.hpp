@@ -21,12 +21,17 @@ public:
     HUD(Graphics &graphics, Player &player);
     void update(int elapsedTime, Player &player);
     void draw(Graphics &graphics);
+    void cycleFireMode();
     
 private:
     Player _player;
 
     Sprite _fov;
     
+    SDL_Texture* _TextureSheet_SA;
+    SDL_Texture* _TextureSheet_BA;
+    
+    bool _fireMode;
     
 };
 

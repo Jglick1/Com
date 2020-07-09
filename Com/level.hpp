@@ -22,6 +22,12 @@
 #include "graph.hpp"
 #include "gunshotPath.hpp"
 #include "fireteam.hpp"
+#include <stdlib.h>
+#include <time.h>
+#include <random>
+#include <math.h>
+#include <cmath>
+
 
 class Graphics;
 struct SDL_Texture;
@@ -162,6 +168,13 @@ public:
     
     Fireteam returnFireteam(int fireteamNumber);
     
+    void playerTriggerPull(Graphics &graphics);
+    
+    void updateUnitFocus(Graphics &graphics);
+    std::shared_ptr<Unit> getPointerToAUnit();
+    
+    
+    bool isUnobstructedPath(double beginx, double beginy, double endx, double endy);
     
     
 private:
@@ -224,6 +237,18 @@ private:
     
     std::vector<Vector2> _unitMovePositions;
 
+    
+    double _playerFireRate;
+    double _timeSinceLastBullet;
+    
+    Sprite _sandbag;
+    
+    
+    std::default_random_engine _randNumGenerator;
+    
+    
+    double _unitFocusCheckTime;
+    double _timeSinceLastFocusCheckTime;
     
     
 };

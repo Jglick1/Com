@@ -27,6 +27,7 @@ class Graphics {
     
 public:
     Graphics();
+    Graphics(int real);
     ~Graphics();
     SDL_Surface* loadImage(const std::string &filePath);
     
@@ -41,14 +42,19 @@ public:
     void moveMouse();
     
     void drawRect(int x, int y, int width, int height);
+    void drawFilledRect(int x, int y, int width, int height);
+    
     
     void drawLine(int x1, int y1, int x2, int y2);
+    void drawColorLine(int x1, int y1, int x2, int y2, int color);
     
     void drawPoint(int x, int y);
     
     void renderText();
     
     SDL_Surface * loadText(const std::string &text);
+    SDL_Surface * loadText(const std::string &text, Uint8 r, Uint8 g, Uint8 b);
+    
     
     void loadSound();
     
@@ -119,9 +125,25 @@ public:
     double distToLine(double playerX, double playerY, double x1, double y1, double x2, double y2);
     
     void drawText(SDL_Texture* texture, SDL_Rect* destinationRectangle);
-    
+    void drawColoredText(SDL_Texture* texture, SDL_Rect* destinationRectangle, int r, int g, int b);
     
     void storeRotatedDebugCircle(double centerX, double centerY, double radius);
+    
+    void storeLineOnBackground(double x1, double y1, double x2, double y2, double color);
+    void drawBackgroundLines();
+    
+    Vector2 rotatePoint(Vector2 point, Vector2 rotateAxis);
+    void clearBackgroundLines();
+    
+    void setCameraDx(double dx);
+    void setCameraDy(double dy);
+    
+    void eraseDebugLines2();
+    
+    
+    
+    
+    
     
 private:
     SDL_Window* _window;
@@ -161,6 +183,9 @@ private:
     
     double _cameraCommandOffsetX;
     double _cameraCommandOffsetY;
+    
+    
+    std::vector< std::vector<double> > _debugBackgroundLines;
     
 };
 

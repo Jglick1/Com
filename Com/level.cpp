@@ -39,11 +39,28 @@ Level::Level(std::string mapName, Graphics &graphics) :
     _drawFovNode(0)
 {
     
+    
+    // initialize random seed for the random number generation for the player shot firing
+    std::srand(std::time(NULL));
+    
+    //std::default_random_engine generator;
+    //std::normal_distribution<double> distribution(0.0,2.0); //(mean, stddv)
+    
+    
+    
+    this->_playerFireRate = 500; //bullets per minute
+    this->_timeSinceLastBullet = 0;
+    
+    this->_unitFocusCheckTime = 1000;
+    this->_timeSinceLastFocusCheckTime = 0;
+    
+    
 	this->loadMap(mapName, graphics);
     
     this->_unit = Unit(graphics, Vector2(0,0), 1);
     
-
+    this->_sandbag = Sprite(graphics,"/Users/jonahglick/Documents/Com/sandbag_test.png", 0, 0, 128, 16, 0, 0);
+    
     this->_fireteam = Fireteam(graphics, 1, Vector2(100,100));
     
     this->_fireteam2 = Fireteam(graphics, 1, Vector2(640, 50));
@@ -193,7 +210,81 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
             
 
             else if (ss.str() == "corners") {
+                //the new corner reader
+                //read in all the vertices
+                //structure does need to be read in first
                 
+                int vertexCount = 0;
+                
+                //count the total number of vertices
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        vertexCount++;
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                printf("vertex count: %d\n", vertexCount);
+                
+                
+                //initialize graph table
+                this->_graph = Graph(vertexCount+2);
+                
+                
+                //now read in the vertices position into this->_cornderNodes
+                //also read them into graph
+                
+                pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        int id = pObject->IntAttribute("name");     //read in direction here
+                        int x = pObject->IntAttribute("x");
+                        int y = pObject->IntAttribute("y");
+                        this->_graph.addToVertexTable(id, x + 8, y + 8);
+                        
+                        this->_cornerNodes.push_back(CornerNode(x + 8, y + 8, NONE, id)); //center of the corners
+
+
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+                
+                //now automatically find the edges
+                //it must be that the structure things have already been read in
+                
+                
+                //comparing each corner to each other corner
+                for(int i = 0; i < this->_cornerNodes.size(); i++) {
+                    for(int j = i+1; j < this->_cornerNodes.size(); j++) {
+                        //printf("%d to %d\n", i, j);
+                        
+                        //check path collision is the one we are looking for
+                        if(!checkPathCollision(this->_cornerNodes[i].x, this->_cornerNodes[i].y, this->_cornerNodes[j].x, this->_cornerNodes[j].y, graphics)) {
+                            //if no collision, then add the vertices to the graph edges
+                            
+                            
+                            double weight = 0.0;
+                            weight = this->_graph.getWeight(this->_cornerNodes[i].id, this->_cornerNodes[j].id);
+                            this->_graph.addEdge(this->_cornerNodes[i].id, this->_cornerNodes[j].id, weight);
+                            
+                            graphics.storeLineDebug(this->_cornerNodes[i].x, this->_cornerNodes[i].y, this->_cornerNodes[j].x, this->_cornerNodes[j].y, 1);
+                            
+                            printf("%d connects to %d\n", this->_cornerNodes[i].id, this->_cornerNodes[j].id);
+                            //printf("%d connects to %d\n", i, j);
+                        }
+                    }
+                }
+                
+                
+                
+                
+                
+                
+                
+                //the old corner reader
+                /*
                 cornerHasBeenCalled = 1;
                 
                 int vertexCount = 0;
@@ -280,14 +371,14 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                                         
                                         
                                         
-                                        /*
-                                        int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
+                 
+                                        //int otherId = pProperty2->IntAttribute("name"); //the vertex to connect to
                                         
-                                        double weight = this->_graph.getWeight(id, otherId);
+                                        //double weight = this->_graph.getWeight(id, otherId);
                                         
-                                        this->_graph.addEdge(id, otherId, weight);
-                                        printf("node: %d to %d weight: %f\n", id, otherId, weight);
-                                        */
+                                        //this->_graph.addEdge(id, otherId, weight);
+                                        //printf("node: %d to %d weight: %f\n", id, otherId, weight);
+                 
                                 
                                         
                                     }
@@ -325,7 +416,7 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
                 }
                 
                 
-            
+            */
             }
             
             else if (ss.str() == "cover") {                                         //needs to come after graph has been created. graph is created in "corners" so "corner" must come first
@@ -614,6 +705,59 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
             
             
             
+            if (ss.str() == "sandbags") {
+                XMLElement * pObject = pObjectGroup->FirstChildElement("object");
+                if (pObject != NULL) {
+                    while (pObject) {
+                        
+                        float x, y;
+                        
+                        x = pObject->FloatAttribute("x");
+                        y = pObject->FloatAttribute("y");
+                        
+                        double rotation = 0.0;
+                        XMLElement * pProperty1 = pObject->FirstChildElement("properties");
+                        if(pProperty1 != NULL) {
+                            
+                            XMLElement * pProperty2 = pProperty1->FirstChildElement("property");
+                            if(pProperty2 != NULL) {
+                                
+                                while(pProperty2) {
+                                    
+                                    std::stringstream ssTemp;
+                                    ssTemp << pProperty2->Attribute("name");
+                                    
+                                    if(ssTemp.str() == "rotation") {
+                                        
+                                        
+                                        rotation = pProperty2->IntAttribute("value"); //in units of degrees
+                                        
+                                        
+                                    }
+                                    pProperty2 = pProperty2->NextSiblingElement("property");
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                        printf("sandbag rotation: %f\n", rotation);
+                        
+                        
+                        //now set up collision information
+                        
+                        
+                        
+                        
+                        
+                        
+                        pObject = pObject->NextSiblingElement("object");
+                    }
+                }
+            }
+            
+            
+            
 			
 			pObjectGroup = pObjectGroup->NextSiblingElement("objectgroup");
 		}
@@ -641,17 +785,15 @@ void Level::loadMap(std::string mapName, Graphics &graphics) {
 
         
     }
-    
-    
-    
-    
-    
-    
-    
+
 }
+
+
 
 void Level::update(int elapsedTime, Graphics &graphics) {
 
+    this->_timeSinceLastBullet += elapsedTime;
+    
 
     for(int i  = 0; i < this->_collisionRects.size(); i++) {
         this->_collisionRects.at(i).update(elapsedTime, graphics.getCameraDx(), graphics.getCameraDy());
@@ -689,13 +831,32 @@ void Level::update(int elapsedTime, Graphics &graphics) {
         iter.update(elapsedTime);
     }
     */
+    
+    
+    
+    //TODO: MAKE IT SO NOT EVERY UNIT IS CHECKING ALL IN ONE FRAME. SPACE THINGS OUT SLIGHTLY.
+    if(this->_timeSinceLastFocusCheckTime >= this->_unitFocusCheckTime) {
+        this->_timeSinceLastFocusCheckTime = 0;
+        updateUnitFocus(graphics);
+        
+    }
+    else {
+        this->_timeSinceLastFocusCheckTime += elapsedTime;
+    }
+    
+    
 }
 
 
 void Level::draw(Graphics &graphics) {
-
+    
     //int posx = std::round(this->_positionx);
     //int posy = std::round(this->_positiony);
+    
+    //draw the corner nodes (should just be for debug mode)
+    //actually, graph should really be reading that.
+    
+    
     
     
     int posx = std::round(graphics.getCameraX());
@@ -757,12 +918,15 @@ void Level::draw(Graphics &graphics) {
 
     
     //unit
+    
     this->_unit.draw(graphics);
     
     this->_fireteam.draw(graphics);
     this->_fireteam2.draw(graphics);
     this->_fireteam3.draw(graphics);
     this->_enemyFireteam.draw(graphics);
+    
+    
     
     //float xEquivalent = this->_unit.getStaticX() + this->_unit.getX()+8;
     //float yEquivalent = this->_unit.getStaticY() + this->_unit.getY()+12;
@@ -798,6 +962,29 @@ void Level::draw(Graphics &graphics) {
     if(this->_drawFovNode) {
         drawFogOfWar(graphics);
     }
+    
+    
+    
+    
+    
+    
+    //drawing the sandbag
+    float sandposx = graphics.getCameraX() + this->_sandbag.getX() + 200;
+    float sandposy = graphics.getCameraY() + this->_sandbag.getY() + 200;
+    
+    int playerx = graphics.getPlayerCenterX();
+    int playery = graphics.getPlayerCenterY();
+    
+    double playerAngle = graphics.getCameraAngle();
+    
+    double renderX = playerx-8 + ( (sandposx)- playerx+8)* std::cos(playerAngle*3.14159/180) - ((sandposy)-playery+12) * std::sin(playerAngle*3.14159/180);
+    double renderY = playery-12 + ( ((sandposy)-playery+12) * std::cos(playerAngle*3.14159/180) + ((sandposx)-playerx+8) * std::sin(playerAngle*3.14159/180));
+    
+    this->_sandbag.drawAngle(graphics, renderX, renderY, graphics.getCameraAngle()+20);
+    
+    
+    this->_graph.draw(graphics);
+    
 }
 
 
@@ -1874,7 +2061,7 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graph
     
     
     //GET STARTING TOP AND BOTTOM POINTS
-    
+    /*
     double topBeginPosX = beginx - 8 * std::cos(angle*3.14159/180);      //radius of unit is 8
     double topBeginPosY = beginy + 8 * std::sin(angle*3.14159/180);
     
@@ -1888,6 +2075,28 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graph
     
     double bottomEndPosX = endx + 8 * std::cos(angle*3.14159/180);
     double bottomEndPosY = endy - 8 * std::sin(angle*3.14159/180);
+    */
+    
+    
+    double topBeginPosX = beginx - 7.5 * std::cos(angle*3.14159/180);      //radius of unit is 8
+    double topBeginPosY = beginy + 7.5 * std::sin(angle*3.14159/180);
+    
+    double bottomBeginPosX = beginx + 7.5 * std::cos(angle*3.14159/180);
+    double bottomBeginPosY = beginy - 7.5 * std::sin(angle*3.14159/180);
+    
+    
+    
+    double topEndPosX = endx - 7.5 * std::cos(angle*3.14159/180);      //radius of unit is 8
+    double topEndPosY = endy + 7.5 * std::sin(angle*3.14159/180);
+    
+    double bottomEndPosX = endx + 7.5 * std::cos(angle*3.14159/180);
+    double bottomEndPosY = endy - 7.5 * std::sin(angle*3.14159/180);
+    
+    
+    
+    
+    
+    
     
     
     //this->_gunShotPaths.push_back(GunshotPath(graphics, topBeginPosX, topBeginPosY, topEndPosX, topEndPosY, 6000));
@@ -1926,7 +2135,6 @@ bool Level::checkPathCollision(int beginx, int beginy, int endx, int endy, Graph
     
     
 }
-
 
 Vector2 Level::checkShotCollisionNewNew(double beginx, double beginy, double endx, double endy, Graphics &graphics) {
     
@@ -2082,6 +2290,20 @@ void Level::moveUnitToNearestCover(Graphics &graphics) {
     
 }
 
+
+void Level::playerTriggerPull(Graphics &graphics) {
+    
+    //this->_timeSinceLastBullet += elapsedTime;
+    
+    if((this->_timeSinceLastBullet/1000.0) > (60.0/this->_playerFireRate)) { //playerFireRate is in bullets per minute. timesincelastbullet is in miliseconds
+        this->_timeSinceLastBullet = 0;
+        playerFireShot(graphics);
+    }
+    
+    
+    
+}
+
 void Level::playerFireShot(Graphics &graphics) {
     
 
@@ -2091,9 +2313,37 @@ void Level::playerFireShot(Graphics &graphics) {
     //Vector2 shotCollision = checkShotCollision(playerX, playerY, graphics.getCameraAngle());
     
     
+    
+    //dermine the random offset. This should eventually depend on the type of weapon and the weapon proficiency of the player
+    
+    double maxShotMissAngle = 30.0;
+    //printf("random: %f\n", std::rand() / (RAND_MAX*1.0));
+    
+    
+    double min = -1.0;
+    double max = 1.0;
+    double randDouble = min + (max - min) * (std::rand()) / RAND_MAX*1.0;
+    //printf("random: %f\n", randDouble);
+    
+    
+    
+    //std::default_random_engine generator;
+    std::normal_distribution<double> distribution(0.0, 0.5); //(mean, stddv)
+   // for(int i= 0; i < 5; i++) {
+    //    double number = distribution(this->_randNumGenerator);
+   //     printf("random: %f\n", number);
+    //}
+    
+    //printf("\n");
+    
+    
+    double randShotOffset = distribution(this->_randNumGenerator);
+    
+    double shotAngle = graphics.getCameraAngle() + randShotOffset;
+    
     double shotDistance = 400;
-    double shotEndX = std::round(playerX) - shotDistance * std::sin(graphics.getCameraAngle()*3.14159/180);
-    double shotEndY = std::round(playerY) - shotDistance * std::cos(graphics.getCameraAngle()*3.14159/180);
+    double shotEndX = std::round(playerX) - shotDistance * std::sin(shotAngle*3.14159/180);
+    double shotEndY = std::round(playerY) - shotDistance * std::cos(shotAngle*3.14159/180);
     
     
     
@@ -2102,19 +2352,7 @@ void Level::playerFireShot(Graphics &graphics) {
     Vector2 newShotCollision = checkShotCollisionNewNew(playerX, playerY, shotEndX, shotEndY, graphics);
     
     //check collision with enemies
-    Vector2 enemyCollision = this->_enemyFireteam.checkUnitCollision(playerX, playerY, shotEndX, shotEndY);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    //Vector2 enemyCollision = this->_enemyFireteam.checkUnitCollision(playerX, playerY, shotEndX, shotEndY);
     
     
     
@@ -2143,15 +2381,6 @@ void Level::playerFireShot(Graphics &graphics) {
     //for calculating experience gain. is this incentivizing wasting bullets?
     
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
 }
@@ -2817,3 +3046,188 @@ Fireteam Level::returnFireteam(int fireteamNumber) {
             break;
     }
 }
+
+void Level::updateUnitFocus(Graphics & graphics) {
+    //have all enemies check all friendlies and vice versa
+    
+    
+    
+    double viewAngle = 160; //in degrees
+    //this is the angle over which the unit can see.
+    
+    
+    //this->_fireteam.updateUnitFocus(this->_enemyFireteam);
+    graphics.clearBackgroundLines();
+    
+    //printf("%d, %d\n", this->_fireteam.getSize(), this->_enemyFireteam.getSize());
+    
+    
+    //iterated through all unts in fireteam
+    for(int i = 0; i < this->_fireteam.getSize(); i++) {
+        std::shared_ptr<Unit> friendlyUnit = this->_fireteam.getPointerToAUnit(i);
+        
+        for(int j = 0; j < this->_enemyFireteam.getSize(); j++) {
+            
+            std::shared_ptr<Unit> enemyUnit = this->_enemyFireteam.getPointerToAUnit(j);
+            
+            
+            double friendlyX = friendlyUnit->getStaticX() + 8;
+            double friendlyY = friendlyUnit->getStaticY() + 12;
+            double enemyX = enemyUnit->getStaticX() + 8;
+            double enemyY = enemyUnit->getStaticY() + 12;
+            
+            
+            if(isUnobstructedPath(friendlyX, friendlyY, enemyX, enemyY)) {
+                
+                //there is a clear line of sight between the two units
+                
+                //find the angle between the two points
+                double angle = std::atan2((friendlyY - enemyY) , (enemyX - friendlyX));
+                
+                //where 0 degrees is facing straight up
+                double angleToEnemy = 90 - angle * 180 / 3.14159;
+                
+                
+                //now check to see if it is in the units line of sight
+                //https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
+                
+                double facingAngle = friendlyUnit->getAngle();
+                
+                //double angleDiff = (std::round((facingAngle - angleToEnemy + 180 + 360)) % 360) - 180;
+                
+                double angleDiff = std::fmod(facingAngle - angleToEnemy + 180 + 360, 360) - 180;
+                
+                //((facingAngle - angleToEnemy + 180 + 360) % 360) - 180;
+                
+                if((angleDiff <= viewAngle/2.0) && (angleDiff >= -viewAngle/2.0)) {
+                    //then the other enemy can be seen by the player
+                    
+                    graphics.storeLineOnBackground(friendlyX, friendlyY, enemyX, enemyY, 0);
+                    
+                    
+                }
+                else {
+                    graphics.storeLineOnBackground(friendlyX, friendlyY, enemyX, enemyY, 2);
+                }
+
+                
+                //NEXT, DO THE SAME THING FOR THE ENEMY TO SEE IF THE ENEMY SEES THE FRIENDLY UNIT.
+                
+                
+                
+                
+                //this is the angle for the friendly unit
+                //printf("%f\n", 90 - angle * 180 / 3.14159);
+                
+                //this is the angle for the enemy unit
+                //printf("%f\n", 180 - (90 - angle * 180 / 3.14159));
+                
+            }
+            
+            
+            
+            
+            
+        }
+    }
+    
+    
+    /*
+    //iterated through all unts in fireteam2
+    for(int i = 0; i < this->_fireteam2.getSize(); i++) {
+        std::shared_ptr<Unit> friendlyUnit = this->_fireteam2.getPointerToAUnit(i);
+        
+        for(int j = 0; j < this->_enemyFireteam.getSize(); j++) {
+            
+            std::shared_ptr<Unit> enemyUnit = this->_enemyFireteam.getPointerToAUnit(i);
+            
+            
+            double friendlyX = friendlyUnit->getStaticX() + 8;
+            double friendlyY = friendlyUnit->getStaticY() + 12;
+            double enemyX = enemyUnit->getStaticX() + 8;
+            double enemyY = enemyUnit->getStaticY() + 12;
+            
+            if(isUnobstructedPath(friendlyX, friendlyY, enemyX, enemyY)) {
+                graphics.storeLineOnBackground(friendlyX, friendlyY, enemyX, enemyY);
+            }
+            
+        }
+    }
+    
+    //iterated through all unts in fireteam3
+    for(int i = 0; i < this->_fireteam3.getSize(); i++) {
+        std::shared_ptr<Unit> friendlyUnit = this->_fireteam3.getPointerToAUnit(i);
+        
+        for(int j = 0; j < this->_enemyFireteam.getSize(); j++) {
+            
+            std::shared_ptr<Unit> enemyUnit = this->_enemyFireteam.getPointerToAUnit(i);
+            
+            
+            double friendlyX = friendlyUnit->getStaticX() + 8;
+            double friendlyY = friendlyUnit->getStaticY() + 12;
+            double enemyX = enemyUnit->getStaticX() + 8;
+            double enemyY = enemyUnit->getStaticY() + 12;
+            
+            //check to see if it collides with anything
+            
+
+            if(isUnobstructedPath(friendlyX, friendlyY, enemyX, enemyY)) {
+                graphics.storeLineOnBackground(friendlyX, friendlyY, enemyX, enemyY);
+            }
+            
+        }
+    }
+    */
+    
+    
+    
+    
+    
+    /*
+    
+    this->_fireteam.LOSUpdate(this->_enemyFireteam); //Line of Sight update
+    
+    this->_fireteam2.LOSUpdate(this->_enemyFireteam);
+    
+    this->_fireteam3.LOSUpdate(this->_enemyFireteam);
+    */
+    
+    
+    //first let's try to the get the player access to an enemy
+    //setPlayerFocus(this->_enemyFireteam);
+    
+    
+    
+}
+
+std::shared_ptr<Unit> Level::getPointerToAUnit() {
+    
+    
+    //extract single unit
+    
+    std::shared_ptr<Unit> singleUnit = this->_enemyFireteam.getPointerToAUnit(0);
+    
+    return singleUnit;
+    
+    //this->_player.setPlayerFocus(singleUnit); //The Unit
+}
+
+bool Level::isUnobstructedPath(double beginx, double beginy, double endx, double endy) {
+    
+    for (Structure &structureIter : this->_structures) {
+        for(int i = 0; i < structureIter.corners.size() - 1; i++) {
+            double x3 = structureIter.corners.at(i).x;
+            double y3 = structureIter.corners.at(i).y;
+            double x4 = structureIter.corners.at(i+1).x;
+            double y4 = structureIter.corners.at(i+1).y;
+            
+            if(isLineLineCollision(beginx, beginy, endx, endy, x3, y3, x4, y4)) {
+                return 0;
+            }
+        }
+    }
+    
+    return 1; //there is an unobstructed path
+    
+}
+
